@@ -22,4 +22,5 @@ Based on "Peter Schwabe and Ko Stoffelen" AES implementation available [here](ht
 - tests
 - examples
 - perf and cortex m3
+- pre generation of lookups
 - lut alignment
