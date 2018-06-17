@@ -25,7 +25,7 @@ Based on "Peter Schwabe and Ko Stoffelen" AES implementation available [here](ht
 only available hint over internet, also confirmed on real STM32F4)
 
 LUT tables have to be placed in non cached and non waitstated SRAM memory with single word wide access, that is not crossing different memory domains (eg. AHB slaves).
-FLASH memory simply cannot be used since ventors usually implements some kind of cache, wide prefetch buffers, and waitstates that will make cipher slower than than bitsliced one.
+FLASH memory simply cannot be used since vendors usually implements some kind of cache, wide prefetch buffers, and waitstates that will make cipher slower than than bitsliced one.
 
 ### CM7_1T
 
@@ -59,6 +59,7 @@ The speed differences can be illustrated by the following code:
 	tock = DWT->CYCCNT - tick - 1;
 
 	printf("4 non %lu\n", tock);
+	printf("This is why no two LDRs can be placed next to each other\n");
 ```
 
 Only DTCM memory can be used for LUT tables, since everything else is cached through AXI bus.
