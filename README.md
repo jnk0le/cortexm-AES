@@ -45,7 +45,7 @@ The speed differences can be illustrated by the following code:
 			""::: "r0","r9");
 	tock = DWT->CYCCNT - tick - 1;
 
-	printf("4 ov %lu\n", tock);
+	printf("4 even loads, cycles: %lu\n", tock);
 
 	tick = DWT->CYCCNT;
 	asm volatile(""
@@ -58,8 +58,8 @@ The speed differences can be illustrated by the following code:
 			""::: "r0","r9");
 	tock = DWT->CYCCNT - tick - 1;
 
-	printf("4 non %lu\n", tock);
-	printf("This is why no two LDRs can be placed next to each other\n");
+	printf("4 linear loads, cycles: %lu\n", tock);
+	printf("This is why any two LDRs cannot be placed next to each other\n");
 ```
 
 Only DTCM memory can be used for LUT tables, since everything else is cached through AXI bus.
