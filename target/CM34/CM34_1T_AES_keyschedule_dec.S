@@ -7,10 +7,10 @@
 .text
 
 .align 2
-// void AES_128_keyschedule_dec(uint8_t* rk) {
-.global AES_keyschedule_dec
-.type   AES_keyschedule_dec,%function
-AES_keyschedule_dec:
+// void CM34_1T_AES_keyschedule_dec(uint8_t* rk, size_t rounds) {
+.global CM34_1T_AES_keyschedule_dec
+.type   CM34_1T_AES_keyschedule_dec,%function
+CM34_1T_AES_keyschedule_dec:
 	push {r4-r9, lr}
 
 	//first and last block is ommited

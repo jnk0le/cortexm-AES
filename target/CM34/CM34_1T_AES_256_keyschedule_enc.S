@@ -7,11 +7,10 @@
 .text
 
 .align 2
-
-// void AES_256_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
-.global AES_256_keyschedule_enc
-.type   AES_256_keyschedule_enc,%function
-AES_256_keyschedule_enc:
+// void CM34_1T_AES_256_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
+.global CM34_1T_AES_256_keyschedule_enc
+.type   CM34_1T_AES_256_keyschedule_enc,%function
+CM34_1T_AES_256_keyschedule_enc:
 	push {r4-r11, lr}
 
 	sub sp, #8 //faster than dummy push
@@ -22,6 +21,7 @@ AES_256_keyschedule_enc:
 	movw r1, #:lower16:AES_Te0
 	movt r1, #:upper16:AES_Te0
 	str r1, [sp] //put Te0 on stack before looping
+	//str r1, [sp, #-8]! // need to test
 
 	//just copy a key
 	stmia r0!, {r2-r9}
