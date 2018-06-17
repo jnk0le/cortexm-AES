@@ -20,7 +20,7 @@ Uses a single T table per enc/dec cipher and additional inv_sbox for final round
 
 Based on "Peter Schwabe and Ko Stoffelen" AES implementation available [here](https://github.com/Ko-/aes-armcortexm).
 
-32 bit LDR opcodes are aligned to 4 byte boundaries to prevent weird undocumented "feature" of cortex m4 that prevents pipelining of neighbouring loads. 
+32 bit LDR opcodes are forcefully aligned to 4 byte boundaries to prevent weird undocumented "feature" of cortex m4 that prevents pipelining of neighbouring loads. 
 ([here](https://community.arm.com/processors/f/discussions/4069/cortex-m3-pipelining-of-consecutive-ldr-instructions-to-different-memory-regions) is the 
 only available hint over internet, also confirmed on real STM32F4)
 
@@ -70,8 +70,6 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 - add bitsliced/masked implementations
 - some renaming
 - doxygen
-- tests
-- examples
 - perf and cortex m3
 - pre generation of lookups
 - optimize rcon generation
