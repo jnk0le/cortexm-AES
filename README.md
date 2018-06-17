@@ -25,7 +25,7 @@ Based on "Peter Schwabe and Ko Stoffelen" AES implementation available [here](ht
 only available hint over internet, also confirmed on real STM32F4)
 
 LUT tables have to be placed in non cached and non waitstated SRAM memory with single word wide access, that is not crossing different memory domains (eg. AHB slaves).
-FLASH memory simply cannot be used since vendors usually implements some kind of cache, wide prefetch buffers, and waitstates that will make cipher slower than bitsliced one.
+FLASH memory simply cannot be used since vendors usually implements some kind of cache, wide prefetch buffers, and waitstates that will make cipher slower than generic or bitsliced/masked one.
 
 ### CM7_1T
 
