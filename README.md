@@ -72,9 +72,9 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 | `setEncKey<128>` |  |  | 305 | 178 |  |
 | `setEncKey<192>` |  |  | 281 | 156/163* |  |
 | `setEncKey<256>` |  |  | 441 | 240 |  |
-| `encrypt<128>` |  |  | 693 | 380 |  |
-| `encrypt<192>` |  |  | 821 | 448 |  |
-| `encrypt<256>` |  |  | 949 | 513/516* |  |
+| `encrypt<128>` |  |  | 689 | 380 |  |
+| `encrypt<192>` |  |  | 817 | 448 |  |
+| `encrypt<256>` |  |  | 945 | 513/516* |  |
 | `encrypt_unrolled<128>` |  |  |  |  |  |
 | `encrypt_unrolled<192>` |  |  |  |  |  |
 | `encrypt_unrolled<256>` |  |  |  |  |  |

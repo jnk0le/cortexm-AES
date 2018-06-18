@@ -128,7 +128,7 @@ CM34_1T_AES_encrypt:
 	ldr r1, [r14, r1, lsl #2]
 	ldr r2, [r14, r2, lsl #2]
 	ldr r3, [r14, r3, lsl #2]
-	ldr r4, [sp] //load output pointer
+	ldr r4, [sp], #8 // load output pointer and clear stack
 
 	bfi r8, r0, #16, #8
 	bfi r9, r1, #16, #8
@@ -147,5 +147,4 @@ CM34_1T_AES_encrypt:
 	str r2, [r4, #8]
 	str r3, [r4, #12]
 
-	add sp, #8 //less mem pressure than postindexed load + dummy pop
 	pop {r4-r11,pc}
