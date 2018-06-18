@@ -65,6 +65,31 @@ The speed differences can be illustrated by the following code:
 Only DTCM memory can be used for LUT tables, since everything else is cached through AXI bus.
 The effects of DMA access to DTCM memory when core have equal priority is unknown.
 
+## Base ciphers performance (in cycles)
+
+| Cipher function  | ? (0ws) - cortex m3 | STM32F4 (0ws) - cortex m4 | STM32F4 (7ws cached) - cortex m4 | cortex-m7 (icache) | cortex-m7 (?) |
+|------------------|---------------------|---------------------------|----------------------------------|--------------------|---------------|
+| `setEncKey<128>` |  |  |  | 178 |  |
+| `setEncKey<192>` |  |  |  | 156/163* |  |
+| `setEncKey<256>` |  |  |  | 240 |  |
+| `encrypt<128>` |  |  |  | 379/382* |  |
+| `encrypt<192>` |  |  |  | 450 |  |
+| `encrypt<256>` |  |  |  | 518 |  |
+| `encrypt_unrolled<128>` |  |  |  |  |  |
+| `encrypt_unrolled<192>` |  |  |  |  |  |
+| `encrypt_unrolled<256>` |  |  |  |  |  |
+| `setDecKey<128>` |  |  |  | 530 |  |
+| `setDecKey<192>` |  |  |  | 637/643* |  |
+| `setDEcKey<256>` |  |  |  | 749/755* |  |
+| `decrypt<128>` |  |  |  | 387 |  |
+| `decrypt<192>` |  |  |  | 455 |  |
+| `decrypt<256>` |  |  |  | 521 |  |
+| `decrypt_unrolled<128>` |  |  |  |  |  |
+| `decrypt_unrolled<192>` |  |  |  |  |  |
+| `decrypt_unrolled<256>` |  |  |  |  |  |
+
+* Variation due to branch prediction between testing code and implementations
+
 ## todo
 - add block modes (CBC, CTR etc.)
 - add bitsliced/masked implementations
