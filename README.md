@@ -4,7 +4,7 @@ FIPS 197 compliant software AES implementation optimized for real world cortex-m
 
 
 ## notes
-- Do not use ECB cipher mode for anything more than 16 bytes of plaintext data.
+- Do not use ECB cipher mode for anything more than 16 bytes of plaintext data per key.
 - Do not blindly trust in timming constantness of LUT based implementations since it depends on many factors that are 
 unknown or just implementation defined like section placement (you need to verify it, especially before use in production).
 - None of the currently available implementations protects against power/EMI analysis attacks.

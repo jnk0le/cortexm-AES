@@ -30,6 +30,7 @@ aes::CipherContext<256, aes::target::CM7_1T> t256;
 void aes_ecb_test()
 {
 	uint32_t tick, tock;
+	uint32_t cycles[5];
 
 	printf("func --- run1/run2/run3/run4/run5 --- (enc/dec matching expected results)\n");
 
@@ -42,10 +43,9 @@ void aes_ecb_test()
 		t128.setEncKey(key_128);
 		tock = DWT->CYCCNT - tick - 1;
 
-		printf("%lu/", tock);
+		cycles[i] = tock;
 	}
-	printf("\n");
-
+	printf("%lu/%lu/%lu/%lu/%lu/\n", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
 
 	printf("encrypt --- ");
 	for(int i = 0; i<5; i++)
@@ -54,9 +54,11 @@ void aes_ecb_test()
 		t128.encrypt(expected_plaintext, tmp);
 		tock = DWT->CYCCNT - tick - 1;
 
-		printf("%lu/", tock);
+		cycles[i] = tock;
 	}
-    if(memcmp(expected_ciphertext_128, tmp, 16) != 0)
+	printf("%lu/%lu/%lu/%lu/%lu/", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+
+	if(memcmp(expected_ciphertext_128, tmp, 16) != 0)
     	printf(" --- incorrect\n");
     else
     {
@@ -70,9 +72,9 @@ void aes_ecb_test()
 		t128.setDecKey(); // reuse context
 		tock = DWT->CYCCNT - tick - 1;
 
-		printf("%lu/", tock);
+		cycles[i] = tock;
 	}
-	printf("\n");
+	printf("%lu/%lu/%lu/%lu/%lu/\n", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
 
 	printf("decrypt --- ");
 	for(int i = 0; i<5; i++)
@@ -81,8 +83,10 @@ void aes_ecb_test()
 		t128.decrypt(expected_ciphertext_128, tmp);
 		tock = DWT->CYCCNT - tick - 1;
 
-		printf("%lu/", tock);
+		cycles[i] = tock;
 	}
+	printf("%lu/%lu/%lu/%lu/%lu/", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+
 	if(memcmp(expected_plaintext, tmp, 16) != 0)
     	printf(" --- incorrect\n");
     else
@@ -99,9 +103,9 @@ void aes_ecb_test()
 		t192.setEncKey(key_192);
 		tock = DWT->CYCCNT - tick - 1;
 
-		printf("%lu/", tock);
+		cycles[i] = tock;
 	}
-	printf("\n");
+	printf("%lu/%lu/%lu/%lu/%lu/\n", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
 
 	printf("encrypt --- ");
 	for(int i = 0; i<5; i++)
@@ -110,8 +114,10 @@ void aes_ecb_test()
 		t192.encrypt(expected_plaintext, tmp);
 		tock = DWT->CYCCNT - tick - 1;
 
-		printf("%lu/", tock);
+		cycles[i] = tock;
 	}
+	printf("%lu/%lu/%lu/%lu/%lu/", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+
     if(memcmp(expected_ciphertext_192, tmp, 16) != 0)
     	printf(" --- incorrect\n");
     else
@@ -126,9 +132,9 @@ void aes_ecb_test()
 		t192.setDecKey(); // reuse context
 		tock = DWT->CYCCNT - tick - 1;
 
-		printf("%lu/", tock);
+		cycles[i] = tock;
 	}
-	printf("\n");
+	printf("%lu/%lu/%lu/%lu/%lu/\n", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
 
 	printf("decrypt --- ");
 	for(int i = 0; i<5; i++)
@@ -137,8 +143,10 @@ void aes_ecb_test()
 		t192.decrypt(expected_ciphertext_192, tmp);
 		tock = DWT->CYCCNT - tick - 1;
 
-		printf("%lu/", tock);
+		cycles[i] = tock;
 	}
+	printf("%lu/%lu/%lu/%lu/%lu/", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+
 	if(memcmp(expected_plaintext, tmp, 16) != 0)
     	printf(" --- incorrect\n");
     else
@@ -155,9 +163,9 @@ void aes_ecb_test()
 		t256.setEncKey(key_256);
 		tock = DWT->CYCCNT - tick - 1;
 
-		printf("%lu/", tock);
+		cycles[i] = tock;
 	}
-	printf("\n");
+	printf("%lu/%lu/%lu/%lu/%lu/\n", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
 
 	printf("encrypt --- ");
 	for(int i = 0; i<5; i++)
@@ -166,8 +174,10 @@ void aes_ecb_test()
 		t256.encrypt(expected_plaintext, tmp);
 		tock = DWT->CYCCNT - tick - 1;
 
-		printf("%lu/", tock);
+		cycles[i] = tock;
 	}
+	printf("%lu/%lu/%lu/%lu/%lu/", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+
     if(memcmp(expected_ciphertext_256, tmp, 16) != 0)
     	printf(" --- incorrect\n");
     else
@@ -182,9 +192,9 @@ void aes_ecb_test()
 		t256.setDecKey(); // reuse context
 		tock = DWT->CYCCNT - tick - 1;
 
-		printf("%lu/", tock);
+		cycles[i] = tock;
 	}
-	printf("\n");
+	printf("%lu/%lu/%lu/%lu/%lu/\n", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
 
 	printf("decrypt --- ");
 	for(int i = 0; i<5; i++)
@@ -193,8 +203,10 @@ void aes_ecb_test()
 		t256.decrypt(expected_ciphertext_256, tmp);
 		tock = DWT->CYCCNT - tick - 1;
 
-		printf("%lu/", tock);
+		cycles[i] = tock;
 	}
+	printf("%lu/%lu/%lu/%lu/%lu/", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+
 	if(memcmp(expected_plaintext, tmp, 16) != 0)
     	printf(" --- incorrect\n");
     else
@@ -202,7 +214,5 @@ void aes_ecb_test()
     	printf(" --- ok\n");
     }
 }
-
-
 
 #endif
