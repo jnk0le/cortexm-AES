@@ -13,21 +13,18 @@
 CM34_1T_AES_256_keyschedule_enc:
 	push {r4-r11, lr}
 
-	sub sp, #8 //faster than dummy push
-
 	//load key
 	ldmia r1!, {r2-r9}
 
 	movw r1, #:lower16:AES_Te0
 	movt r1, #:upper16:AES_Te0
-	str r1, [sp] //put Te0 on stack before looping
-	//str r1, [sp, #-8]! // need to test
+	str r1, [sp, #-8]! // put Te0 on stack before looping and reserve space on stack
 
 	//just copy a key
 	stmia r0!, {r2-r9}
-	str r0, [sp, #4] //use rk later
+	str.w r0, [sp, #4] //use rk later //align following code to 4 bytes
 
-	movs r0, #0x01 //first rcon
+	mov.w r0, #0x01000000 // calculate rcon in highest byte to use a carry flag
 
 2:	uxtb r10, r9, ror #8
 	uxtb r11, r9, ror #16
@@ -39,7 +36,7 @@ CM34_1T_AES_256_keyschedule_enc:
 	ldrb r12, [r1, r12, lsl #2] //load sbox from Te0
 	ldrb r14, [r1, r14, lsl #2] //load sbox from Te0
 
-	eors r2, r0 //apply rcon
+	eor r2, r2, r0, lsr #24 // rcon is in highest byte
 	eor r2, r2, r10
 	eor r2, r2, r11, lsl #8
 	eor r2, r2, r12, lsl #16
@@ -68,14 +65,13 @@ CM34_1T_AES_256_keyschedule_enc:
 	eor r9, r8
 
 	lsls r0, #1
-	cmp r0, #0x80 //break when rcon reaches 0x80
 
-	ittte ne
-	stmiane r1!, {r2-r9} //write full roundkey
-	strne r1, [sp, #4] //rk pointer
-	ldrne r1, [sp] //Te0
-	stmiaeq r1!, {r2-r5} //write only 4 words at the last round
-	bne 2b
+	ittte pl // negative flag is set when r0 = 0x80000000
+	stmiapl r1!, {r2-r9} //write full roundkey
+	strpl r1, [sp, #4] //rk pointer
+	ldrpl r1, [sp] //Te0
+	stmiami r1!, {r2-r5} //write only 4 words at the last round
+	bpl 2b
 
 	add sp, #8 // faster than dummy pops
 	pop {r4-r11, pc}

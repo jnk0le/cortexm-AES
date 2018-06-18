@@ -17,8 +17,8 @@ CM34_1T_AES_192_keyschedule_enc:
 	movt r14, #:upper16:AES_Te0
 
 	//load key
-	ldmia r1!, {r2-r7} //align following code to 4 bytes
-	movw r1, #0x01 //first rcon //align following code to 4 bytes
+	ldmia r1!, {r2-r7}
+	mov.w r1, #0x01000000 // calculate rcon in highest byte to use a carry flag
 
 	//just copy a key
 	stmia r0!, {r2-r7}
@@ -33,7 +33,7 @@ CM34_1T_AES_192_keyschedule_enc:
 	ldrb r10, [r14, r10, lsl #2] //load sbox from Te0
 	ldrb r12, [r14, r12, lsl #2] //load sbox from Te0
 
-	eors r2, r1 //apply rcon
+	eor r2, r2, r1, lsr #24 // rcon is in highest byte
 	eor r2, r2, r8
 	eor r2, r2, r9, lsl #8
 	eor r2, r2, r10, lsl #16
@@ -45,11 +45,10 @@ CM34_1T_AES_192_keyschedule_enc:
 	eors r7, r6
 
 	lsls r1, #1
-	cmp r1, 0x80 //break when rcon is greater than 0x80
 
-	itet ls
-	stmials r0!, {r2-r7} //write full roundkey
-	stmiahi r0!, {r2-r5} //write only 4 words at the last round
-	bls 1b
+	itet cc // we need one round with 0x80 so use carry flag
+	stmiacc r0!, {r2-r7} //write full roundkey
+	stmiacs r0!, {r2-r5} //write only 4 words at the last round
+	bcc 1b
 
 	pop {r4-r10, pc}
