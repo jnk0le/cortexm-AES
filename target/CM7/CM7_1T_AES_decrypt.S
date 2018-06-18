@@ -110,6 +110,7 @@ CM7_1T_AES_decrypt:
 	eor r7, r11, r3, ror #24
 	cmp r0, r12
 
+	//nop ?
 	bne 1b
 
 	//do we really need inv_sbox?

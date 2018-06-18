@@ -20,6 +20,7 @@ CM7_1T_AES_encrypt:
 
 	//load input
 	ldmia r1!, {r4-r7}
+
 	//load key
 	ldmia r12!, {r0-r3}
 
@@ -107,8 +108,8 @@ CM7_1T_AES_encrypt:
 	eor r7, r11, r3, ror #24
 	cmp r0, r12
 
-	bne 1b //align following code to 4 bytes
-//nop?
+	nop // have to be placed before branch (branch is not data dependent but let's average run to run variations)
+	bne 1b
 
 	//final round
 	uxtb r0, r7, ror #24
@@ -191,6 +192,7 @@ CM7_1T_AES_encrypt:
 	//strd r0,r1, [r4, #0]
 	//strd r2,r3, [r4, #8]
 
+	//nop
 	stmia r4!, {r0-r3}
 
 	pop {r4-r11,pc}

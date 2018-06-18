@@ -72,9 +72,9 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 | `setEncKey<128>` |  |  |  | 178 |  |
 | `setEncKey<192>` |  |  |  | 156/163* |  |
 | `setEncKey<256>` |  |  |  | 240 |  |
-| `encrypt<128>` |  |  |  | 379/382* |  |
-| `encrypt<192>` |  |  |  | 450 |  |
-| `encrypt<256>` |  |  |  | 518 |  |
+| `encrypt<128>` |  |  |  | 380 |  |
+| `encrypt<192>` |  |  |  | 448 |  |
+| `encrypt<256>` |  |  |  | 513/516* |  |
 | `encrypt_unrolled<128>` |  |  |  |  |  |
 | `encrypt_unrolled<192>` |  |  |  |  |  |
 | `encrypt_unrolled<256>` |  |  |  |  |  |
@@ -88,7 +88,7 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 | `decrypt_unrolled<192>` |  |  |  |  |  |
 | `decrypt_unrolled<256>` |  |  |  |  |  |
 
-* Variation due to branch prediction between testing code and implementations
+`*` Run to run variation due to branch prediction, code alignment, or something else beetwen testing code and implementations
 
 ## todo
 - add block modes (CBC, CTR etc.)

@@ -68,6 +68,7 @@ CM7_1T_AES_192_keyschedule_enc:
 	itt ls  // last 2 words are ommited
 	strdls r6,r7, [r0], #8
 
+	//nop ?
 	bls 1b
 
 	pop {r4-r10, pc}

@@ -143,6 +143,7 @@ CM7_1T_AES_keyschedule_dec:
 
 	strd r4,r5, [r1, #8] // write rk back
 
+	//nop ?
 	bne 1b
 
 	pop {r4-r9, pc}
