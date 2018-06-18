@@ -150,11 +150,11 @@ CM34_1T_AES_decrypt:
 	eor r2, r10, r2, lsl #24
 	eor r3, r11, r3, lsl #24
 
+	add sp, #8 //less mem pressure than preindexed load + dummy pop
+
 	str r0, [r4, #0]
 	str r1, [r4, #4]
 	str r2, [r4, #8]
 	str r3, [r4, #12]
-
-	add sp, #8 //less mem pressure than preindexed load + dummy pop
 
 	pop {r4-r11, pc}
