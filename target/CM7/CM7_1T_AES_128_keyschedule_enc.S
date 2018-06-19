@@ -21,7 +21,7 @@ CM7_1T_AES_128_keyschedule_enc:
 
 	//load key once
 	ldmia r1!, {r2-r5}
-	movw r1, #0x01 //first rcon //align following code to 4 bytes
+	mov.w r1, #0x01000000 // calculate rcon in highest byte to use a carry flag
 
 	//just copy a key
 	stmia r0!, {r2-r5}
@@ -36,7 +36,7 @@ CM7_1T_AES_128_keyschedule_enc:
 	uxtb r12, r5
 	ldrb r7, [r14, r7, lsl #2] //load sbox from Te0
 
-	eors r2, r1 //apply rcon
+	eor r2, r2, r1, lsr #24 // rcon is in highest byte
 	ldrb r8, [r14, r8, lsl #2] //load sbox from Te0
 
 	eors r2, r2, r6
@@ -47,23 +47,22 @@ CM7_1T_AES_128_keyschedule_enc:
 	lsls r1, #1 // will use flags later
 
 	eor r2, r2, r8, lsl #16
-	cmp r1, #0x80
+	it cs // we need one round with 0x80 so use carry flag
+	movcs r1, #0x1b000000 // cannot do cmp next cycle
 
 	eor r2, r2, r12, lsl #24
-	it hi
-	movhi r1, #0x1b
-
-	eors r3, r2
 	str r2, [r0], #4
 
-	eors r4, r3
+	eors r3, r2
 	str r3, [r0], #4
 
-	cmp r1, #0x6c // will use flags later
+	eors r4, r3
+	cmp r1, #0x6c000000 // will use flags later
+
 	eor r5, r4 // do not set a flags
+	str r4, [r0], #4
 
-	strd r4,r5, [r0], #8
-
+	str r5, [r0], #4
 	bne 1b
 
 	pop {r4-r8, pc}

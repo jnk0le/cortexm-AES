@@ -21,12 +21,12 @@ CM7_1T_AES_256_keyschedule_enc:
 
 	movw r1, #:lower16:AES_Te0
 	movt r1, #:upper16:AES_Te0
-	str r1, [sp, #-8]! //put Te0 on stack before looping
+	str r1, [sp, #-8]! // put Te0 on stack before looping and reserve space on stack
 
 	//just copy a key
 	stmia r0!, {r2-r9}
-	str r0, [sp, #4] //use rk later
 
+	str r0, [sp, #4] //use rk later
 	movs r0, #0x01 //first rcon
 
 2:	uxtb r10, r9, ror #8
@@ -65,7 +65,7 @@ CM7_1T_AES_256_keyschedule_enc:
 	str r1, [sp, #4] //save rk pointer
 
 	uxtb r10, r5, ror #16
-	ldr r1, [sp] // reload Te0
+	ldr r1, [sp] // reload Te0 // using r1 in next cycle might add penalty
 
 	uxtb r11, r5, ror #8
 	cmp r0, #0x80 //break when rcon reaches 0x80 // will use flags later
@@ -87,14 +87,14 @@ CM7_1T_AES_256_keyschedule_enc:
 	ldr r1, [sp, #4] //replace Te0 with rk pointer
 
 	eor r6, r6, r14, lsl #24
-	str r5, [r1], #4 //somehow r1 can be used now
+	str r5, [r1], #4 //somehow r1 can be used freely here
 
 	itttt ne
 	eorne r7, r6 // do not set a flags
 	strne r6, [r1], #4
 
 	eorne r8, r7 // do not set a flags
-	strne r7, [r1], #12 // preserve space to dual issue rk saver before storing 2 last registers cocatenated for single store unit
+	strne r7, [r1], #12 // preserve space to dual issue rk saver before storing 2 last registers concatenated for single store unit
 
 	itttt ne
 	eorne r9, r8 // do not set a flags
@@ -105,5 +105,5 @@ CM7_1T_AES_256_keyschedule_enc:
 	ldrne r1, [sp] //reload Te0
 	bne 2b
 
-	add sp, #8 // faster than dummy pops
+	add sp, #8
 	pop {r4-r11, pc}

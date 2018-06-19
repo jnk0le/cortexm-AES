@@ -192,7 +192,6 @@ CM7_1T_AES_encrypt:
 	//strd r0,r1, [r4, #0]
 	//strd r2,r3, [r4, #8]
 
-	//nop
 	stmia r4!, {r0-r3}
 
 	pop {r4-r11,pc}

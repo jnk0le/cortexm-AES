@@ -61,14 +61,13 @@ CM7_1T_AES_192_keyschedule_enc:
 	eor r5, r4 // do not set a flags
 	str r5, [r0], #4
 
-	eor r6, r5 // do not set a flags
-	nop // seems to perform better
+	itttt ls  // last 2 words are ommited
+	eorls r6, r5 // do not set a flags
+	strls r6, [r0], #4
 
-	eor r7, r6 // do not set a flags
-	itt ls  // last 2 words are ommited
-	strdls r6,r7, [r0], #8
+	eorls r7, r6 // do not set a flags
+	strls r7, [r0], #4
 
-	//nop ?
 	bls 1b
 
 	pop {r4-r10, pc}
