@@ -69,26 +69,26 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 
 | Cipher function  | ? (0ws) - cortex m3 | STM32F4 (0ws) - cortex m4 | STM32F4 (7ws cached) - cortex m4 | cortex-m7 (icache) | cortex-m7 (?) |
 |------------------|---------------------|---------------------------|----------------------------------|--------------------|---------------|
-| `setEncKey<128>` |  |  | 305 | 167/170* |  |
-| `setEncKey<192>` |  |  | 281 | 155 |  |
-| `setEncKey<256>` |  |  | 441 | 240 |  |
-| `encrypt<128>` |  |  | 689 | 374/380* |  |
-| `encrypt<192>` |  |  | 817 | 448 |  |
-| `encrypt<256>` |  |  | 945 | 516 |  |
+| `setEncKey<128>` |  |  | 305 | 157.03 |  |
+| `setEncKey<192>` |  |  | 281 | 140.01 |  |
+| `setEncKey<256>` |  |  | 441 | 227.01 |  |
+| `encrypt<128>` |  |  | 689 | 368.01 |  |
+| `encrypt<192>` |  |  | 817 | 436.01 |  |
+| `encrypt<256>` |  |  | 945 | 504.01 |  |
 | `encrypt_unrolled<128>` |  |  |  |  |  |
 | `encrypt_unrolled<192>` |  |  |  |  |  |
 | `encrypt_unrolled<256>` |  |  |  |  |  |
-| `setDecKey<128>` |  |  | 723 | 521/530* |  |
-| `setDecKey<192>` |  |  | 877 | 637/643* |  |
-| `setDEcKey<256>` |  |  | 1031 | 749/755* |  |
-| `decrypt<128>` |  |  | 694 | 387 |  |
-| `decrypt<192>` |  |  | 822 | 455 |  |
-| `decrypt<256>` |  |  | 950 | 523 |  |
+| `setDecKey<128>` |  |  | 723 | 518.01 |  |
+| `setDecKey<192>` |  |  | 877 | 630.01 |  |
+| `setDEcKey<256>` |  |  | 1031 | 742.01 |  |
+| `decrypt<128>` |  |  | 694 | 375.01 |  |
+| `decrypt<192>` |  |  | 822 | 443.01 |  |
+| `decrypt<256>` |  |  | 950 | 511.01 |  |
 | `decrypt_unrolled<128>` |  |  |  |  |  |
 | `decrypt_unrolled<192>` |  |  |  |  |  |
 | `decrypt_unrolled<256>` |  |  |  |  |  |
 
-`*` Run to run variation due to branch prediction, code alignment, or something else beetwen testing code and implementations
+Cortex-m7 results are averaged over 1024 runs + one ommited (instruction) cache train run.
 
 ## todo
 - add block modes (CBC, CTR etc.)
@@ -100,4 +100,3 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 - optimize cm7 for execution from itcm
 - forward keyschedule_dec 
 - optimize cm7 keyschedule_dec
-- take average speed for at least cm7

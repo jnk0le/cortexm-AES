@@ -30,33 +30,36 @@ aes::CipherContext<256, aes::target::CM7_1T> t256;
 void aes_ecb_test()
 {
 	uint32_t tick, tock;
-	uint32_t cycles[5];
+	uint32_t cycles_sum = 0;
 
-	printf("func --- run1/run2/run3/run4/run5 --- (enc/dec matching expected results)\n");
+	printf("func --- averaged run (without first run) --- (enc/dec matching expected results)\n");
 
 	printf("\n----------------aes_128------------------\n\n");
 
 	printf("setEncKey --- ");
-	for(int i = 0; i<5; i++)
+	t128.setEncKey(key_128); // cache train run
+	for(int i = 0; i<1024; i++)
 	{
 		tick = DWT->CYCCNT;
 		t128.setEncKey(key_128);
 		tock = DWT->CYCCNT - tick - 1;
 
-		cycles[i] = tock;
+		cycles_sum += tock;
 	}
-	printf("%lu/%lu/%lu/%lu/%lu/\n", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+	printf("%f\n", (double)cycles_sum/1024.0f);
+	cycles_sum = 0;
 
 	printf("encrypt --- ");
-	for(int i = 0; i<5; i++)
+	t128.encrypt(expected_plaintext, tmp); // cache train run
+	for(int i = 0; i<1024; i++)
 	{
 		tick = DWT->CYCCNT;
 		t128.encrypt(expected_plaintext, tmp);
 		tock = DWT->CYCCNT - tick - 1;
 
-		cycles[i] = tock;
+		cycles_sum += tock;
 	}
-	printf("%lu/%lu/%lu/%lu/%lu/", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+	printf("%f", (double)cycles_sum/1024.0f);
 
 	if(memcmp(expected_ciphertext_128, tmp, 16) != 0)
     	printf(" --- incorrect\n");
@@ -65,27 +68,35 @@ void aes_ecb_test()
     	printf(" --- ok\n");
     }
 
+	cycles_sum = 0;
+
 	printf("setDecKey --- ");
-	for(int i = 0; i<5; i++)
+	t128.setDecKey(); //cache train run
+	for(int i = 0; i<1024; i++)
 	{
 		tick = DWT->CYCCNT;
-		t128.setDecKey(); // reuse context
+		t128.setDecKey();
 		tock = DWT->CYCCNT - tick - 1;
 
-		cycles[i] = tock;
+		cycles_sum += tock;
 	}
-	printf("%lu/%lu/%lu/%lu/%lu/\n", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+	printf("%f\n", (double)cycles_sum/1024.0f);
+
+	cycles_sum = 0;
+
+	t128.setDecKey(key_128); // no idea how it worked with an 5x context reuse
 
 	printf("decrypt --- ");
-	for(int i = 0; i<5; i++)
+	t128.decrypt(expected_ciphertext_128, tmp); //cache train run
+	for(int i = 0; i<1024; i++)
 	{
 		tick = DWT->CYCCNT;
 		t128.decrypt(expected_ciphertext_128, tmp);
 		tock = DWT->CYCCNT - tick - 1;
 
-		cycles[i] = tock;
+		cycles_sum += tock;
 	}
-	printf("%lu/%lu/%lu/%lu/%lu/", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+	printf("%f", (double)cycles_sum/1024.0f);
 
 	if(memcmp(expected_plaintext, tmp, 16) != 0)
     	printf(" --- incorrect\n");
@@ -96,56 +107,69 @@ void aes_ecb_test()
 
 	printf("\n----------------aes_192------------------\n\n");
 
+	cycles_sum = 0;
+
 	printf("setEncKey --- ");
-	for(int i = 0; i<5; i++)
+	t192.setEncKey(key_192); // cache train run
+	for(int i = 0; i<1024; i++)
 	{
 		tick = DWT->CYCCNT;
 		t192.setEncKey(key_192);
 		tock = DWT->CYCCNT - tick - 1;
 
-		cycles[i] = tock;
+		cycles_sum += tock;
 	}
-	printf("%lu/%lu/%lu/%lu/%lu/\n", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+	printf("%f\n", (double)cycles_sum/1024.0f);
+	cycles_sum = 0;
 
 	printf("encrypt --- ");
-	for(int i = 0; i<5; i++)
+	t192.encrypt(expected_plaintext, tmp); // cache train run
+	for(int i = 0; i<1024; i++)
 	{
 		tick = DWT->CYCCNT;
 		t192.encrypt(expected_plaintext, tmp);
 		tock = DWT->CYCCNT - tick - 1;
 
-		cycles[i] = tock;
+		cycles_sum += tock;
 	}
-	printf("%lu/%lu/%lu/%lu/%lu/", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+	printf("%f", (double)cycles_sum/1024.0f);
 
-    if(memcmp(expected_ciphertext_192, tmp, 16) != 0)
+	if(memcmp(expected_ciphertext_192, tmp, 16) != 0)
     	printf(" --- incorrect\n");
     else
     {
     	printf(" --- ok\n");
     }
 
+	cycles_sum = 0;
+
 	printf("setDecKey --- ");
-	for(int i = 0; i<5; i++)
+	t192.setDecKey(); //cache train run
+	for(int i = 0; i<1024; i++)
 	{
 		tick = DWT->CYCCNT;
-		t192.setDecKey(); // reuse context
+		t192.setDecKey();
 		tock = DWT->CYCCNT - tick - 1;
 
-		cycles[i] = tock;
+		cycles_sum += tock;
 	}
-	printf("%lu/%lu/%lu/%lu/%lu/\n", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+	printf("%f\n", (double)cycles_sum/1024.0f);
+
+	t192.setDecKey(key_192); // no idea how it worked with an 5x context reuse
+
+	cycles_sum = 0;
 
 	printf("decrypt --- ");
-	for(int i = 0; i<5; i++)
+	t192.decrypt(expected_ciphertext_192, tmp); //cache train run
+	for(int i = 0; i<1024; i++)
 	{
 		tick = DWT->CYCCNT;
 		t192.decrypt(expected_ciphertext_192, tmp);
 		tock = DWT->CYCCNT - tick - 1;
 
-		cycles[i] = tock;
+		cycles_sum += tock;
 	}
-	printf("%lu/%lu/%lu/%lu/%lu/", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+	printf("%f", (double)cycles_sum/1024.0f);
 
 	if(memcmp(expected_plaintext, tmp, 16) != 0)
     	printf(" --- incorrect\n");
@@ -156,56 +180,71 @@ void aes_ecb_test()
 
 	printf("\n----------------aes_256------------------\n\n");
 
+	cycles_sum = 0;
+
 	printf("setEncKey --- ");
-	for(int i = 0; i<5; i++)
+	t256.setEncKey(key_256); // cache train run
+	for(int i = 0; i<1024; i++)
 	{
 		tick = DWT->CYCCNT;
 		t256.setEncKey(key_256);
 		tock = DWT->CYCCNT - tick - 1;
 
-		cycles[i] = tock;
+		cycles_sum += tock;
 	}
-	printf("%lu/%lu/%lu/%lu/%lu/\n", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+	printf("%f\n", (double)cycles_sum/1024.0f);
+	cycles_sum = 0;
+
+	cycles_sum = 0;
 
 	printf("encrypt --- ");
-	for(int i = 0; i<5; i++)
+	t256.encrypt(expected_plaintext, tmp); // cache train run
+	for(int i = 0; i<1024; i++)
 	{
 		tick = DWT->CYCCNT;
 		t256.encrypt(expected_plaintext, tmp);
 		tock = DWT->CYCCNT - tick - 1;
 
-		cycles[i] = tock;
+		cycles_sum += tock;
 	}
-	printf("%lu/%lu/%lu/%lu/%lu/", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+	printf("%f", (double)cycles_sum/1024.0f);
 
-    if(memcmp(expected_ciphertext_256, tmp, 16) != 0)
+	if(memcmp(expected_ciphertext_256, tmp, 16) != 0)
     	printf(" --- incorrect\n");
     else
     {
     	printf(" --- ok\n");
     }
 
+	cycles_sum = 0;
+
 	printf("setDecKey --- ");
-	for(int i = 0; i<5; i++)
+	t256.setDecKey(); //cache train run
+	for(int i = 0; i<1024; i++)
 	{
 		tick = DWT->CYCCNT;
-		t256.setDecKey(); // reuse context
+		t256.setDecKey();
 		tock = DWT->CYCCNT - tick - 1;
 
-		cycles[i] = tock;
+		cycles_sum += tock;
 	}
-	printf("%lu/%lu/%lu/%lu/%lu/\n", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+	printf("%f\n", (double)cycles_sum/1024.0f);
+
+	t256.setDecKey(key_256); // no idea how it worked with an 5x context reuse
+
+	cycles_sum = 0;
 
 	printf("decrypt --- ");
-	for(int i = 0; i<5; i++)
+	t256.decrypt(expected_ciphertext_256, tmp); //cache train run
+	for(int i = 0; i<1024; i++)
 	{
 		tick = DWT->CYCCNT;
 		t256.decrypt(expected_ciphertext_256, tmp);
 		tock = DWT->CYCCNT - tick - 1;
 
-		cycles[i] = tock;
+		cycles_sum += tock;
 	}
-	printf("%lu/%lu/%lu/%lu/%lu/", cycles[0],cycles[1],cycles[2],cycles[3],cycles[4]);
+	printf("%f", (double)cycles_sum/1024.0f);
 
 	if(memcmp(expected_plaintext, tmp, 16) != 0)
     	printf(" --- incorrect\n");
