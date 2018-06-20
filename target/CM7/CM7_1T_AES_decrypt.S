@@ -110,18 +110,24 @@ CM7_1T_AES_decrypt:
 	eor r7, r11, r3, ror #24
 	cmp r0, r12
 
-	//nop ?
 	bne 1b
+	add sp, #4 // we need to dual issue it anyway
+
+	//final round
+	//ldmdb r12, {r8-r11} // one cycle slower
 
 	//do we really need inv_sbox?
 	movw r14, #:lower16:AES_inv_sbox
-	movt r14, #:upper16:AES_inv_sbox
+	ldr r8, [r12, #-16]!
 
-	//final round
-	ldmdb r12, {r8-r11}
+	movt r14, #:upper16:AES_inv_sbox
+	ldr r9, [r12, #4]
 
 	uxtb r0, r4
+	ldr r10, [r12, #8]
+
 	uxtb r1, r5
+	ldr r11, [r12, #12]
 
 	uxtb r2, r6
 	ldrb r0, [r14, r0]
@@ -190,10 +196,10 @@ CM7_1T_AES_decrypt:
 	ldrb r3, [r14, r3]
 
 	eor r2, r10, r2, lsl #24
-	ldr r4, [sp, #4] //load output pointer
+	ldr r4, [sp], #4 //load output pointer and clear stack
 
 	eor r3, r11, r3, lsl #24
-	add sp, #8 // clear stack
+	//strd/stmia cannot be dual issued
 
 	//strd r0,r1, [r4, #0]
 	//strd r2,r3, [r4, #8]

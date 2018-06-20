@@ -81,9 +81,9 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 | `setDecKey<128>` |  |  | 723 | 518.01 |  |
 | `setDecKey<192>` |  |  | 877 | 630.01 |  |
 | `setDEcKey<256>` |  |  | 1031 | 742.01 |  |
-| `decrypt<128>` |  |  | 694 | 375.01 |  |
-| `decrypt<192>` |  |  | 822 | 443.01 |  |
-| `decrypt<256>` |  |  | 950 | 511.01 |  |
+| `decrypt<128>` |  |  | 694 | 374.01 |  |
+| `decrypt<192>` |  |  | 822 | 442.01 |  |
+| `decrypt<256>` |  |  | 950 | 510.01 |  |
 | `decrypt_unrolled<128>` |  |  |  |  |  |
 | `decrypt_unrolled<192>` |  |  |  |  |  |
 | `decrypt_unrolled<256>` |  |  |  |  |  |
