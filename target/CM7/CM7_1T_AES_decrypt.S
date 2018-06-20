@@ -111,7 +111,7 @@ CM7_1T_AES_decrypt:
 	cmp r0, r12
 
 	bne 1b
-	add sp, #4 // we need to dual issue it anyway
+	add sp, #4 // we need to dual issue it somewhere anyway
 
 	//final round
 	//ldmdb r12, {r8-r11} // one cycle slower
