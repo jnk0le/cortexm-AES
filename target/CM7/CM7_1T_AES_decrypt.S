@@ -132,8 +132,8 @@ CM7_1T_AES_decrypt:
 	eor r8, r0
 	ldrb r2, [r14, r2]
 
-	ldrb r3, [r14, r3]
 	eor r9, r1
+	ldrb r3, [r14, r3]
 
 	eor r10, r2
 	eor r11, r3
@@ -189,11 +189,11 @@ CM7_1T_AES_decrypt:
 	eor r1, r9, r1, lsl #24
 	ldrb r3, [r14, r3]
 
-	ldr r4, [sp, #4] //load output pointer
-	add sp, #8 // clear stack
-
 	eor r2, r10, r2, lsl #24
+	ldr r4, [sp, #4] //load output pointer
+
 	eor r3, r11, r3, lsl #24
+	add sp, #8 // clear stack
 
 	//strd r0,r1, [r4, #0]
 	//strd r2,r3, [r4, #8]
