@@ -18,7 +18,7 @@ CM34_1T_AES_128_keyschedule_enc:
 
 	//load key once
 	ldmia r1!, {r2-r5}
-	mov.w r1, #0x01000000 // calculate rcon in highest byte to use a carry flag // align following code to 4 bytes
+	mov.w r1, #0x01000000 // calculate rcon in highest byte to use a carry flag
 
 	//just copy a key
 	stmia r0!, {r2-r5}

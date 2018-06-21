@@ -16,6 +16,7 @@ unknown or just implementation defined like section placement (you need to verif
 
 ### CM34_1T
 
+cortex m3 and cortex m4 optimized implementation.
 Uses a single T table per enc/dec cipher and additional inv_sbox for final round in decryption.
 
 Based on "Peter Schwabe and Ko Stoffelen" AES implementation available [here](https://github.com/Ko-/aes-armcortexm).
@@ -29,6 +30,7 @@ FLASH memory simply cannot be used since vendors usually implements some kind of
 
 ### CM7_1T
 
+cortex m7 optimized implementation.
 Uses a single T table per enc/dec cipher and additional inv_sbox for final round in decryption.
 
 Based on CM34 implementation, carefully rescheduled for dual issue pipeline, with 2x32 bit DTCM interface, to avoid data dependent issuing capability from even/odd DTCM words.
@@ -67,28 +69,28 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 
 ## Base ciphers performance (in cycles)
 
-| Cipher function  | ? (0ws) - cortex m3 | STM32F4 (0ws) - cortex m4 | STM32F4 (7ws cached) - cortex m4 | cortex-m7 (icache) | cortex-m7 (?) |
-|------------------|---------------------|---------------------------|----------------------------------|--------------------|---------------|
-| `setEncKey<128>` |  |  | 305 | 157.03 |  |
-| `setEncKey<192>` |  |  | 281 | 140.01 |  |
-| `setEncKey<256>` |  |  | 441 | 227.01 |  |
-| `encrypt<128>` |  |  | 689 | 366.01 |  |
-| `encrypt<192>` |  |  | 817 | 434.01 |  |
-| `encrypt<256>` |  |  | 945 | 502.01 |  |
-| `encrypt_unrolled<128>` |  |  |  |  |  |
-| `encrypt_unrolled<192>` |  |  |  |  |  |
-| `encrypt_unrolled<256>` |  |  |  |  |  |
-| `setDecKey<128>` |  |  | 723 | 518.01 |  |
-| `setDecKey<192>` |  |  | 877 | 630.01 |  |
-| `setDEcKey<256>` |  |  | 1031 | 742.01 |  |
-| `decrypt<128>` |  |  | 694 | 374.01 |  |
-| `decrypt<192>` |  |  | 822 | 442.01 |  |
-| `decrypt<256>` |  |  | 950 | 510.01 |  |
-| `decrypt_unrolled<128>` |  |  |  |  |  |
-| `decrypt_unrolled<192>` |  |  |  |  |  |
-| `decrypt_unrolled<256>` |  |  |  |  |  |
+| Cipher function     | ? (0ws) - cortex m3 | STM32F4 (0ws) - cortex m4 | STM32F4 (7ws cached) - cortex m4 | cortex-m7 (icache) | cortex-m7 (?) |
+|---------------------|---------------------|---------------------------|----------------------------------|--------------------|---------------|
+| `setEncKey<128>`    |  | 306 | 306 | 157.03 |  |
+| `setEncKey<192>`    |  | 282 | 282 | 140.01 |  |
+| `setEncKey<256>`    |  | 435 | 435 | 227.01 |  |
+| `encrypt<128>`      |  | 690 | 690 | 366.01 |  |
+| `encrypt<192>`      |  | 818 | 818 | 434.01 |  |
+| `encrypt<256>`      |  | 946 | 946 | 502.01 |  |
+| `enc_unrolled<128>` |  | 630 | 1030 |  |  |
+| `enc_unrolled<192>` |  | 743 | 1214 |  |  |
+| `enc_unrolled<256>` |  | 857 | 1407 |  |  |
+| `setDecKey<128>`    |  | 723 | 723 | 518.01 |  |
+| `setDecKey<192>`    |  | 877 | 877 | 630.01 |  |
+| `setDEcKey<256>`    |  | 1031 | 1031 | 742.01 |  |
+| `decrypt<128>`      |  | 695 | 695 | 374.01 |  |
+| `decrypt<192>`      |  | 825 | 825 | 442.01 |  |
+| `decrypt<256>`      |  | 951 | 951 | 510.01 |  |
+| `dec_unrolled<128>` |  | 632 | 1037 |  |  |
+| `dec_unrolled<192>` |  | 747 | 1217 |  |  |
+| `dec_unrolled<256>` |  | 859 | 1416 |  |  |
 
-Cortex-m7 results are averaged over 1024 runs + one ommited (instruction) cache train run.
+Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 
 ## todo
 - add block modes (CBC, CTR etc.)
