@@ -33,10 +33,16 @@ CM7_1T_AES_decrypt:
 	eors r6, r2
 	eors r7, r3
 
-1:	ldmdb r12!, {r8-r11}
+1:	//ldmdb r12!, {r8-r11}
+	//ldrd r8,r9, [r12, #-16]!
+	ldr r8, [r12, #-16]!
+	ldr r9, [r12, #4]
 
 	uxtb r0, r4
+	ldr r10, [r12, #8]
+
 	uxtb r1, r5
+	ldr r11, [r12, #12]
 
 	uxtb r2, r6
 	ldr r0, [r14, r0, lsl #2]
@@ -51,9 +57,9 @@ CM7_1T_AES_decrypt:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r10, r10, r2, ror #16
-	eor r11, r11, r3, ror #16
-
 	uxtb r0, r7, ror #8
+
+	eor r11, r11, r3, ror #16
 	uxtb r1, r4, ror #8
 
 	uxtb r2, r5, ror #8
@@ -69,9 +75,9 @@ CM7_1T_AES_decrypt:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r10, r10, r2, ror #8
-	eor r11, r11, r3, ror #8
-
 	uxtb r0, r6, ror #16
+
+	eor r11, r11, r3, ror #8
 	uxtb r1, r7, ror #16
 
 	uxtb r2, r4, ror #16
@@ -87,9 +93,9 @@ CM7_1T_AES_decrypt:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r10, r2
-	eor r11, r3
-
 	uxtb r0, r5, ror #24
+
+	eor r11, r3
 	uxtb r1, r6, ror #24
 
 	uxtb r2, r7, ror #24
@@ -101,8 +107,8 @@ CM7_1T_AES_decrypt:
 	eor r4, r8, r0, ror #24
 	ldr r2, [r14, r2, lsl #2]
 
-	ldr r3, [r14, r3, lsl #2]
 	eor r5, r9, r1, ror #24
+	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
 	ldr r0, [sp]
@@ -114,7 +120,7 @@ CM7_1T_AES_decrypt:
 	add sp, #4 // we need to dual issue it somewhere anyway
 
 	//final round
-	//ldmdb r12, {r8-r11} // one cycle slower
+	//ldmdb r12, {r8-r11}
 
 	//do we really need inv_sbox?
 	movw r14, #:lower16:AES_inv_sbox
@@ -142,9 +148,9 @@ CM7_1T_AES_decrypt:
 	ldrb r3, [r14, r3]
 
 	eor r10, r2
-	eor r11, r3
-
 	uxtb r0, r7, ror #8
+
+	eor r11, r3
 	uxtb r1, r4, ror #8
 
 	uxtb r2, r5, ror #8
@@ -160,9 +166,9 @@ CM7_1T_AES_decrypt:
 	ldrb r3, [r14, r3]
 
 	eor r10, r10, r2, lsl #8
-	eor r11, r11, r3, lsl #8
-
 	uxtb r0, r6, ror #16
+
+	eor r11, r11, r3, lsl #8
 	uxtb r1, r7, ror #16
 
 	uxtb r2, r4, ror #16
@@ -178,9 +184,9 @@ CM7_1T_AES_decrypt:
 	ldrb r3, [r14, r3]
 
 	eor r10, r10, r2, lsl #16
-	eor r11, r11, r3, lsl #16
-
 	uxtb r0, r5, ror #24
+
+	eor r11, r11, r3, lsl #16
 	uxtb r1, r6, ror #24
 
 	uxtb r2, r7, ror #24

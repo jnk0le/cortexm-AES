@@ -1,11 +1,11 @@
 # cortexm AES
 
-FIPS 197 compliant software AES implementation optimized for real world cortex-m3/4/7 microcontrollers.
+FIPS 197 compliant software AES implementation optimized for real world cortex-m microcontrollers.
 
 
 ## notes
 - Do not use ECB cipher mode for anything more than 16 bytes of plaintext data per key.
-- Do not blindly trust in timming constantness of LUT based implementations since it depends on many factors that are 
+- Do not blindly trust in timming constantness of LUT based ciphers since it depends on many factors that are 
 unknown or just implementation defined like section placement (you need to verify it, especially before use in production).
 - None of the currently available implementations protects against power/EMI analysis attacks.
 - do not use CM34_1T implementation on cortex-m7 since it is slower and will introduce timming leaks.
@@ -61,7 +61,7 @@ The speed differences can be illustrated by the following code:
 	tock = DWT->CYCCNT - tick - 1;
 
 	printf("4 linear loads, cycles: %lu\n", tock);
-	printf("This is why any two LDRs cannot be placed next to each other\n");
+	printf("This is why any two data dependent LDRs cannot be placed next to each other\n");
 ```
 
 Only DTCM memory can be used for LUT tables, since everything else is cached through AXI bus.
@@ -69,26 +69,26 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 
 ## Base ciphers performance (in cycles)
 
-| Cipher function     | ? (0ws) - cortex m3 | STM32F4 (0ws) - cortex m4 | STM32F4 (7ws cached) - cortex m4 | cortex-m7 (icache) | cortex-m7 (?) |
-|---------------------|---------------------|---------------------------|----------------------------------|--------------------|---------------|
-| `setEncKey<128>`    |  | 306 | 306 | 157.03 |  |
-| `setEncKey<192>`    |  | 282 | 282 | 140.01 |  |
-| `setEncKey<256>`    |  | 435 | 435 | 227.01 |  |
-| `encrypt<128>`      |  | 690 | 690 | 366.01 |  |
-| `encrypt<192>`      |  | 818 | 818 | 434.01 |  |
-| `encrypt<256>`      |  | 946 | 946 | 502.01 |  |
-| `enc_unrolled<128>` |  | 630 | 1030 |  |  |
-| `enc_unrolled<192>` |  | 743 | 1214 |  |  |
-| `enc_unrolled<256>` |  | 857 | 1407 |  |  |
-| `setDecKey<128>`    |  | 723 | 723 | 518.01 |  |
-| `setDecKey<192>`    |  | 877 | 877 | 630.01 |  |
-| `setDEcKey<256>`    |  | 1031 | 1031 | 742.01 |  |
-| `decrypt<128>`      |  | 695 | 695 | 374.01 |  |
-| `decrypt<192>`      |  | 825 | 825 | 442.01 |  |
-| `decrypt<256>`      |  | 951 | 951 | 510.01 |  |
-| `dec_unrolled<128>` |  | 632 | 1037 |  |  |
-| `dec_unrolled<192>` |  | 747 | 1217 |  |  |
-| `dec_unrolled<256>` |  | 859 | 1416 |  |  |
+| Cipher function     | ? (0ws) - cortex m3 | STM32F4 (0ws/7ws) - cortex m4 | cortex-m7 (icache) | cortex-m7 (?) |
+|---------------------|---------------------|-------------------------------|--------------------|---------------|
+| `setEncKey<128>`    |  | 306      | 157.03 |  |
+| `setEncKey<192>`    |  | 282      | 140.01 |  |
+| `setEncKey<256>`    |  | 435      | 227.01 |  |
+| `encrypt<128>`      |  | 690      | 340.01 |  |
+| `encrypt<192>`      |  | 818      | 402.01 |  |
+| `encrypt<256>`      |  | 946      | 464.01 |  |
+| `enc_unrolled<128>` |  | 630/1030 |  |  |
+| `enc_unrolled<192>` |  | 743/1214 |  |  |
+| `enc_unrolled<256>` |  | 857/1407 |  |  |
+| `setDecKey<128>`    |  | 723      | 518.01 |  |
+| `setDecKey<192>`    |  | 877      | 630.01 |  |
+| `setDEcKey<256>`    |  | 1031     | 742.01 |  |
+| `decrypt<128>`      |  | 695      | 344.01 |  |
+| `decrypt<192>`      |  | 825      | 406.01 |  |
+| `decrypt<256>`      |  | 951      | 468.01 |  |
+| `dec_unrolled<128>` |  | 632/1037 |  |  |
+| `dec_unrolled<192>` |  | 747/1217 |  |  |
+| `dec_unrolled<256>` |  | 859/1416 |  |  |
 
 Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 

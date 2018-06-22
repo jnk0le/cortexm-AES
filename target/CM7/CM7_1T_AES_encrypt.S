@@ -22,7 +22,9 @@ CM7_1T_AES_encrypt:
 	ldmia r1!, {r4-r7}
 
 	//load key
-	ldmia r12!, {r0-r3}
+	//ldmia r12!, {r0-r3}
+	ldrd r0,r1, [r12], #8
+	ldrd r2,r3, [r12], #8
 
 	//initial addroundkey
 	eors r4, r0
@@ -31,10 +33,16 @@ CM7_1T_AES_encrypt:
 	eors r6, r2
 	eors r7, r3
 
-1:	ldmia r12!, {r8-r11}
+1:	//ldmia r12!, {r8-r11}
+	//ldrd r8,r9, [r12], #8
+	ldr r8, [r12], #4
+	ldr r9, [r12], #4
 
 	uxtb r0, r4
+	ldr r10, [r12], #4
+
 	uxtb r1, r5
+	ldr r11, [r12], #4
 
 	uxtb r2, r6
 	ldr r0, [r14, r0, lsl #2]
@@ -49,9 +57,9 @@ CM7_1T_AES_encrypt:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r10, r10, r2, ror #16
-	eor r11, r11, r3, ror #16
-
 	uxtb r0, r5, ror #8
+
+	eor r11, r11, r3, ror #16
 	uxtb r1, r6, ror #8
 
 	uxtb r2, r7, ror #8
@@ -67,9 +75,9 @@ CM7_1T_AES_encrypt:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r10, r10, r2, ror #8
-	eor r11, r11, r3, ror #8
-
 	uxtb r0, r6, ror #16
+
+	eor r11, r11, r3, ror #8
 	uxtb r1, r7, ror #16
 
 	uxtb r2, r4, ror #16
@@ -85,9 +93,9 @@ CM7_1T_AES_encrypt:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r10, r2
-	eor r11, r3
-
 	uxtb r0, r7, ror #24
+
+	eor r11, r3
 	uxtb r1, r4, ror #24
 
 	uxtb r2, r5, ror #24
@@ -139,8 +147,8 @@ CM7_1T_AES_encrypt:
 	ldr r3, [r14, r3, lsl #2]
 	bfi r10, r2, #24, #8
 
-	bfi r11, r3, #24, #8
 	uxtb r0, r4
+	bfi r11, r3, #24, #8
 
 	uxtb r1, r5
 	uxtb r3, r7
@@ -157,8 +165,8 @@ CM7_1T_AES_encrypt:
 	ldr r3, [r14, r3, lsl #2]
 	bfi r10, r2, #8, #8
 
-	bfi r11, r3, #8, #8
 	uxtb r0, r5, ror #8
+	bfi r11, r3, #8, #8
 
 	uxtb r1, r6, ror #8
 	uxtb r2, r7, ror #8
@@ -178,8 +186,7 @@ CM7_1T_AES_encrypt:
 	ldr r0, [r12]
 	bfi r11, r3, #16, #8
 
-	//ldmia r12, {r0-r3} // again slower
-
+	//ldmia r12, {r0-r3}
 	ldr r1, [r12, #4]
 	eor r0, r0, r8, ror #8
 
