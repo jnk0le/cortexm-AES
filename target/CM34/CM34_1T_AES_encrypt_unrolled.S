@@ -28,8 +28,8 @@ CM34_1T_AES_encrypt_unrolled:
 	eorvc r6, r2 // do not set a flags
 	eorvc r7, r3 // do not set a flags
 
-	beq.w 12f // if rounds == 12
 	blo.w 10f // if rounds < 12
+	beq.w 12f // if rounds == 12
 	// go forward if rounds > 12
 
 	// round 1
