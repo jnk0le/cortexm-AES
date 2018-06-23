@@ -11,7 +11,7 @@
 .global CM7_1T_AES_decrypt_unrolled
 .type   CM7_1T_AES_decrypt_unrolled,%function
 CM7_1T_AES_decrypt_unrolled:
-	push {r2, r4-r11, lr} //stack output pointer
+	push {r2,r4-r11, lr} //stack output pointer
 
 	add r12, r0, r3, lsl #4 //rk_end-16 = rk + rounds * 16
 	cmp r3, #12
@@ -20,7 +20,7 @@ CM7_1T_AES_decrypt_unrolled:
 	movt r14, #:upper16:AES_Td0
 
 	//load input
-	ldmia r1!, {r4-r7}
+	ldm r1, {r4-r7}
 
 	//load initial round key
 	ldm r12, {r0-r3}
@@ -1064,13 +1064,13 @@ CM7_1T_AES_decrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	movw r14, #:lower16:AES_inv_sbox //final round
+	ldr r8, [r12, #-16]! //final round
 
-	eor r7, r11, r3, ror #24
+	movw r14, #:lower16:AES_inv_sbox //final round
 	movt r14, #:upper16:AES_inv_sbox //final round
 
+	eor r7, r11, r3, ror #24
 	//final round
-	ldr r8, [r12, #-16]!
 	ldr r9, [r12, #4]
 
 	uxtb r0, r4

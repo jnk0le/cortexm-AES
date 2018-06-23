@@ -1,6 +1,6 @@
 /*!
  * \file cipher_impl.hpp
- * \version 2.2.0
+ * \version 2.3.0
  * \brief implementation wrappers of aes ciphers
  *
  * \author jnk0le <jnk0le@hotmail.com>
@@ -110,10 +110,9 @@ namespace target {
 				CM7_1T_AES_encrypt_unrolled(rk, data_in, data_out, this->key_rounds);
 			}
 
-			// negative or no gain in decryption
-			//void decrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
-			//	CM7_1T_AES_decrypt_unrolled(rk, data_in, data_out, this->key_rounds);
-			//}
+			void decrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
+				CM7_1T_AES_decrypt_unrolled(rk, data_in, data_out, this->key_rounds);
+			}
 		};
 
 } //namespace target

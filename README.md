@@ -77,8 +77,8 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 | `encrypt<128>`      |  | 690      | 340.01 |  |
 | `encrypt<192>`      |  | 818      | 402.01 |  |
 | `encrypt<256>`      |  | 946      | 464.01 |  |
-| `enc_unrolled<128>` |  | 630/1030 | 323    |  |
-| `enc_unrolled<192>` |  | 743/1214 | 380    |  |
+| `enc_unrolled<128>` |  | 630/1030 | 326    |  |
+| `enc_unrolled<192>` |  | 743/1214 | 384    |  |
 | `enc_unrolled<256>` |  | 857/1407 | 439.01 |  |
 | `setDecKey<128>`    |  | 723      | 518.01 |  |
 | `setDecKey<192>`    |  | 877      | 630.01 |  |
@@ -86,9 +86,9 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 | `decrypt<128>`      |  | 695      | 344.01 |  |
 | `decrypt<192>`      |  | 825      | 406.01 |  |
 | `decrypt<256>`      |  | 951      | 468.01 |  |
-| `dec_unrolled<128>` |  | 632/1037 | -      |  |
-| `dec_unrolled<192>` |  | 747/1217 | -      |  |
-| `dec_unrolled<256>` |  | 859/1416 | -      |  |
+| `dec_unrolled<128>` |  | 632/1037 | 326.01 |  |
+| `dec_unrolled<192>` |  | 747/1217 | 384    |  |
+| `dec_unrolled<256>` |  | 859/1416 | 436.01 |  |
 
 Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 
