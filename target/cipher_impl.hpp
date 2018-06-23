@@ -1,6 +1,6 @@
 /*!
  * \file cipher_impl.hpp
- * \version 2.0.0
+ * \version 2.2.0
  * \brief implementation wrappers of aes ciphers
  *
  * \author jnk0le <jnk0le@hotmail.com>
@@ -54,7 +54,18 @@ namespace target {
 			static constexpr size_t key_rounds = (key_length == 128) ? 10 : ((key_length == 192) ? 12 : 14);
 		};
 
-//+unrolled
+	template<size_t key_length>
+		class CM34_1T_unrolled : public CM34_1T<key_length>
+		{
+		public: // override only unrolled functions
+			void encrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
+				CM34_1T_AES_encrypt_unrolled(rk, data_in, data_out, this->key_rounds);
+			}
+
+			void decrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
+				CM34_1T_AES_decrypt_unrolled(rk, data_in, data_out, this->key_rounds);
+			}
+		};
 
 	template<size_t key_length>
 		class CM7_1T
@@ -91,8 +102,19 @@ namespace target {
 			static constexpr size_t key_rounds = (key_length == 128) ? 10 : ((key_length == 192) ? 12 : 14);
 		};
 
-//+unrolled
+	template<size_t key_length>
+		class CM7_1T_unrolled : public CM7_1T<key_length>
+		{
+		public: // override only unrolled functions
+			void encrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
+				CM7_1T_AES_encrypt_unrolled(rk, data_in, data_out, this->key_rounds);
+			}
 
+			// negative or no gain in decryption
+			//void decrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
+			//	CM7_1T_AES_decrypt_unrolled(rk, data_in, data_out, this->key_rounds);
+			//}
+		};
 
 } //namespace target
 } //namespace aes

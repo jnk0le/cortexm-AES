@@ -1,5 +1,4 @@
 // uses backward expanded round key
-
 // LUT loads are splitted to avoid data dependent issuing capability from even/odd DTCM words
 
 .syntax unified

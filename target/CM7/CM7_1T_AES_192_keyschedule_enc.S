@@ -20,7 +20,7 @@ CM7_1T_AES_192_keyschedule_enc:
 	movt r14, #:upper16:AES_Te0
 
 	//load key
-	ldmia r1!, {r2-r7} //align following code to 4 bytes
+	ldmia r1!, {r2-r7}
 	movw r1, #0x01 //first rcon //align following code to 4 bytes
 
 	//just copy a key
