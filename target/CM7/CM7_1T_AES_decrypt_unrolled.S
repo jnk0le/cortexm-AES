@@ -116,10 +116,10 @@ CM7_1T_AES_decrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12, #-16]! //round 2
+	ldr r8, [r12, #-16]!
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12, #4] //round 2
+	ldr r9, [r12, #4]
 
 	//round 2
 	uxtb r0, r4
@@ -195,10 +195,10 @@ CM7_1T_AES_decrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12, #-16]! //round 3/1
+	ldr r8, [r12, #-16]!
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12, #4] //round 3/1
+	ldr r9, [r12, #4]
 
 	//round 3/1
 12:	uxtb r0, r4
@@ -274,10 +274,10 @@ CM7_1T_AES_decrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12, #-16]! //round 4/2
+	ldr r8, [r12, #-16]!
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12, #4] //round 4/2
+	ldr r9, [r12, #4]
 
 	//round 4/2
 	uxtb r0, r4
@@ -353,10 +353,10 @@ CM7_1T_AES_decrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12, #-16]! //round 5/3/1
+	ldr r8, [r12, #-16]!
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12, #4] //round 5/3/1
+	ldr r9, [r12, #4]
 
 	//round 5/3/1
 10:	uxtb r0, r4
@@ -432,10 +432,10 @@ CM7_1T_AES_decrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12, #-16]! //round 6/4/2
+	ldr r8, [r12, #-16]!
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12, #4] //round 6/4/2
+	ldr r9, [r12, #4]
 
 	//round 6/4/2
 	uxtb r0, r4
@@ -511,10 +511,10 @@ CM7_1T_AES_decrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12, #-16]! //round 7/5/3
+	ldr r8, [r12, #-16]!
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12, #4] //round 7/5/3
+	ldr r9, [r12, #4]
 
 	//round 7/5/3
 	uxtb r0, r4
@@ -590,10 +590,10 @@ CM7_1T_AES_decrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12, #-16]! //round 8/6/4
+	ldr r8, [r12, #-16]!
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12, #4] //round 8/6/4
+	ldr r9, [r12, #4]
 
 	//round 8/6/4
 	uxtb r0, r4
@@ -669,10 +669,10 @@ CM7_1T_AES_decrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12, #-16]! //round 9/7/5
+	ldr r8, [r12, #-16]!
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12, #4] //round 9/7/5
+	ldr r9, [r12, #4]
 
 	//round 9/7/5
 	uxtb r0, r4
@@ -748,10 +748,10 @@ CM7_1T_AES_decrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12, #-16]! //round 10/8/6
+	ldr r8, [r12, #-16]!
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12, #4] //round 10/8/6
+	ldr r9, [r12, #4]
 
 	//round 10/8/6
 	uxtb r0, r4
@@ -827,10 +827,10 @@ CM7_1T_AES_decrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12, #-16]! //round 11/9/7
+	ldr r8, [r12, #-16]!
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12, #4] //round 11/9/7
+	ldr r9, [r12, #4]
 
 	//round 11/9/7
 	uxtb r0, r4
@@ -906,10 +906,10 @@ CM7_1T_AES_decrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12, #-16]! //round 12/10/8
+	ldr r8, [r12, #-16]!
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12, #4] //round 12/10/8
+	ldr r9, [r12, #4]
 
 	//round 12/10/8
 	uxtb r0, r4
@@ -985,10 +985,10 @@ CM7_1T_AES_decrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12, #-16]! //round 13/11/9
+	ldr r8, [r12, #-16]!
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12, #4] //round 13/11/9
+	ldr r9, [r12, #4]
 
 	//round 13/11/9
 	uxtb r0, r4
@@ -1064,10 +1064,10 @@ CM7_1T_AES_decrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12, #-16]! //final round
+	ldr r8, [r12, #-16]!
 
-	movw r14, #:lower16:AES_inv_sbox //final round
-	movt r14, #:upper16:AES_inv_sbox //final round
+	movw r14, #:lower16:AES_inv_sbox
+	movt r14, #:upper16:AES_inv_sbox
 
 	eor r7, r11, r3, ror #24
 	//final round
@@ -1146,10 +1146,11 @@ CM7_1T_AES_decrypt_unrolled:
 	ldrb r3, [r14, r3]
 
 	eor r2, r10, r2, lsl #24
-	ldr r4, [sp], #4 //load output pointer and clear stack
+	ldr r5, [sp], #4 //load output pointer and clear stack
 
 	eor r3, r11, r3, lsl #24
+	ldr r4, [sp], #4 // pop early to pop even number of registers later
 
-	stmia r4!, {r0-r3}
+	stmia r5!, {r0-r3}
 
-	pop {r4-r11, pc}
+	pop {r5-r11, pc}

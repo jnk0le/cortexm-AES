@@ -71,24 +71,24 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 
 | Cipher function     | ? (0ws) - cortex m3 | STM32F4 (0ws/7ws) - cortex m4 | cortex-m7 (icache) | cortex-m7 (?) |
 |---------------------|---------------------|-------------------------------|--------------------|---------------|
-| `setEncKey<128>`    |  | 306      | 157.03 |  |
-| `setEncKey<192>`    |  | 282      | 140.01 |  |
-| `setEncKey<256>`    |  | 435      | 227.01 |  |
-| `encrypt<128>`      |  | 690      | 340.01 |  |
-| `encrypt<192>`      |  | 818      | 402.01 |  |
-| `encrypt<256>`      |  | 946      | 464.01 |  |
-| `enc_unrolled<128>` |  | 629/1022 | 326    |  |
-| `enc_unrolled<192>` |  | 744/1219 | 384    |  |
-| `enc_unrolled<256>` |  | 857/1407 | 439.01 |  |
-| `setDecKey<128>`    |  | 723      | 518.01 |  |
-| `setDecKey<192>`    |  | 877      | 630.01 |  |
-| `setDEcKey<256>`    |  | 1031     | 742.01 |  |
-| `decrypt<128>`      |  | 695      | 344.01 |  |
-| `decrypt<192>`      |  | 825      | 406.01 |  |
-| `decrypt<256>`      |  | 951      | 468.01 |  |
-| `dec_unrolled<128>` |  | 631/1031 | 326.01 |  |
-| `dec_unrolled<192>` |  | 748/1223 | 384    |  |
-| `dec_unrolled<256>` |  | 859/1408 | 436.01 |  |
+| `setEncKey<128>`    |  | 306      | 157 |  |
+| `setEncKey<192>`    |  | 282      | 140 |  |
+| `setEncKey<256>`    |  | 435      | 227 |  |
+| `encrypt<128>`      |  | 690      | 340 |  |
+| `encrypt<192>`      |  | 818      | 402 |  |
+| `encrypt<256>`      |  | 946      | 464 |  |
+| `enc_unrolled<128>` |  | 629/1022 | 325 |  |
+| `enc_unrolled<192>` |  | 744/1219 | 383 |  |
+| `enc_unrolled<256>` |  | 857/1407 | 438 |  |
+| `setDecKey<128>`    |  | 723      | 518 |  |
+| `setDecKey<192>`    |  | 877      | 630 |  |
+| `setDEcKey<256>`    |  | 1031     | 742 |  |
+| `decrypt<128>`      |  | 695      | 344 |  |
+| `decrypt<192>`      |  | 825      | 406 |  |
+| `decrypt<256>`      |  | 951      | 468 |  |
+| `dec_unrolled<128>` |  | 631/1031 | 325 |  |
+| `dec_unrolled<192>` |  | 748/1223 | 383 |  |
+| `dec_unrolled<256>` |  | 859/1408 | 435 |  |
 
 Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 

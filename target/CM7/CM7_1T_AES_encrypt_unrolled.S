@@ -118,10 +118,10 @@ CM7_1T_AES_encrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12], #4 //round 2
+	ldr r8, [r12], #4
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12], #4 //round 2
+	ldr r9, [r12], #4
 
 	//round 2
 	//ldmia r12!, {r8-r11}
@@ -200,10 +200,10 @@ CM7_1T_AES_encrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12], #4 //round 3/1
+	ldr r8, [r12], #4
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12], #4 //round 3/1
+	ldr r9, [r12], #4
 
 	//round 3/1
 12:	//ldmia r12!, {r8-r11}
@@ -282,10 +282,10 @@ CM7_1T_AES_encrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12], #4 //round 4/2
+	ldr r8, [r12], #4
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12], #4 //round 4/2
+	ldr r9, [r12], #4
 
 	//round 4/2
 	//ldmia r12!, {r8-r11}
@@ -364,10 +364,10 @@ CM7_1T_AES_encrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12], #4 //round 5/3/1
+	ldr r8, [r12], #4
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12], #4 //round 5/3/1
+	ldr r9, [r12], #4
 
 	//round 5/3/1
 10:	//ldmia r12!, {r8-r11}
@@ -446,10 +446,10 @@ CM7_1T_AES_encrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12], #4 //round 6/4/2
+	ldr r8, [r12], #4
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12], #4 //round 6/4/2
+	ldr r9, [r12], #4
 
 	//round 6/4/2
 	//ldmia r12!, {r8-r11}
@@ -528,10 +528,10 @@ CM7_1T_AES_encrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12], #4 //round 7/5/3
+	ldr r8, [r12], #4
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12], #4 //round 7/5/3
+	ldr r9, [r12], #4
 
 	//round 7/5/3
 	//ldmia r12!, {r8-r11}
@@ -610,10 +610,10 @@ CM7_1T_AES_encrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12], #4 //round 8/6/4
+	ldr r8, [r12], #4
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12], #4 //round 8/6/4
+	ldr r9, [r12], #4
 
 	//round 8/6/4
 	//ldmia r12!, {r8-r11}
@@ -692,10 +692,10 @@ CM7_1T_AES_encrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12], #4 //round 9/7/5
+	ldr r8, [r12], #4
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12], #4 //round 9/7/5
+	ldr r9, [r12], #4
 
 	//round 9/7/5
 	//ldmia r12!, {r8-r11}
@@ -774,10 +774,10 @@ CM7_1T_AES_encrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12], #4 //round 10/8/6
+	ldr r8, [r12], #4
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12], #4 //round 10/8/6
+	ldr r9, [r12], #4
 
 	//round 10/8/6
 	//ldmia r12!, {r8-r11}
@@ -856,10 +856,10 @@ CM7_1T_AES_encrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12], #4 //round 11/9/7
+	ldr r8, [r12], #4
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12], #4 //round 11/9/7
+	ldr r9, [r12], #4
 
 	//round 11/9/7
 	//ldmia r12!, {r8-r11}
@@ -938,10 +938,10 @@ CM7_1T_AES_encrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12], #4 //round 12/10/8
+	ldr r8, [r12], #4
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12], #4 //round 12/10/8
+	ldr r9, [r12], #4
 
 	//round 12/10/8
 	//ldmia r12!, {r8-r11}
@@ -1020,10 +1020,10 @@ CM7_1T_AES_encrypt_unrolled:
 	ldr r3, [r14, r3, lsl #2]
 
 	eor r6, r10, r2, ror #24
-	ldr r8, [r12], #4 //round 13/11/9
+	ldr r8, [r12], #4
 
 	eor r7, r11, r3, ror #24
-	ldr r9, [r12], #4 //round 13/11/9
+	ldr r9, [r12], #4
 
 	//round 13/11/9
 	//ldmia r12!, {r8-r11}
@@ -1101,18 +1101,18 @@ CM7_1T_AES_encrypt_unrolled:
 	eor r5, r9, r1, ror #24
 	ldr r3, [r14, r3, lsl #2]
 
+	eor r6, r10, r2, ror #24
+	uxtb r1, r4, ror #24
+
 	eor r7, r11, r3, ror #24
 	//final round
-	uxtb r0, r7, ror #24
+	uxtb r3, r6, ror #24
 
-	eor r6, r10, r2, ror #24 // 1 instruction still not paired - no gain
-	uxtb r1, r4, ror #24
+	uxtb r0, r7, ror #24
+	ldr r9, [r14, r1, lsl #2]
 
 	uxtb r2, r5, ror #24
 	ldr r8, [r14, r0, lsl #2]
-
-	uxtb r3, r6, ror #24
-	ldr r9, [r14, r1, lsl #2]
 
 	uxtb r0, r6, ror #16
 	ldr r10, [r14, r2, lsl #2]
@@ -1182,10 +1182,11 @@ CM7_1T_AES_encrypt_unrolled:
 	ldr r3, [r12, #12]
 
 	eor r2, r2, r10, ror #8
-	ldr r4, [sp], #4 //load output pointer and clear stack
+	ldr r5, [sp], #4 //load output pointer and clear stack
 
 	eor r3, r3, r11, ror #8
+	ldr r4, [sp], #4 // pop early to pop even number of registers later
 
-	stmia r4!, {r0-r3}
+	stmia r5!, {r0-r3}
 
-	pop {r4-r11,pc}
+	pop {r5-r11,pc}
