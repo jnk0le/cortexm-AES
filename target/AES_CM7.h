@@ -1,6 +1,6 @@
 /*!
  * \file AES_CM7.h
- * \version 2.5.0
+ * \version 2.6.0
  * \brief FIPS 197 compliant software AES implementation optimized for cortex-m7 utilizing a single T table
  *
  * LUT tables are occupying 1 kB + 1.25 kB of memory for encryption + decryption
@@ -22,7 +22,7 @@
 	extern "C" {
 #endif
 
-//	void CM7_1T_AES_128_keyschedule_enc(uint8_t* rk, const uint8_t* key); // __attribute__ ((section(".itcm.text")));
+	void CM7_1T_AES_128_keyschedule_enc(uint8_t* rk, const uint8_t* key); // __attribute__ ((section(".itcm.text")));
 	void CM7_1T_AES_192_keyschedule_enc(uint8_t* rk, const uint8_t* key); // __attribute__ ((section(".itcm.text")));
 	void CM7_1T_AES_256_keyschedule_enc(uint8_t* rk, const uint8_t* key); // __attribute__ ((section(".itcm.text")));
 	void CM7_1T_AES_keyschedule_dec(uint8_t* rk, size_t rounds); // __attribute__ ((section(".itcm.text")));

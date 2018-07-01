@@ -59,7 +59,7 @@ CM7_1T_AES_256_keyschedule_enc:
 	str r3, [r1], #4
 
 	eors r4, r3
-	str r4, [r1], #4//8 // preserve space to put r5 later
+	str r4, [r1], #4
 
 	eors r5, r4
 	str r1, [sp, #4] //save rk pointer
@@ -87,7 +87,7 @@ CM7_1T_AES_256_keyschedule_enc:
 	ldr r1, [sp, #4] //replace Te0 with rk pointer
 
 	eor r6, r6, r14, lsl #24
-	str r5, [r1], #4 //somehow r1 can be used freely here
+	str r5, [r1], #4
 
 	itttt ne
 	eorne r7, r6 // do not set a flags
