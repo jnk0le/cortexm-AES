@@ -33,7 +33,7 @@ FLASH memory simply cannot be used since vendors usually implements some kind of
 cortex m7 optimized implementation.
 Uses a single T table per enc/dec cipher and additional inv_sbox for final round in decryption.
 
-Based on CM34 implementation, carefully rescheduled for dual issue pipeline, with 2x32 bit DTCM interface, to avoid data dependent issuing capability from even/odd DTCM words.
+Based on CM34 implementation, carefully reordered for dual issue pipeline, with 2x32 bit DTCM interface, to avoid data dependent issuing capability from even/odd DTCM words.
 The speed differences can be illustrated by the following code:
 ```
 	tick = DWT->CYCCNT;
@@ -41,10 +41,10 @@ The speed differences can be illustrated by the following code:
 			"movw r9, #:lower16:AES_Te0 \n"
 			"movt r9, #:upper16:AES_Te0 \n"
 			"ldr r0, [r9, #0] \n"
-			"ldr r0, [r9, #8] \n"
-			"ldr r0, [r9, #16] \n"
-			"ldr r0, [r9, #24] \n"
-			""::: "r0","r9");
+			"ldr r1, [r9, #8] \n"
+			"ldr r2, [r9, #16] \n"
+			"ldr r3, [r9, #24] \n"
+			""::: "r0","r1","r2","r3","r9");
 	tock = DWT->CYCCNT - tick - 1;
 
 	printf("4 even loads, cycles: %lu\n", tock);
@@ -54,10 +54,10 @@ The speed differences can be illustrated by the following code:
 			"movw r9, #:lower16:AES_Te0 \n"
 			"movt r9, #:upper16:AES_Te0 \n"
 			"ldr r0, [r9, #0] \n"
-			"ldr r0, [r9, #4] \n"
-			"ldr r0, [r9, #8] \n"
-			"ldr r0, [r9, #12] \n"
-			""::: "r0","r9");
+			"ldr r1, [r9, #4] \n"
+			"ldr r2, [r9, #8] \n"
+			"ldr r3, [r9, #12] \n"
+			""::: "r0","r1","r2","r3","r9");
 	tock = DWT->CYCCNT - tick - 1;
 
 	printf("4 linear loads, cycles: %lu\n", tock);
@@ -69,7 +69,7 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 
 ## Base ciphers performance (in cycles)
 
-| Cipher function     | ? (0ws) - cortex m3 | STM32F4 (0ws/7ws) - cortex m4 | STM32H7 (icache*) - cortex-m7| cortex-m7 (?) |
+| Cipher function     | ? (0ws) - cortex m3 | STM32F4 (0ws/7ws) - cortex m4 | STM32H7 (icache*) - cortex-m7 | cortex-m7 (?) |
 |---------------------|---------------------|-------------------------------|--------------------|---------------|
 | `setEncKey<128>`    |  | 306      | 157 |  |
 | `setEncKey<192>`    |  | 282      | 140 |  |
@@ -86,12 +86,12 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 | `decrypt<128>`      |  | 695      | 344 |  |
 | `decrypt<192>`      |  | 825      | 406 |  |
 | `decrypt<256>`      |  | 951      | 468 |  |
-| `dec_unrolled<128>` |  | 631/1031 | 325 |  |
-| `dec_unrolled<192>` |  | 748/1223 | 383 |  |
-| `dec_unrolled<256>` |  | 859/1408 | 435 |  |
+| `dec_unrolled<128>` |  | 631/1031 | 319 |  |
+| `dec_unrolled<192>` |  | 748/1223 | 376 |  |
+| `dec_unrolled<256>` |  | 859/1408 | 434 |  |
 
 Results are averaged over 1024 runs + one ommited (instruction) cache train run.
-* Assuming no cache pressure due to code size or associativity (using unrolled ciphers in [aes tests](aes_tests.hpp) can add about 10 cycles in this case)
+* Assuming no cache pressure due to code size or associativity (using unrolled ciphers in [aes tests](aes_tests.hpp) can add about 10 cycles in this case (7ws flash))
 
 ## todo
 - add block modes (CBC, CTR etc.)
