@@ -26,7 +26,7 @@ aes::CipherContext<256, aes::target::CM7_1T> t256;
 
 //just a dirty function in a header
 
-//__attribute__ ((section(".itcm.text")))
+__attribute__ ((section(".itcm.text"), noinline))
 void aes_ecb_test()
 {
 	uint32_t tick, tock;

@@ -69,29 +69,34 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 
 ## Base ciphers performance (in cycles)
 
-| Cipher function     | ? (0ws) - cortex m3 | STM32F4 (0ws/7ws) - cortex m4 | STM32H7 (icache*) - cortex-m7 | cortex-m7 (?) |
-|---------------------|---------------------|-------------------------------|--------------------|---------------|
-| `setEncKey<128>`    |  | 306      | 157 |  |
-| `setEncKey<192>`    |  | 282      | 140 |  |
-| `setEncKey<256>`    |  | 435      | 227 |  |
-| `encrypt<128>`      |  | 690      | 340 |  |
-| `encrypt<192>`      |  | 818      | 402 |  |
-| `encrypt<256>`      |  | 946      | 464 |  |
-| `enc_unrolled<128>` |  | 629/1022 | 315 |  |
-| `enc_unrolled<192>` |  | 744/1219 | 373 |  |
-| `enc_unrolled<256>` |  | 857/1407 | 431 |  |
-| `setDecKey<128>`    |  | 723      | 518 |  |
-| `setDecKey<192>`    |  | 877      | 630 |  |
-| `setDEcKey<256>`    |  | 1031     | 742 |  |
-| `decrypt<128>`      |  | 695      | 344 |  |
-| `decrypt<192>`      |  | 825      | 406 |  |
-| `decrypt<256>`      |  | 951      | 468 |  |
-| `dec_unrolled<128>` |  | 631/1031 | 319 |  |
-| `dec_unrolled<192>` |  | 748/1223 | 376 |  |
-| `dec_unrolled<256>` |  | 859/1408 | 434 |  |
+| Cipher function     | ? (0ws/2ws) - cortex m3 | STM32F4 (0ws/7ws) - cortex m4 | STM32H7 icache* - cortex-m7 | STM32H7 itcm (rolled/unrolled)** - cortex-m7 |
+|---------------------|---------------------|-------------------------------|-------------------------------|----------------------------------|
+| `setEncKey<128>`    |  | 306      | 157 | 157/166 |
+| `setEncKey<192>`    |  | 282      | 140 | 140/149 |
+| `setEncKey<256>`    |  | 435      | 227 | 227/236 |
+| `encrypt<128>`      |  | 690      | 340 | 340/ - |
+| `encrypt<192>`      |  | 818      | 402 | 402/ - |
+| `encrypt<256>`      |  | 946      | 464 | 464/ - |
+| `enc_unrolled<128>` |  | 629/1022 | 315 | - /321 |
+| `enc_unrolled<192>` |  | 744/1219 | 373 | - /381 |
+| `enc_unrolled<256>` |  | 857/1407 | 431 | - /440 |
+| `setDecKey<128>`    |  | 723      | 518 | 518/527 |
+| `setDecKey<192>`    |  | 877      | 630 | 630/639 |
+| `setDEcKey<256>`    |  | 1031     | 742 | 742/751 |
+| `decrypt<128>`      |  | 695      | 344 | 345/ - |
+| `decrypt<192>`      |  | 825      | 406 | 407/ - |
+| `decrypt<256>`      |  | 951      | 468 | 469/ - |
+| `dec_unrolled<128>` |  | 631/1031 | 319 | - /317 |
+| `dec_unrolled<192>` |  | 748/1223 | 376 | - /385 |
+| `dec_unrolled<256>` |  | 859/1408 | 434 | - /443 |
 
 Results are averaged over 1024 runs + one ommited (instruction) cache train run.
-* Assuming no cache pressure due to code size or associativity (using unrolled ciphers in [aes tests](aes_tests.hpp) can add about 10 cycles in this case (7ws flash))
+
+`*` Assuming no cache pressure due to code size, associativity, or something other (using unrolled ciphers in [aes tests](aes_tests.hpp) 
+can add about 10 cycles in this case (7ws flash))
+
+`**` When at least 2 unrolled functions are compiled in, everything else (including those functions) gets +9/10 cycles to execution.  
+`long_call` attribute will only add few cycles in both cases.
 
 ## todo
 - add block modes (CBC, CTR etc.)
