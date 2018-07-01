@@ -1,6 +1,6 @@
 /*!
  * \file cipher_impl.hpp
- * \version 2.3.0
+ * \version 2.4.0
  * \brief implementation wrappers of aes ciphers
  *
  * \author jnk0le <jnk0le@hotmail.com>
@@ -107,9 +107,23 @@ namespace target {
 		{
 		public: // override only unrolled functions
 			void encrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
-				CM7_1T_AES_encrypt_unrolled(rk, data_in, data_out, this->key_rounds);
+				//CM7_1T_AES_encrypt_unrolled(rk, data_in, data_out, this->key_rounds);
+				switch(key_length)
+				{
+				case 128:
+					CM7_1T_AES_128_encrypt_unrolled(rk, data_in, data_out);
+					break;
+				case 192:
+					CM7_1T_AES_192_encrypt_unrolled(rk, data_in, data_out);
+					break;
+				case 256:
+					CM7_1T_AES_256_encrypt_unrolled(rk, data_in, data_out);
+					break;
+				}
+
 			}
 
+			//not yet
 			void decrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
 				CM7_1T_AES_decrypt_unrolled(rk, data_in, data_out, this->key_rounds);
 			}
