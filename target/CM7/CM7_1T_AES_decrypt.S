@@ -201,14 +201,14 @@ CM7_1T_AES_decrypt:
 	ldrb r3, [r14, r3]
 
 	eor r2, r10, r2, lsl #24
-	ldr r4, [sp], #4 //load output pointer and clear stack
+	ldr r5, [sp], #4 //load output pointer and clear stack
 
 	eor r3, r11, r3, lsl #24
-	//strd/stmia cannot be dual issued
+	ldr r4, [sp], #4 // pop early to pop even number of registers later
 
 	//strd r0,r1, [r4, #0]
 	//strd r2,r3, [r4, #8]
 
-	stmia r4!, {r0-r3}
+	stmia r5!, {r0-r3}
 
-	pop {r4-r11, pc}
+	pop {r5-r11, pc}
