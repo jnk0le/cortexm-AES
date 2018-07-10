@@ -1,6 +1,6 @@
 /*!
  * \file aes_cipher.hpp
- * \version 2.0.1
+ * \version 3.0.0
  * \brief basic ECB cipher context class
  *
  * \warning Do not use ECB mode for more than 16 bytes of plaintext data per key.
@@ -24,7 +24,6 @@ namespace aes
 		{
 		public:
 			CipherContext() {}
-			//copy constructor ??
 			~CipherContext() {}
 
 			void setEncKey(const uint8_t* key) {
@@ -40,14 +39,14 @@ namespace aes
 				impl<key_length>::key_schedule_dec(this->round_key);
 			}
 
-			void encrypt(uint8_t* data) const {
+			void encrypt(uint8_t* data) {
 				encrypt(data, data);
 			}
 
 			void encrypt(const uint8_t* data_in, uint8_t* data_out) {
 				impl<key_length>::encrypt(this->round_key, data_in, data_out);
 			}
-			void decrypt(uint8_t* data) const {
+			void decrypt(uint8_t* data) {
 				decrypt(data, data);
 			}
 
@@ -55,9 +54,10 @@ namespace aes
 				impl<key_length>::decrypt(this->round_key, data_in, data_out);
 			}
 
-		private:
+		protected:
 			uint8_t round_key[(impl<key_length>::key_rounds+1)*16];
 
+		private:
 			static_assert(key_length == 128 || key_length == 192 || key_length == 256,
 					"non standard key lengths are not supported");
 		};

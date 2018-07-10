@@ -10,7 +10,7 @@ unknown or just implementation defined like section placement (you need to verif
 - None of the currently available implementations protects against power/EMI analysis attacks.
 - do not use CM34_1T implementation on cortex-m7 since it is slower and will introduce timming leaks.
 - Unrolled ciphers might perform slower than looped versions due to cache pressure and flash waitstates. (like STM32F4 with 1K ART cache and up to 8WS) 
-- input/output buffers have to be word aligned due to use of ldm,stm and strd instructions.
+- input/output buffers have to be word aligned due to use of ldm,stm,ldrd and strd instructions.
 
 ## implementations
 
@@ -34,7 +34,7 @@ cortex m7 optimized implementation.
 Uses a single T table per enc/dec cipher and additional inv_sbox for final round in decryption.
 
 Based on CM34 implementation, carefully reordered for dual issue pipeline, with 2x32 bit DTCM interface, to avoid data dependent issuing capability from even/odd DTCM words.
-The speed differences can be illustrated by the following code:
+The time differences can be illustrated by the following code:
 ```
 	tick = DWT->CYCCNT;
 	asm volatile(""
@@ -69,8 +69,8 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 
 ## Base ciphers performance (in cycles)
 
-| Cipher function     | ? (0ws/2ws) - cortex m3 | STM32F4 (0ws/7ws) - cortex m4 | STM32H7 (icache/itcm)* - cortex-m7 |
-|---------------------|---------------------|-------------------------------|-------------------------------|
+| Cipher function     | STM32F1 (0ws/2ws) - cortex m3 | STM32F4 (0ws/7ws) - cortex m4 | STM32H7 (icache/itcm)* - cortex-m7 |
+|---------------------|-------------------------------|-------------------------------|------------------------------------|
 | `setEncKey<128>`    |  | 306      | 157 |
 | `setEncKey<192>`    |  | 282      | 140 |
 | `setEncKey<256>`    |  | 435      | 227 |
@@ -97,6 +97,7 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 
 ## todo
 - add block modes (CBC, CTR etc.)
+- add proper padding
 - add bitsliced/masked implementations
 - fix perf of unrolled functions
 - doxygen
