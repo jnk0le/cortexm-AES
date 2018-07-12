@@ -11,7 +11,7 @@
 .global CM7_1T_AES_decrypt
 .type   CM7_1T_AES_decrypt,%function
 CM7_1T_AES_decrypt:
-	adds r0, #16 //to compare against before final round
+	add.w r0, #16 //to compare against before final round
 	add r12, r0, r3, lsl #4 //rk_end = rk+16 + rounds * 16
 
 	push {r0, r2, r4-r11, lr} //stack rk+16, out
@@ -20,7 +20,7 @@ CM7_1T_AES_decrypt:
 	movt r14, #:upper16:AES_Td0
 
 	//load input
-	ldmia r1!, {r4-r7}
+	ldm.w r1, {r4-r7}
 
 	//load initial round key
 	ldmdb r12!, {r0-r3}
@@ -33,9 +33,7 @@ CM7_1T_AES_decrypt:
 	eors r7, r3
 
 1:	//ldmdb r12!, {r8-r11}
-	//ldrd r8,r9, [r12, #-16]!
-	ldr r8, [r12, #-16]!
-	ldr r9, [r12, #4]
+	ldrd r8,r9, [r12, #-16]!
 
 	uxtb r0, r4
 	ldr r10, [r12, #8]
@@ -205,9 +203,6 @@ CM7_1T_AES_decrypt:
 
 	eor r3, r11, r3, lsl #24
 	ldr r4, [sp], #4 // pop early to pop even number of registers later
-
-	//strd r0,r1, [r4, #0]
-	//strd r2,r3, [r4, #8]
 
 	stmia r5!, {r0-r3}
 
