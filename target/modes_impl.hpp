@@ -23,7 +23,7 @@ namespace target
 			using CipherContext<key_length, base_impl>::setEncKey;
 			using CipherContext<key_length, base_impl>::setDecKey;
 
-			uint32_t* encrypt(const uint8_t* data_in, uint8_t* data_out, const uint8_t* iv, uint32_t blocks_cnt)
+			uint32_t* encrypt(const uint8_t* data_in, uint8_t* data_out, const void* iv, uint32_t blocks_cnt)
 			{
 				uint32_t* data_in_p = (uint32_t*)data_in;
 				uint32_t* data_out_p = (uint32_t*)data_out;
@@ -46,7 +46,7 @@ namespace target
 				return iv_p;
 			}
 
-			uint32_t* decrypt(const uint8_t* data_in, uint8_t* data_out, uint8_t* iv, uint32_t blocks_cnt)
+			uint32_t* decrypt(const uint8_t* data_in, uint8_t* data_out, void* iv, uint32_t blocks_cnt)
 			{
 				uint32_t* data_out_p = (uint32_t*)data_out;
 				uint32_t* iv_p = (uint32_t*)iv;

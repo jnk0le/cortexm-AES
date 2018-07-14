@@ -25,11 +25,7 @@ namespace mode
 			CBC() {}
 			~CBC() {}
 
-			void setIv(uint8_t* n_iv) {
-				memcpy(this->iv, n_iv, 16);
-			}
-
-			void setIv(uint32_t* n_iv) {
+			void setIv(void* n_iv) {
 				memcpy(this->iv, n_iv, 16);
 			}
 
@@ -43,18 +39,12 @@ namespace mode
 			using mode_impl<key_length, base_impl>::setEncKey;
 			using mode_impl<key_length, base_impl>::setDecKey;
 
-			void encrypt(const uint8_t* data_in, uint8_t* data_out, uint32_t len)
-			{
-				uint32_t* new_iv;
-				new_iv = mode_impl<key_length, base_impl>::encrypt(data_in, data_out, (uint8_t*)iv, (len+15)/16);
-				this->setIv(new_iv);
+			void encrypt(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
+				this->setIv(mode_impl<key_length, base_impl>::encrypt(data_in, data_out, iv, (len+15)/16));
 			}
 
-			void decrypt(const uint8_t* data_in, uint8_t* data_out, uint32_t len)
-			{
-				uint32_t* new_iv;
-				new_iv = mode_impl<key_length, base_impl>::decrypt(data_in, data_out, (uint8_t*)iv, (len+15)/16);
-				this->setIv(new_iv);
+			void decrypt(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
+				this->setIv(mode_impl<key_length, base_impl>::decrypt(data_in, data_out, iv, (len+15)/16));
 			}
 
 		private:
