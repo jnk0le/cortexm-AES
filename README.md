@@ -69,26 +69,26 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 
 ## Base ciphers performance (in cycles)
 
-| Cipher function     | STM32F1 (0ws/2ws) - cortex m3 | STM32F4 (0ws/7ws) - cortex m4 | STM32H7 (icache/itcm)* - cortex-m7 |
-|---------------------|-------------------------------|-------------------------------|------------------------------------|
-| `setEncKey<128>`    | 302/355   | 306      | 157 |
-| `setEncKey<192>`    | 278/348   | 282      | 140 |
-| `setEncKey<256>`    | 402/516   | 435      | 227 |
-| `encrypt<128>`      | 667/896   | 680      | 337 |
-| `encrypt<192>`      | 791/1064  | 806      | 400/399 |
-| `encrypt<256>`      | 915/1232  | 932      | 461 |
-| `enc_unrolled<128>` |           | 629/1022 | 315/314 |
-| `enc_unrolled<192>` |           | 744/1219 | 373/372 | 
-| `enc_unrolled<256>` |           | 857/1407 | 431/430 | 
-| `setDecKey<128>`    | 720/997   | 723      | 518 |
-| `setDecKey<192>`    | 874/1211  | 877      | 630 |
-| `setDEcKey<256>`    | 1028/1425 | 1031     | 742 |
-| `decrypt<128>`      | 661/923   | 684      | 342/343 |
-| `decrypt<192>`      | 783/1098  | 812      | 404/405 |
-| `decrypt<256>`      | 905/1271  | 936      | 467/467 |
-| `dec_unrolled<128>` |           | 631/1031 | 319/317 |
-| `dec_unrolled<192>` |           | 748/1223 | 376/375 |
-| `dec_unrolled<256>` |           | 859/1408 | 434/433 | 
+| Cipher function     | STM32F1 dense impl (0ws/2ws) - cortex m3 |STM32F1 (0ws/2ws) - cortex m3 | STM32F4 (0ws/7ws) - cortex m4 | STM32H7 (icache/itcm)* - cortex-m7 |
+|---------------------|------------------------------------------|------------------------------|-------------------------------|-----------------------------------|
+| `setEncKey<128>`    |          | 302/355   | 306      | 157 |
+| `setEncKey<192>`    |          | 278/348   | 282      | 140 |
+| `setEncKey<256>`    |          | 402/516   | 435      | 227 |
+| `encrypt<128>`      | 668/883  | 667/896   | 680      | 337 |
+| `encrypt<192>`      | 792/1049 | 791/1064  | 806      | 400/399 |
+| `encrypt<256>`      | 916/1215 | 915/1232  | 932      | 461 |
+| `enc_unrolled<128>` |          |           | 629/1022 | 315/314 |
+| `enc_unrolled<192>` |          |           | 744/1219 | 373/372 | 
+| `enc_unrolled<256>` |          |           | 857/1407 | 431/430 | 
+| `setDecKey<128>`    |          | 720/997   | 723      | 518 |
+| `setDecKey<192>`    |          | 874/1211  | 877      | 630 |
+| `setDEcKey<256>`    |          | 1028/1425 | 1031     | 742 |
+| `decrypt<128>`      | 670/897  | 661/923   | 684      | 342/343 |
+| `decrypt<192>`      | 794/1066 | 783/1098  | 812      | 404/405 |
+| `decrypt<256>`      | 918/1233 | 905/1271  | 936      | 467/467 |
+| `dec_unrolled<128>` |          |           | 631/1031 | 319/317 |
+| `dec_unrolled<192>` |          |           | 748/1223 | 376/375 |
+| `dec_unrolled<256>` |          |           | 859/1408 | 434/433 | 
 
 Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 
@@ -101,7 +101,6 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 - add bitsliced/masked implementations
 - fix perf of cm7 unrolled functions
 - doxygen
-- denser cm34 enc/dec 
 - pre generation of lookups
 - forward keyschedule_dec 
 - optimize cm7 keyschedule_dec
