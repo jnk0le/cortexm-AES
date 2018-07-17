@@ -2,7 +2,7 @@
 .thumb
 .text
 
-.align 2
+.align 3
 // void CM34_1T_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
 .global CM34_1T_AES_encrypt
 .type   CM34_1T_AES_encrypt,%function
@@ -67,6 +67,9 @@ CM34_1T_AES_encrypt:
 	eor r10, r2
 	eor r11, r3
 
+	ldr r0, [sp, #4]
+	cmp r0, r12 // set flags early to optimize speculative fetches in cm3
+
 	uxtb r0, r7, ror #24
 	uxtb r1, r4, ror #24
 	uxtb r2, r5, ror #24
@@ -80,8 +83,6 @@ CM34_1T_AES_encrypt:
 	eor r6, r10, r2, ror #24
 	eor r7, r11, r3, ror #24
 
-	ldr r0, [sp, #4]
-	cmp r0, r12
 	bne.w 1b //align following code to 4 bytes
 
 	//final round

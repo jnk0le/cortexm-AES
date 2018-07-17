@@ -6,7 +6,7 @@
 .thumb
 .text
 
-.align 2
+.align 3
 // void CM34_1T_AES_256_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
 .global CM34_1T_AES_256_keyschedule_enc
 .type   CM34_1T_AES_256_keyschedule_enc,%function
@@ -26,7 +26,7 @@ CM34_1T_AES_256_keyschedule_enc:
 
 	mov.w r0, #0x01000000 // calculate rcon in highest byte to use a carry flag
 
-2:	uxtb r10, r9, ror #8
+1:	uxtb r10, r9, ror #8
 	uxtb r11, r9, ror #16
 	uxtb r12, r9, ror #24
 	uxtb r14, r9
@@ -43,7 +43,7 @@ CM34_1T_AES_256_keyschedule_enc:
 	eor r2, r2, r14, lsl #24
 	eors r3, r2
 	eors r4, r3
-	eors r5, r4
+	eor.w r5, r4 // align to 4 bytes
 
 	uxtb r10, r5, ror #16
 	uxtb r11, r5, ror #8
@@ -64,14 +64,14 @@ CM34_1T_AES_256_keyschedule_enc:
 	eor r8, r7
 	eor r9, r8
 
-	lsls r0, #1
+	lsls r0, #1 // set flags early
 
 	ittte pl // negative flag is set when r0 = 0x80000000
 	stmiapl r1!, {r2-r9} //write full roundkey
 	strpl r1, [sp, #4] //rk pointer
 	ldrpl r1, [sp] //Te0
 	stmiami r1!, {r2-r5} //write only 4 words at the last round
-	bpl 2b
+	bpl 1b
 
 	add sp, #8 // faster than dummy pops
 	pop {r4-r11, pc}

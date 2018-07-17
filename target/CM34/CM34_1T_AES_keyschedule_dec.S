@@ -6,7 +6,7 @@
 .thumb
 .text
 
-.align 2
+.align 3
 // void CM34_1T_AES_keyschedule_dec(uint8_t* rk, size_t rounds) {
 .global CM34_1T_AES_keyschedule_dec
 .type   CM34_1T_AES_keyschedule_dec,%function
@@ -16,14 +16,16 @@ CM34_1T_AES_keyschedule_dec:
 	//first and last block is ommited
 	//rk_end-16 = rk + rounds * 16
 	add r1, r0, r1, lsl #4
-	add r0, #16 //align following code to 4 bytes
+	add.w r0, #16 //align following code to 4 bytes
 
 	movw r14, #:lower16:AES_Te0
 	movt r14, #:upper16:AES_Te0
 	movw r12, #:lower16:AES_Td0
 	movt r12, #:upper16:AES_Td0
 
-1:	ldmdb r1, {r2-r5}
+	//nop.w
+
+1:	ldmdb r1!, {r2-r5}
 
 	uxtb r6, r2, ror #8
 	uxtb r7, r2, ror #16
@@ -89,10 +91,11 @@ CM34_1T_AES_keyschedule_dec:
 	eor r5, r5, r9, ror #16
 	eor r5, r5, r6, ror #8
 
-	//write roundkey
-	stmdb r1!, {r2-r5}
-
 	cmp r1, r0
+
+	//write roundkey
+	stm r1, {r2-r5}
+
 	bne 1b
 
 	pop {r4-r9, pc}

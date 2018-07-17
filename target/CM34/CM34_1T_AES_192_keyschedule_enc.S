@@ -6,7 +6,7 @@
 .thumb
 .text
 
-.align 2
+.align 3
 // void CM34_1T_AES_192_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
 .global CM34_1T_AES_192_keyschedule_enc
 .type   CM34_1T_AES_192_keyschedule_enc,%function
@@ -17,11 +17,11 @@ CM34_1T_AES_192_keyschedule_enc:
 	movt r14, #:upper16:AES_Te0
 
 	//load key
-	ldmia r1!, {r2-r7}
+	ldmia.w r1, {r2-r7} // align loop entry to 8 bytes
 	mov.w r1, #0x01000000 // calculate rcon in highest byte to use a carry flag
 
 	//just copy a key
-	stmia r0!, {r2-r7}
+	stmia.w r0!, {r2-r7} // align loop entry to 8 bytes
 
 1:	uxtb r8, r7, ror #8
 	uxtb r9, r7, ror #16
