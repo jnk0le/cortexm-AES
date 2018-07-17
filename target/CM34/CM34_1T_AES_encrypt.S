@@ -26,16 +26,29 @@ CM34_1T_AES_encrypt:
 	eors r6, r2
 	eors r7, r3
 
-1:	ldmia r12!, {r8-r11}
+1:
+#if __ARM_ARCH_7M__
+	ldmia r12!, {r8-r11}
+#endif
 
 	uxtb r0, r4
 	uxtb r1, r5
 	uxtb r2, r6
 	uxtb r3, r7
+
 	ldr r0, [r14, r0, lsl #2]
 	ldr r1, [r14, r1, lsl #2]
 	ldr r2, [r14, r2, lsl #2]
 	ldr r3, [r14, r3, lsl #2]
+
+#if __ARM_ARCH_7EM__
+	//doesn't pipeline well on cm3
+	ldr r8, [r12], #4
+	ldr r9, [r12], #4
+	ldr r10, [r12], #4
+	ldr r11, [r12], #4
+#endif
+
 	eor r8, r8, r0, ror #16
 	eor r9, r9, r1, ror #16
 	eor r10, r10, r2, ror #16
@@ -130,18 +143,22 @@ CM34_1T_AES_encrypt:
 	ldr r2, [r14, r2, lsl #2]
 	ldr r3, [r14, r3, lsl #2]
 	ldr r4, [sp], #8 // load output pointer and clear stack
+	ldr r14, [r12]
+	ldr r5, [r12, #4]
+	ldr r6, [r12, #8]
+	ldr r7, [r12, #12]
 
 	bfi r8, r0, #16, #8
 	bfi r9, r1, #16, #8
 	bfi r10, r2, #16, #8
 	bfi r11, r3, #16, #8
 
-	ldmia r12, {r0-r3}
+	//ldmia r12, {r0-r3}
 
-	eor r0, r0, r8, ror #8
-	eor r1, r1, r9, ror #8
-	eor r2, r2, r10, ror #8
-	eor r3, r3, r11, ror #8
+	eor r0, r14, r8, ror #8
+	eor r1, r5, r9, ror #8
+	eor r2, r6, r10, ror #8
+	eor r3, r7, r11, ror #8
 
 	str r0, [r4, #0]
 	str r1, [r4, #4]
