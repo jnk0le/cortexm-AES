@@ -69,9 +69,6 @@ CM34_1T_AES_encrypt_d:
 	eor r10, r2
 	eor r11, r3
 
-	ldr r0, [sp, #4]
-	cmp r0, r12 // set flags early to optimize speculative fetches in cm3
-
 	uxtb r0, r7, ror #24
 	uxtb r1, r4, ror #24
 	uxtb r2, r5, ror #24
@@ -80,6 +77,9 @@ CM34_1T_AES_encrypt_d:
 	ldr r1, [r14, r1, lsl #2]
 	ldr r2, [r14, r2, lsl #2]
 	ldr r3, [r14, r3, lsl #2]
+	ldr r4, [sp, #4]
+	cmp r4, r12 // set flags early to optimize speculative fetches in cm3
+
 	eor r4, r8, r0, ror #24
 	eor r5, r9, r1, ror #24
 	eor r6, r10, r2, ror #24
@@ -88,19 +88,21 @@ CM34_1T_AES_encrypt_d:
 	bne.w 1b //align following code to 4 bytes
 
 	//final round
-	uxtb r0, r7, ror #24
-	uxtb r1, r4, ror #24
-	uxtb r2, r5, ror #24
-	uxtb r3, r6, ror #24
-	ldr r8, [r14, r0, lsl #2]
-	ldr r9, [r14, r1, lsl #2]
-	ldr r10, [r14, r2, lsl #2]
-	ldr r11, [r14, r3, lsl #2]
+	uxtb r8, r7, ror #24
+	uxtb r9, r4, ror #24
+	uxtb r10, r5, ror #24
+	uxtb r11, r6, ror #24
 
 	uxtb r0, r6, ror #16
 	uxtb r1, r7, ror #16
 	uxtb r2, r4, ror #16
 	uxtb r3, r5, ror #16
+
+	ldr r8, [r14, r8, lsl #2]
+	ldr r9, [r14, r9, lsl #2]
+	ldr r10, [r14, r10, lsl #2]
+	ldr r11, [r14, r11, lsl #2]
+
 	ldr r0, [r14, r0, lsl #2]
 	ldr r1, [r14, r1, lsl #2]
 	ldr r2, [r14, r2, lsl #2]

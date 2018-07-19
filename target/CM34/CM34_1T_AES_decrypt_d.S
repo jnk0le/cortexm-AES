@@ -71,9 +71,6 @@ CM34_1T_AES_decrypt_d:
 	eor r10, r2
 	eor r11, r3
 
-	ldr r0, [sp]
-	cmp r0, r12 // set flags early to optimize speculative fetches in cm3
-
 	uxtb r0, r5, ror #24
 	uxtb r1, r6, ror #24
 	uxtb r2, r7, ror #24
@@ -82,6 +79,9 @@ CM34_1T_AES_decrypt_d:
 	ldr r1, [r14, r1, lsl #2]
 	ldr r2, [r14, r2, lsl #2]
 	ldr r3, [r14, r3, lsl #2]
+	ldr r4, [sp]
+	cmp r4, r12 // set flags early to optimize speculative fetches in cm3
+
 	eor r4, r8, r0, ror #24
 	eor r5, r9, r1, ror #24
 	eor r6, r10, r2, ror #24
