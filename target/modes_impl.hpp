@@ -1,6 +1,6 @@
 /*!
  * \file modes_impl.hpp
- * \version 3.0.0
+ * \version 3.3.0
  * \brief wrappers for block mode ciphers
  *
  * \author jnk0le <jnk0le@hotmail.com>
@@ -70,16 +70,45 @@ namespace target
 
 		};
 
-	/*template<size_t key_length, template<size_t> class base_impl>
-		class CTR_LE32NONCE_GENERIC : public CipherContext<key_length, base_impl>
+	//SP 800-38A compliant
+	template<size_t key_length, template<size_t> class base_impl>
+		class CTR_GENERIC : private CipherContext<key_length, base_impl>
 		{
 		public:
+			using CipherContext<key_length, base_impl>::setEncKey;
 
+			void encrypt(const uint8_t* data_in, uint8_t* data_out, void* nonce, uint32_t blocks_cnt)
+			{
+				uint32_t* data_in_p = (uint32_t*)data_in;
+				uint32_t* data_out_p = (uint32_t*)data_out;
+				uint32_t* nonce_p = (uint32_t*)nonce;
 
-		private:
+				uint32_t tmp_ctr = nonce_p[3];
 
+				tmp_ctr = __builtin_bswap32(tmp_ctr); // initially swap to little endian format
 
-		};*/
+				for(uint32_t i = 0; i<blocks_cnt; i++)
+				{
+					CipherContext<key_length, base_impl>::encrypt((uint8_t*)nonce_p, (uint8_t*)data_out_p);
+
+					data_out_p[0] ^= data_in_p[0];
+					data_out_p[1] ^= data_in_p[1];
+					data_out_p[2] ^= data_in_p[2];
+					data_out_p[3] ^= data_in_p[3];
+
+					tmp_ctr++;
+
+					nonce_p[3] = __builtin_bswap32(tmp_ctr); // SP 800-38A compliant format
+
+					data_out_p += 4;
+					data_in_p += 4;
+				}
+			}
+
+			void decrypt(const uint8_t* data_in, uint8_t* data_out, void* nonce, uint32_t blocks_cnt) {
+				this->encrypt(data_in, data_out, nonce, blocks_cnt);
+			}
+		};
 
 }
 }
