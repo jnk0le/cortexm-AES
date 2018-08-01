@@ -1,9 +1,9 @@
 /*!
  * \file AES_CM34.h
- * \version 3.2.0
- * \brief FIPS 197 compliant software AES implementation optimized for cortex-m3/4 utilizing a single T table
+ * \version 3.2.1
+ * \brief FIPS 197 compliant software AES implementations optimized for cortex-m3/4
  *
- * LUT tables are occupying 1 kB + 1.25 kB of memory for encryption + decryption
+ * Utilizes a 1K T table per cipher occupying 1 kB + 1.25 kB of memory for encryption + decryption
  *
  * This part is based on "Peter Schwabe and Ko Stoffelen" AES implementation:
  * https://github.com/Ko-/aes-armcortexm

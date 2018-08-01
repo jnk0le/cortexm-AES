@@ -1,12 +1,12 @@
 /*!
  * \file AES_CM7.h
- * \version 2.6.0
- * \brief FIPS 197 compliant software AES implementation optimized for cortex-m7 utilizing a single T table
+ * \version 2.6.1
+ * \brief FIPS 197 compliant software AES implementation optimized for cortex-m7
  *
- * LUT tables are occupying 1 kB + 1.25 kB of memory for encryption + decryption
+ * Utilizes a 1K T table per cipher occupying 1 kB + 1.25 kB of memory for encryption + decryption
  *
  * \warning Only DTCM memory can be used for LUT tables, since everything else is cached through AXI bus.
- * \warning Effects of DMA access to DTCM when core have equal priority is unknown.
+ * \warning Effects of DMA access to DTCM through AHBS, when core have equal priority is unknown.
  *
  * This part is based on CM34 implementation, carefully reordered for dual issue pipeline, with 2x32 bit DTCM
  * interface, to avoid data dependent stalls when two neighbouring loads both accesses data on even/odd location
