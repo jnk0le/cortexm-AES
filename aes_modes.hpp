@@ -1,6 +1,6 @@
 /*!
  * \file aes_modes.hpp
- * \version 3.3.0
+ * \version 3.4.0
  * \brief block mode implementations
  *
  * \author jnk0le <jnk0le@hotmail.com>
@@ -52,9 +52,19 @@ namespace mode
 		};
 
 
+	namespace ctr
+	{
+		// workaround
+		class Nonce
+		{
+		public:
+			uint32_t nonce[4];
+		};
+	}
+
 	//SP 800-38A compliant, 32 bit counter
 	template<size_t key_length, template<size_t> class base_impl = aes::target::CM34_1T, template<size_t key_len, template<size_t> class base> class mode_impl = aes::mode::target::CTR_GENERIC>
-		class CTR : private mode_impl<key_length, base_impl>
+		class CTR : protected ctr::Nonce, private mode_impl<key_length, base_impl> // put the nonce before rk, to be compatible with optimized asm implementation
 		{
 		public:
 			CTR() {}
@@ -77,15 +87,15 @@ namespace mode
 			using mode_impl<key_length, base_impl>::setEncKey;
 
 			void encrypt(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
-				mode_impl<key_length, base_impl>::encrypt(data_in, data_out, nonce, (len+15)/16);
+				mode_impl<key_length, base_impl>::encrypt(data_in, data_out, this->nonce, (len+15)/16);
 			}
 
 			void decrypt(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
-				mode_impl<key_length, base_impl>::decrypt(data_in, data_out, nonce, (len+15)/16);
+				mode_impl<key_length, base_impl>::encrypt(data_in, data_out, this->nonce, (len+15)/16);
 			}
 
 		private:
-			uint32_t nonce[4];
+			//uint32_t nonce[4];
 		};
 
 }
