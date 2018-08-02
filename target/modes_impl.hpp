@@ -1,6 +1,6 @@
 /*!
  * \file modes_impl.hpp
- * \version 3.4.0
+ * \version 3.4.1
  * \brief wrappers for block mode ciphers
  *
  * \author jnk0le <jnk0le@hotmail.com>
@@ -108,7 +108,7 @@ namespace target
 			}
 		};
 
-	//UNOPTIMIZED //SP 800-38A compliant
+	//SP 800-38A compliant
 	template<size_t key_length, template<size_t> class base_impl>
 		class CTR_CM34_1T : private CipherContext<key_length, base_impl>
 		{

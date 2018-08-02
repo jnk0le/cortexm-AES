@@ -1,14 +1,12 @@
 /*!
  * \file AES_CM34_modes.h
- * \version 3.4.0
+ * \version 3.4.1
  * \brief SP 800-38A compliant, software AES block modes implementations optimized for cortex-m3/4
  *
  * ctr encryption can be recycled for decryption thus requiring only 1K T table for encryption
  *
  * This part is based on "Peter Schwabe and Ko Stoffelen" AES implementation:
  * https://github.com/Ko-/aes-armcortexm
- *
- * \warning UNOPTIMIZED yet
  *
  * \author jnk0le <jnk0le@hotmail.com>
  * \copyright MIT License

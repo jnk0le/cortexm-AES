@@ -106,9 +106,9 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 | CTR_GENERIC<128>            |                               | 43.07                         |                                   |
 | CTR_GENERIC<192>            |                               | 50.82                         |                                   |
 | CTR_GENERIC<256>            |                               | 58.57                         |                                   |
-| CTR<128>                    |                               | 36.85                         |                                   |
-| CTR<192>                    |                               | 44.85                         |                                   |
-| CTR<256>                    |                               | 52.85                         |                                   |
+| CTR<128>                    |                               | 34.72                         |                                   |
+| CTR<192>                    |                               | 42.47                         |                                   |
+| CTR<256>                    |                               | 50.22                         |                                   |
 
 
 ## todo
