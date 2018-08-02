@@ -68,7 +68,7 @@ The time differences can be illustrated by the following code:
 Only DTCM memory can be used for LUT tables, since everything else is cached through AXI bus.
 The effects of DMA access to DTCM memory when core have equal priority is unknown.
 
-## Base ciphers performance (in cycles including fuction call and stacking)
+## Base ciphers performance (in cycles per block)
 
 | Cipher function     | STM32F1 (0ws/2ws) - cortex-m3 | STM32F4 (0ws/7ws) - cortex-m4 | STM32H7 (icache/itcm)* - cortex-m7 |
 |---------------------|-------------------------------|-------------------------------|-----------------------------------|
@@ -96,8 +96,22 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 `*` When at least 2 unrolled functions are compiled in, everything else (including those functions) gets +9/10 cycles to execution (at least in [aes tests](aes_tests.hpp)).  
 `long_call` attribute will only add a few cycles in both cases.
 
+## Cipher modes performance (in cycles per byte) 
+
+| Cipher function             | STM32F1 (0ws/2ws) - cortex-m3 | STM32F4 (0ws/7ws) - cortex-m4 | STM32H7 (icache/itcm) - cortex-m7 |
+|-----------------------------|-------------------------------|-------------------------------|-----------------------------------|
+| CBC_GENERIC<128> enc dec    |                               | 43.9 + 0.3                    |                                   |
+| CBC_GENERIC<192> enc dec    |                               | 51.65 + 0.3                   |                                   |
+| CBC_GENERIC<256> enc dec    |                               | 59.4 + 0.3                    |                                   |
+| CTR_GENERIC<128>            |                               | 43.07                         |                                   |
+| CTR_GENERIC<192>            |                               | 50.82                         |                                   |
+| CTR_GENERIC<256>            |                               | 58.57                         |                                   |
+| CTR<128>                    |                               | 36.85                         |                                   |
+| CTR<192>                    |                               | 44.85                         |                                   |
+| CTR<256>                    |                               | 52.85                         |                                   |
+
+
 ## todo
-- add block modes (CBC, CTR etc.)
 - add proper padding
 - add bitsliced/masked implementations
 - fix perf of cm7 unrolled functions
