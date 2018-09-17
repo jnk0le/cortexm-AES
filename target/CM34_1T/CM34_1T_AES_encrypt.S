@@ -26,12 +26,7 @@ CM34_1T_AES_encrypt:
 	eors r6, r2
 	eors r7, r3
 
-1:
-#if __ARM_ARCH_7M__
-	ldmia r12!, {r8-r11}
-#endif
-
-	uxtb r0, r4
+1:	uxtb r0, r4
 	uxtb r1, r5
 	uxtb r2, r6
 	uxtb r3, r7
@@ -47,6 +42,8 @@ CM34_1T_AES_encrypt:
 	ldr r9, [r12], #4
 	ldr r10, [r12], #4
 	ldr r11, [r12], #4
+#else
+	ldmia r12!, {r8-r11}
 #endif
 
 	eor r8, r8, r0, ror #16
