@@ -46,6 +46,7 @@ ctr_partial_precompute:
 	ldr r1, [r14, r1, lsl #2]
 	ldr r2, [r14, r2, lsl #2]
 	ldr r3, [r14, r3, lsl #2]
+
 	eor r8, r8, r0, ror #16
 	eor r9, r9, r1, ror #16
 	eor r10, r10, r2, ror #16
@@ -192,12 +193,7 @@ ctr_encrypt_first:
 	eor r6, r6, r2
 	eor r7, r7, r3, ror #8
 
-1:
-#if __ARM_ARCH_7M__
-	ldmia r12!, {r8-r11}
-#endif
-
-	uxtb r0, r4
+1:	uxtb r0, r4
 	uxtb r1, r5
 	uxtb r2, r6
 	uxtb r3, r7
@@ -213,6 +209,8 @@ ctr_encrypt_first:
 	ldr r9, [r12], #4
 	ldr r10, [r12], #4
 	ldr r11, [r12], #4
+#else
+	ldmia r12!, {r8-r11}
 #endif
 
 	eor r8, r8, r0, ror #16
@@ -366,7 +364,7 @@ ctr_encrypt_first:
 	str r1, [sp, #20+4] // in p
 	str r2, [sp, #20+8] // out p
 
-	//if ctrnonce%256==0: partial_precompute
+	//if ctr%256==0: partial_precompute
 	bne ctr_encrypt_block
 
 	sub r12, #64 //reset to p, as required by partial_precompute
