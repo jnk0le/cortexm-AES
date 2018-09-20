@@ -1,6 +1,6 @@
 /*!
  * \file AES_CM34.h
- * \version 3.2.1
+ * \version 3.5.0
  * \brief FIPS 197 compliant software AES implementations optimized for cortex-m3/4
  *
  * Utilizes a 1K T table per cipher occupying 1 kB + 1.25 kB of memory for encryption + decryption
@@ -25,7 +25,6 @@
 	void CM34_1T_AES_keyschedule_dec(uint8_t* rk, size_t rounds);
 
 	void CM34_1T_AES_encrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
-	void CM34_1T_AES_encrypt_d(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
 	void CM34_1T_AES_encrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
 
 	void CM34_1T_AES_128_encrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out);
@@ -33,7 +32,6 @@
 	void CM34_1T_AES_256_encrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out);
 
 	void CM34_1T_AES_decrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
-	void CM34_1T_AES_decrypt_d(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
 	void CM34_1T_AES_decrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
 
 	void CM34_1T_AES_128_decrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out);
