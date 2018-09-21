@@ -98,17 +98,20 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 
 ## Cipher modes performance (in cycles per byte) 
 
-| Cipher function            | STM32F1 (0ws/2ws) - cortex-m3 | STM32F4 (0ws/7ws) - cortex-m4 | STM32H7 (icache/itcm) - cortex-m7    |
-|----------------------------|-------------------------------|-------------------------------|-------------------|
-| CBC_GENERIC<128> enc(+dec) | 43.08(-0.3)/56.97(+2.2)       | 43.9(+0.3)                    |                   |
-| CBC_GENERIC<192> enc(+dec) | 50.71(-0.3)/67.22(+2.4)       | 51.65(+0.3)                   |                   |
-| CBC_GENERIC<256> enc(+dec) | 58.33(-0.3)/77.47(+3.1)       | 59.4(+0.3)                    |                   |
-| CTR_GENERIC<128>           | 42.32/56.32                   | 43.07                         |                   |
-| CTR_GENERIC<192>           | 49.95/66.88                   | 50.82                         |                   |
-| CTR_GENERIC<256>           | 57.57/76.69                   | 58.57                         |                   |
-| CTR<128>                   | 33.97/46.23                   | 34.72                         |                   |
-| CTR<192>                   | 41.60/56.73                   | 42.47                         |                   |
-| CTR<256>                   | 49.22/67.23                   | 50.22                         |                   |
+| Cipher function            | STM32F1 (0ws/2ws) - cortex-m3 | STM32F4 (0ws/7ws) - cortex-m4 | STM32H7 (icache/itcm) - cortex-m7 |
+|----------------------------|-------------------------------|-------------------------------|-----------------------------------|
+| CBC_GENERIC<128> enc(+dec) | 43.08(-0.3)/56.97(+2.2)       | 43.9(+0.3)                    |                                   |
+| CBC_GENERIC<192> enc(+dec) | 50.71(-0.3)/67.22(+2.4)       | 51.65(+0.3)                   |                                   |
+| CBC_GENERIC<256> enc(+dec) | 58.33(-0.3)/77.47(+3.1)       | 59.4(+0.3)                    |                                   |
+| CTR_GENERIC<128>           | 42.32/56.32                   | 43.07                         |                                   |
+| CTR_GENERIC<192>           | 49.95/66.88                   | 50.82                         |                                   |
+| CTR_GENERIC<256>           | 57.57/76.69                   | 58.57                         |                                   |
+| CTR<128>                   | 33.97/46.23                   | 34.72                         |                                   |
+| CTR<192>                   | 41.60/56.73                   | 42.47                         |                                   |
+| CTR<256>                   | 49.22/67.23                   | 50.22                         |                                   |
+| CTR_unrolled<128>          | 31.09/45.48                   |                               |                                   |
+| CTR_unrolled<192>          | 37.97/55.67                   |                               |                                   |
+| CTR_unrolled<256>          | 44.84/65.79                   |                               |                                   |
 
 ## todo
 - add proper padding

@@ -1,6 +1,6 @@
 /*!
  * \file modes_impl.hpp
- * \version 3.4.1
+ * \version 3.6.0
  * \brief wrappers for block mode ciphers
  *
  * \author jnk0le <jnk0le@hotmail.com>
@@ -119,6 +119,32 @@ namespace target
 			{
 				//nonce should be placed right before expanded key
 				CM34_1T_AES_CTR_enc(nonce, data_in, data_out, this->key_rounds, blocks_cnt);
+			}
+		};
+
+	template<size_t key_length, template<size_t> class base_impl>
+		class CTR_CM34_1T_unrolled : private CipherContext<key_length, base_impl>
+		{
+		public:
+			using CipherContext<key_length, base_impl>::setEncKey;
+
+			void encrypt(const uint8_t* data_in, uint8_t* data_out, void* nonce, uint32_t blocks_cnt)
+			{
+				//nonce should be placed right before expanded key
+
+				switch(key_length)
+				{
+				case 128:
+					CM34_1T_AES_128_CTR_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
+					break;
+				case 192:
+					CM34_1T_AES_192_CTR_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
+					break;
+				case 256:
+					CM34_1T_AES_256_CTR_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
+					break;
+				}
+
 			}
 		};
 

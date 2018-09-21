@@ -1,4 +1,4 @@
-// counter mode, SP 800-38A compliant (32bit, big endian ctr)
+// counter mode, SP 800-38A compliant (32bit, big endian ctr), can start from any counter value
 
 .syntax unified
 .thumb
@@ -9,7 +9,6 @@
 .global CM34_1T_AES_CTR_enc
 .type   CM34_1T_AES_CTR_enc,%function
 CM34_1T_AES_CTR_enc:
-
 	mov r12, r0
 	//use this value to reload context pointer before next encryption
 	adds r0, #64 // p+4*4*4
