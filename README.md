@@ -106,12 +106,12 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 | CTR_GENERIC<128>           | 42.32/56.32                   | 43.07                         |                                   |
 | CTR_GENERIC<192>           | 49.95/66.88                   | 50.82                         |                                   |
 | CTR_GENERIC<256>           | 57.57/76.69                   | 58.57                         |                                   |
-| CTR<128>                   | 33.97/46.23                   | 34.72                         |                                   |
-| CTR<192>                   | 41.60/56.73                   | 42.47                         |                                   |
-| CTR<256>                   | 49.22/67.23                   | 50.22                         |                                   |
-| CTR_unrolled<128>          | 31.09/45.48                   |                               |                                   |
-| CTR_unrolled<192>          | 37.97/55.67                   |                               |                                   |
-| CTR_unrolled<256>          | 44.84/65.79                   |                               |                                   |
+| CTR<128>                   | 33.78/45.98                   | 34.60                         |                                   |
+| CTR<192>                   | 41.41/56.48                   | 42.35                         |                                   |
+| CTR<256>                   | 49.03/66.98                   | 50.10                         |                                   |
+| CTR_unrolled<128>          | 31.09/44.80                   | 31.47/55.43                   |                                   |
+| CTR_unrolled<192>          | 37.97/54.98                   | 38.34/67.93                   |                                   |
+| CTR_unrolled<256>          | 44.84/65.11                   | 45.22/80.43                   |                                   |
 
 ## todo
 - add proper padding

@@ -35,8 +35,6 @@ ctr_partial_precompute:
 	eors r7, r3
 
 	//round 1
-	ldmia r12!, {r8-r11}
-
 	uxtb r0, r4 // LE/LEFT
 	uxtb r1, r5
 	uxtb r2, r6
@@ -45,6 +43,8 @@ ctr_partial_precompute:
 	ldr r1, [r14, r1, lsl #2]
 	ldr r2, [r14, r2, lsl #2]
 	ldr r3, [r14, r3, lsl #2]
+
+	ldmia r12!, {r8-r11}
 
 	eor r8, r8, r0, ror #16
 	eor r9, r9, r1, ror #16
@@ -156,33 +156,46 @@ ctr_partial_precompute:
 	eor r6, r6, r1, ror #16
 	eor r7, r7, r2, ror #16
 
-	stm sp, {r4-r7}
-	ldr r10, [sp, #16] //load precomputed_x0
+	//stm sp, {r4-r7}
+	str r4, [sp, #0]
+	str r5, [sp, #4]
+	str r6, [sp, #8]
+	str r7, [sp, #12]
+
+	//ldr r10, [sp, #16] //load precomputed_x0
 	//the first time, we can skip some loads
 	b.w ctr_encrypt_first
+	nop.w //align for 8 byte fetches
 
 ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack, p+4*4*4 in r12
 
-	ldm sp, {r4-r7,r10} //load precomputed
+	//ldm sp, {r4-r7,r10} //load precomputed
+	ldr r4, [sp, #0]
+	ldr r5, [sp, #4]
+	ldr r6, [sp, #8]
+	ldr r7, [sp, #12]
 
 ctr_encrypt_first:
 	//load ctr[3]
-	ldr r8, [r12, #-52] // -64
+	ldr r1, [r12, #-52] // -64
 
 	//load key[3]
-	ldr r9, [r12, #-36] // -48
+	ldr r2, [r12, #-36] // -48
+
+	//load precomputed_x0
+	ldr r3, [sp, #16]
 
 	//round 1
-	eor r8, r9
-	uxtb r8, r8, ror #24
-	ldr r8, [r14, r8, lsl #2]
-	eor r10, r10, r8, ror #24
+	eors r1, r2
+	uxtb r1, r1, ror #24
+	ldr r1, [r14, r1, lsl #2]
+	eor r3, r3, r1, ror #24
 
 	//round 2
-	uxtb r0, r10
-	uxtb r1, r10, ror #24
-	uxtb r2, r10, ror #16
-	uxtb r3, r10, ror #8
+	uxtb.w r0, r3
+	uxtb r1, r3, ror #24
+	uxtb r2, r3, ror #16
+	uxtb r3, r3, ror #8
 	ldr r0, [r14, r0, lsl #2]
 	ldr r1, [r14, r1, lsl #2]
 	ldr r2, [r14, r2, lsl #2]
@@ -211,6 +224,10 @@ ctr_encrypt_first:
 #else
 	ldmia r12!, {r8-r11}
 #endif
+	/*ldr r9, [r12, #4]
+	ldr r10, [r12, #8]
+	ldr r11, [r12, #12]
+	ldr r8, [r12], #16*/ // on cm3 same as ldmia
 
 	eor r8, r8, r0, ror #16
 	eor r9, r9, r1, ror #16
@@ -328,34 +345,59 @@ ctr_encrypt_first:
 
 	//ldmia r12!, {r0-r3}
 
-	eor r4, r4, r8, ror #8
-	eor r5, r5, r9, ror #8
-	eor r6, r6, r10, ror #8
-	eor r7, r7, r11, ror #8
+	eor r8, r4, r8, ror #8
+	eor r9, r5, r9, ror #8
+	eor r10, r6, r10, ror #8
+	eor r11, r7, r11, ror #8
 
 	//load in, out, len counter
 
 	ldr r12, [sp, #20] // reload to p+4*4*4
 	ldr r1, [sp, #20+4] // in p
 	ldr r2, [sp, #20+8] // out p
+
+#if __ARM_ARCH_7EM__
 	ldr r3, [sp, #20+52] // blocks len // argument passed through stack
+	ldr r5, [r1, #4]
+	// cycle lost if both are moved after ctr load
+
 	ldr r0, [r12, #-52] // ctr
+#else
+	ldr r0, [r12, #-52] // ctr
+	ldr r3, [sp, #20+52] // blocks len // argument passed through stack
+#endif
 
 	//load input, xor keystream and write to output
-	ldmia r1!, {r8-r11}
+#if __ARM_ARCH_7EM__
+	//ldr r5, [r1, #4]
+	ldr r6, [r1, #8]
+	ldr r7, [r1, #12]
+	ldr r4, [r1], #16
+#else
+	ldmia r1!, {r4-r7}
+#endif
+
 	eor r4, r8
 	eor r5, r9
 	eor r6, r10
 	eor r7, r11
-	stmia r2!, {r4-r7}
 
-	rev r0, r0
-	adds r0, #1
+	//stmia r2!, {r4-r7}
+	str r5, [r2, #4]
+	str r6, [r2, #8]
+	str r7, [r2, #12]
+
+	rev r0, r0 // waitstate reduction
+	adds r0, #1 // also required here, otherwise no yield
+
+	str r4, [r2], #16
+
+	//dec and store len counter // set flags early to optimize speculative fetches in cm3
+	subs r3, #1
+
 	rev r0, r0
 	str r0, [r12, #-52]
 
-	//dec and store len counter
-	subs r3, #1
 	beq ctr_exit //if len==0: exit
 
 	tst r0, #0xff000000 // set flags early to optimize speculative fetches in cm3

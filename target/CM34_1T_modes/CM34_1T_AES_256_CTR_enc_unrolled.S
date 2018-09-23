@@ -186,25 +186,26 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	ldr r7, [sp, #12]
 
 ctr_encrypt_first:
-	ldr r10, [sp, #16]
-
 	//load ctr[3]
-	ldr r8, [r12, #12]
+	ldr r1, [r12, #12]
 
 	//load key[3]
-	ldr r9, [r12, #28]
+	ldr r2, [r12, #28]
+
+	//load precomputed_x0
+	ldr r3, [sp, #16]
 
 	//round 1
-	eor r8, r9
-	uxtb r8, r8, ror #24
-	ldr r8, [r14, r8, lsl #2]
-	eor r10, r10, r8, ror #24
+	eors r1, r2
+	uxtb r1, r1, ror #24
+	ldr r1, [r14, r1, lsl #2]
+	eor r3, r3, r1, ror #24
 
 	//round 2
-	uxtb r0, r10
-	uxtb r1, r10, ror #24
-	uxtb r2, r10, ror #16
-	uxtb r3, r10, ror #8
+	uxtb.w r0, r3
+	uxtb r1, r3, ror #24
+	uxtb r2, r3, ror #16
+	uxtb r3, r3, ror #8
 	ldr r0, [r14, r0, lsl #2]
 	ldr r1, [r14, r1, lsl #2]
 	ldr r2, [r14, r2, lsl #2]
@@ -956,23 +957,26 @@ ctr_encrypt_first:
 
 	//ldmia r12!, {r0-r3}
 
-	eor r4, r4, r8, ror #8
-	eor r5, r5, r9, ror #8
-	eor r6, r6, r10, ror #8
-	eor r7, r7, r11, ror #8
+	eor r8, r4, r8, ror #8
+	eor r9, r5, r9, ror #8
+	eor r10, r6, r10, ror #8
+	eor r11, r7, r11, ror #8
 
 	//load in, out, len counter
 	ldr r0, [r12, #12] // ctr
 	ldr r1, [sp, #20+0] // in p
 	ldr r2, [sp, #20+4] // out p
-	ldr.w r3, [sp, #20+8] // blocks len
+	ldr r3, [sp, #20+8] // blocks len
 
 	//load input, xor keystream and write to output
-	//ldmia r1!, {r8-r11}
-	ldr r9, [r1, #4]
-	ldr r10, [r1, #8]
-	ldr r11, [r1, #12]
-	ldr r8, [r1], #16
+#if __ARM_ARCH_7EM__
+	ldr r5, [r1, #4]
+	ldr r6, [r1, #8]
+	ldr r7, [r1, #12]
+	ldr r4, [r1], #16 // same as ldmia in cm3
+#else
+	ldmia r1!, {r4-r7}
+#endif
 
 	eor r4, r8
 	eor r5, r9
