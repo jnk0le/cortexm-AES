@@ -6,7 +6,7 @@
 .text
 
 .align 3
-// void CM7_1T_CTR_enc(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t rounds, uint32_t blocks_cnt) {
+// void CM7_1T_AES_CTR_enc(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t rounds, uint32_t blocks_cnt) {
 .global CM7_1T_AES_CTR_enc
 .type   CM7_1T_AES_CTR_enc,%function
 CM7_1T_AES_CTR_enc:
