@@ -180,30 +180,30 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	// there is so much stalling that we have no reason to do load skipping
 
 	//load ctr[3]
-	ldr r1, [r12, #12]
+	ldr r1, [r12, #-52] // -64
 	nop
 
 	//load key[3]
-	ldr r2, [r12, #28]
+	ldr r2, [r12, #-36] // -48
 	nop
 
-	//round 1
-	eors r1, r2
 	//load precomputed_x0
 	ldr r3, [sp, #16]
+	//round 1
+	eors r1, r2
 
-	uxtb r1, r1, ror #24
-	//nop.w
 	ldr r4, [sp, #0]
+	//uxtb r1, r1, ror #24 // cycle lost if uxtb is older opcode
+	lsr.w r1, r1, #24
 
-	nop
 	ldr r1, [r14, r1, lsl #2]
+	nop
 
 	ldr r5, [sp, #4]
 	ldr r6, [sp, #8]
 
-	ldr r7, [sp, #12]
 	eor r3, r3, r1, ror #24
+	ldr r7, [sp, #12]
 
 	//round 2
 	uxtb r0, r3
