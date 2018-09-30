@@ -180,11 +180,11 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	// there is so much stalling that we have no reason to do load skipping
 
 	//load ctr[3]
-	ldr r1, [r12, #-52] // -64
+	ldr r1, [r12, #12] // -64
 	nop
 
 	//load key[3]
-	ldr r2, [r12, #-36] // -48
+	ldr r2, [r12, #28] // -48
 	nop
 
 	//load precomputed_x0
