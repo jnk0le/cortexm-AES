@@ -184,12 +184,12 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	// there is so much stalling that we have no reason to do load skipping
 
 	//load ctr[3]
-	ldr r1, [r12, #-52] // -64
-	nop
+	ldr r1, [r12, #-52]
+	nop // r1 is not available here
 
 	//load key[3]
-	ldr r2, [r12, #-36] // -48
-	nop
+	ldr r2, [r12, #-36]
+	rev r0, r1
 
 	//load precomputed_x0
 	ldr r3, [sp, #16]
@@ -197,11 +197,14 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	eors r1, r2
 
 	ldr r4, [sp, #0]
-	//uxtb r1, r1, ror #24 // cycle lost if uxtb is older opcode
-	lsr.w r1, r1, #24
+	uxtb r1, r1, ror #24
+	//lsr.w r1, r1, #24 // no diff if dependent ldr is older opcode
 
+	adds r0, #1 // cycle lost if adds is older opcode even with lsr workaround
 	ldr r1, [r14, r1, lsl #2]
-	nop
+
+	rev r0, r0
+	str r0, [r12, #-52]
 
 	ldr r5, [sp, #4]
 	ldr r6, [sp, #8]
@@ -210,7 +213,7 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	ldr r7, [sp, #12]
 
 	//round 2
-	uxtb r0, r3
+	uxtb.w r0, r3
 	uxtb r1, r3, ror #24
 
 	uxtb r2, r3, ror #16
@@ -392,18 +395,15 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	ldr r1, [sp, #20+4] // in p
 
 	eor r8, r4, r8, ror #8
-	ldr r2, [sp, #20+8] // out p
-
-	eor r9, r5, r9, ror #8
-	ldr r0, [r12, #-52] // ctr
-
-	eor r10, r6, r10, ror #8
 	ldr r3, [sp, #20+52] // blocks len // argument passed through stack
 
-	eor r11, r7, r11, ror #8
-	rev r0, r0
+	eor r9, r5, r9, ror #8
+	ldr r2, [sp, #20+8] // out p
 
-	adds r0, #1
+	eor r10, r6, r10, ror #8
+	ldr r0, [r12, #-52] // ctr
+
+	eor r11, r7, r11, ror #8
 	subs r3, #1 // set flags
 
 	//load input, xor keystream and write to output
@@ -417,8 +417,8 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 
 	stmia r2!, {r4-r7}
 
-	rev r0, r0
-	str r0, [r12, #-52]
+	//rev r0, r0
+	//str r0, [r12, #-52]
 
 	beq ctr_exit //if len==0: exit
 	str r3, [sp, #20+52] // blocks len // argument passed through stack
