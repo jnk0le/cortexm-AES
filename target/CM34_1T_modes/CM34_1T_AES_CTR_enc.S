@@ -1,5 +1,5 @@
 // counter mode, SP 800-38A compliant (32bit, big endian ctr), can start from any counter value
-// counter is written back
+// counter is written back and can be used to continue encryption later
 
 .syntax unified
 .thumb
