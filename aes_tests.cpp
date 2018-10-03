@@ -21,9 +21,9 @@ uint8_t expected_ciphertext_256[16] = {0x8e, 0xa2, 0xb7, 0xca, 0x51, 0x67, 0x45,
 
 uint8_t tmp[16];
 
-aes::CipherContext<128, aes::target::CM34_1T> t128;
-aes::CipherContext<192, aes::target::CM34_1T> t192;
-aes::CipherContext<256, aes::target::CM34_1T> t256;
+aes::CipherContext<128, aes::target::CM7_1T> t128;
+aes::CipherContext<192, aes::target::CM7_1T> t192;
+aes::CipherContext<256, aes::target::CM7_1T> t256;
 
 //__attribute__ ((section(".itcm.text"), noinline))
 void aes_ecb_test(void)
@@ -317,9 +317,9 @@ uint8_t ctr_expected_ciphertext[64] = {
 
 uint8_t ctr_tmp[64];
 
-aes::mode::CTR<256, aes::target::CM34_1T, aes::mode::target::CTR_CM34_1T> tctr;
+aes::mode::CTR<256, aes::target::CM7_1T, aes::mode::target::CTR_CM7_1T> tctr;
 
-void aes_ctr_test(void)
+void aes_ctr_nist_test(void)
 {
 	tctr.setEncKey(nist_256_key);
 	tctr.setNonce(ctr_nonce, 16);
@@ -349,9 +349,9 @@ void aes_ctr_test(void)
 
 uint8_t dummy_8k[8192]; // we don't care about content, just performance
 
-aes::mode::CBC<128, aes::target::CM34_1T, aes::mode::target::CBC_GENERIC> tcbc128;
-aes::mode::CBC<192, aes::target::CM34_1T, aes::mode::target::CBC_GENERIC> tcbc192;
-aes::mode::CBC<256, aes::target::CM34_1T, aes::mode::target::CBC_GENERIC> tcbc256;
+aes::mode::CBC<128, aes::target::CM7_1T, aes::mode::target::CBC_GENERIC> tcbc128;
+aes::mode::CBC<192, aes::target::CM7_1T, aes::mode::target::CBC_GENERIC> tcbc192;
+aes::mode::CBC<256, aes::target::CM7_1T, aes::mode::target::CBC_GENERIC> tcbc256;
 
 void aes_cbc_perf_test(void)
 {
@@ -378,8 +378,6 @@ void aes_cbc_perf_test(void)
 
 	printf("cbc dec 128: %f cycles per byte\n", (double)tock/8192.0);
 
-
-
 	tcbc192.setEncKey(key_192);
 	tcbc192.setIv(cbc_iv);
 
@@ -400,8 +398,6 @@ void aes_cbc_perf_test(void)
 	tock = DWT->CYCCNT - tick - 1;
 
 	printf("cbc dec 192: %f cycles per byte\n", (double)tock/8192.0);
-
-
 
 	tcbc256.setEncKey(key_128);
 	tcbc256.setIv(cbc_iv);
@@ -426,9 +422,9 @@ void aes_cbc_perf_test(void)
 
 }
 
-aes::mode::CTR<128, aes::target::CM34_1T, aes::mode::target::CTR_GENERIC> tctr128;
-aes::mode::CTR<192, aes::target::CM34_1T, aes::mode::target::CTR_GENERIC> tctr192;
-aes::mode::CTR<256, aes::target::CM34_1T, aes::mode::target::CTR_GENERIC> tctr256;
+aes::mode::CTR<128, aes::target::CM7_1T, aes::mode::target::CTR_CM7_1T> tctr128;
+aes::mode::CTR<192, aes::target::CM7_1T, aes::mode::target::CTR_CM7_1T> tctr192;
+aes::mode::CTR<256, aes::target::CM7_1T, aes::mode::target::CTR_CM7_1T> tctr256;
 
 void aes_ctr_perf_test(void)
 {
@@ -443,6 +439,7 @@ void aes_ctr_perf_test(void)
 	tctr128.encrypt(dummy_8k, dummy_8k, 8192);
 	tock = DWT->CYCCNT - tick - 1;
 
+	printf("ctr 128 total: %d \n", tock);
 	printf("ctr 128: %f cycles per byte\n", (double)tock/8192.0);
 
 	tctr192.setEncKey(key_192);
@@ -454,6 +451,7 @@ void aes_ctr_perf_test(void)
 	tctr192.encrypt(dummy_8k, dummy_8k, 8192);
 	tock = DWT->CYCCNT - tick - 1;
 
+	printf("ctr 192 total: %d \n", tock);
 	printf("ctr 192: %f cycles per byte\n", (double)tock/8192.0);
 
 	tctr256.setEncKey(key_256);
@@ -465,6 +463,7 @@ void aes_ctr_perf_test(void)
 	tctr256.encrypt(dummy_8k, dummy_8k, 8192);
 	tock = DWT->CYCCNT - tick - 1;
 
+	printf("ctr 256 total: %d \n", tock);
 	printf("ctr 256: %f cycles per byte\n", (double)tock/8192.0);
 
 }
