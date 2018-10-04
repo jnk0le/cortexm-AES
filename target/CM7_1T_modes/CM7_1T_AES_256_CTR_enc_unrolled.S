@@ -1,5 +1,5 @@
 // counter mode, SP 800-38A compliant (32bit, big endian ctr), can start from any counter value
-// counter is written back
+// counter is written back and can be used to continue encryption later
 
 .syntax unified
 .thumb
@@ -10,6 +10,9 @@
 .global CM7_1T_AES_256_CTR_enc_unrolled
 .type   CM7_1T_AES_256_CTR_enc_unrolled,%function
 CM7_1T_AES_256_CTR_enc_unrolled:
+	add r3, r1, r3, lsl #4 // in_p + cnt*16
+	nop.w
+
 	push {r1-r11,lr} // push data_in, data_out, blocks_cnt
 
 	mov r12, r0
@@ -180,24 +183,27 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	// there is so much stalling that we have no reason to do load skipping
 
 	//load ctr[3]
-	ldr r1, [r12, #12] // -64
-	nop
+	ldr r1, [r12, #12]
+	nop  // r1 is not available here
 
 	//load key[3]
-	ldr r2, [r12, #28] // -48
-	nop
+	ldr r2, [r12, #28]
+	rev r0, r1
 
 	//load precomputed_x0
 	ldr r3, [sp, #16]
 	//round 1
 	eors r1, r2
 
+	uxtb r1, r1, ror #24
+	//lsr.w r1, r1, #24
 	ldr r4, [sp, #0]
-	//uxtb r1, r1, ror #24 // cycle lost if uxtb is older opcode
-	lsr.w r1, r1, #24
 
+	adds r0, #1
 	ldr r1, [r14, r1, lsl #2]
-	nop
+
+	rev r0, r0
+	str r0, [r12, #12]
 
 	ldr r5, [sp, #4]
 	ldr r6, [sp, #8]
@@ -206,7 +212,7 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	ldr r7, [sp, #12]
 
 	//round 2
-	uxtb r0, r3
+	uxtb.w r0, r3
 	uxtb r1, r3, ror #24
 
 	uxtb r2, r3, ror #16
@@ -1168,7 +1174,6 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	bfi r9, r1, #16, #8
 	ldr r3, [r14, r3, lsl #2]
 
-	//ldmia r12!, {r4-r7}
 	ldr r4, [r12, #240]
 	ldr r5, [r12, #244]
 
@@ -1176,25 +1181,19 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	ldr r7, [r12, #252]
 
 	bfi r10, r2, #16, #8
-	nop.w // dead cycle
+	ldr r1, [sp, #20] // in p
 
 	bfi r11, r3, #16, #8
-	ldr r1, [sp, #20] // in p
+	ldr r3, [sp, #20+8] // final in_p address at which we break encryption
 
 	eor r8, r4, r8, ror #8
 	ldr r2, [sp, #20+4] // out p
 
 	eor r9, r5, r9, ror #8
-	ldr r0, [r12, #12] // ctr
+	ldr r0, [r12, #12] // ctr, incremented at the beginning of the loop
 
 	eor r10, r6, r10, ror #8
-	ldr r3, [sp, #20+8] // blocks len
-
 	eor r11, r7, r11, ror #8
-	rev r0, r0
-
-	adds r0, #1
-	subs r3, #1 // set flags
 
 	//load input, xor keystream and write to output
 	ldmia r1!, {r4-r7}
@@ -1207,19 +1206,16 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 
 	stmia r2!, {r4-r7}
 
-	rev r0, r0
-	str r0, [r12, #12]
-
+	cmp r3, r1 // at least exit is an one off case
 	beq ctr_exit //if len==0: exit
-	str r3, [sp, #20+8] // blocks len // argument passed through stack
 
-	tst r0, #0xff000000 // set flags early
 	str r1, [sp, #20] // in p
+	tst r0, #0xff000000 // set flags early
 
 	str r2, [sp, #20+4] // out p
 	bne ctr_encrypt_block //if ctr%256==0: partial_precompute
 
-	nop //dead cycle
+	nop
 	b ctr_partial_precompute
 
 ctr_exit:

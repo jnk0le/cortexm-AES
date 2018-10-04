@@ -11,7 +11,6 @@ unknown or just implementation defined like section placement (you need to verif
 - do not use CM34_1T implementation on cortex-m7 since it is slower and will introduce timming leaks.
 - Unrolled ciphers might perform slower than looped versions due to cache pressure and flash waitstates. (like STM32F4 with 1K ART cache and up to 8WS) 
 - input/output buffers have to be word aligned due to use of ldm,stm,ldrd and strd instructions.
-- In case of cache less, waitstated execution cm34_1T_dense implementation can be used to gain few cycles.
 
 ## implementations
 
@@ -104,12 +103,12 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 | CTR_GENERIC<128>           | 42.32/56.32                   | 43.07                         | 21.63               |
 | CTR_GENERIC<192>           | 49.95/66.88                   | 50.82                         | 25.50               |
 | CTR_GENERIC<256>           | 57.57/76.69                   | 58.57                         | 29.38               |
-| CTR<128>                   | 33.78/45.98                   | 34.60                         | 17.71               |
-| CTR<192>                   | 41.41/56.48                   | 42.35                         | 21.58               |
-| CTR<256>                   | 49.03/66.98                   | 50.10                         | 25.46               |
-| CTR_unrolled<128>          | 31.09/44.80                   | 31.47/55.43                   | 16.71               |
-| CTR_unrolled<192>          | 37.97/54.98                   | 38.34/67.93                   | 20.33               |
-| CTR_unrolled<256>          | 44.84/65.11                   | 45.22/80.43                   | 23.96               |
+| CTR<128>                   | 33.78/45.98                   | 34.60                         | 17.65               |
+| CTR<192>                   | 41.41/56.48                   | 42.35                         | 21.52               |
+| CTR<256>                   | 49.03/66.98                   | 50.10                         | 25.40               |
+| CTR_unrolled<128>          | 31.09/44.80                   | 31.47/55.43                   | 16.64               |
+| CTR_unrolled<192>          | 37.97/54.98                   | 38.34/67.93                   | 20.27               |
+| CTR_unrolled<256>          | 44.84/65.11                   | 45.22/80.43                   | 23.89               |
 
 ## todo
 - add proper padding

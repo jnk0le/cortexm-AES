@@ -1,5 +1,5 @@
 // counter mode, SP 800-38A compliant (32bit, big endian ctr), can start from any counter value
-// counter is written back
+// counter is written back and can be used to continue encryption later
 
 .syntax unified
 .thumb
@@ -10,6 +10,12 @@
 .global CM7_1T_AES_CTR_enc
 .type   CM7_1T_AES_CTR_enc,%function
 CM7_1T_AES_CTR_enc:
+	ldr r12, [sp]
+	nop.w
+
+	add r12, r1, r12, lsl #4 // in_p + cnt*16
+	str r12, [sp]
+
 	mov r12, r0
 	add r3, r12, r3, lsl #4 //rk_end-16 = rk + rounds * 16
 
@@ -395,41 +401,43 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	ldr r1, [sp, #20+4] // in p
 
 	eor r8, r4, r8, ror #8
-	ldr r3, [sp, #20+52] // blocks len // argument passed through stack
+	ldr r3, [sp, #20+52] // final in_p address at which we break encryption // argument passed through stack
 
 	eor r9, r5, r9, ror #8
 	ldr r2, [sp, #20+8] // out p
 
 	eor r10, r6, r10, ror #8
-	ldr r0, [r12, #-52] // ctr
+	ldr r0, [r12, #-52] // ctr, incremented at the beginning of the loop
 
 	eor r11, r7, r11, ror #8
-	subs r3, #1 // set flags
-
-	//load input, xor keystream and write to output
-	ldmia r1!, {r4-r7}
+	ldr r4, [r1], #4
 
 	eor r4, r8
+	ldr r5, [r1], #4
+
 	eor r5, r9
+	ldr r6, [r1], #4
 
 	eor r6, r10
+	ldr r7, [r1], #4
+
 	eor r7, r11
+	cmp r3, r1
 
 	stmia r2!, {r4-r7}
 
-	//rev r0, r0
-	//str r0, [r12, #-52]
-
 	beq ctr_exit //if len==0: exit
-	str r3, [sp, #20+52] // blocks len // argument passed through stack
-
+	//str r3, [sp, #20+52] // blocks len // argument passed through stack
 	tst r0, #0xff000000 // set flags early
-	str r1, [sp, #20+4] // in p
 
-	str r2, [sp, #20+8] // out p
+	//str r1, [sp, #20+4] // in p
+	//str r2, [sp, #20+8] // out p
+
+	strd r1,r2, [sp, #20+4] // in and out
+
 	bne ctr_encrypt_block //if ctr%256==0: partial_precompute
-
 	sub r12, #64 //reset to p, as required by partial_precompute
+
 	b ctr_partial_precompute
 
 ctr_exit:
