@@ -105,13 +105,13 @@ CM7_1T_AES_encrypt:
 	ldr r6, [r14, r6, lsl #2]
 
 	eor r2, r2, r5, ror #24
-	ldr r7, [sp, #4] // assume inherited delay from register offset ldr
+	ldr r7, [sp, #4] // assume inherited delay from register offset ldr, it works somehow on next cycle but better to avoid it
 
 	eor r3, r3, r6, ror #24
 	eor r4, r8, r0
 
-	cmp r7, r12
 	eor r5, r9, r1
+	cmp r7, r12
 
 	eor r6, r10, r2
 	eor r7, r11, r3

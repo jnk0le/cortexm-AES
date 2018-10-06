@@ -83,38 +83,40 @@ CM7_1T_AES_decrypt:
 	uxtb r3, r5, ror #16
 	ldr r1, [r14, r1, lsl #2]
 
-	eor r8, r0
+	uxtb r5, r5, ror #24
 	ldr r2, [r14, r2, lsl #2]
 
-	eor r9, r1
+	uxtb r6, r6, ror #24
 	ldr r3, [r14, r3, lsl #2]
 
-	eor r10, r2
-	uxtb r0, r5, ror #24
+	uxtb r7, r7, ror #24
+	ldr r5, [r14, r5, lsl #2]
 
-	eor r11, r3
-	uxtb r1, r6, ror #24
+	uxtb r4, r4, ror #24
+	ldr r6, [r14, r6, lsl #2]
 
-	uxtb r2, r7, ror #24
-	ldr r0, [r14, r0, lsl #2]
+	// change xoring order to writeback r4-r7 without extra moves
+	eor r0, r0, r5, ror #24
+	ldr r7, [r14, r7, lsl #2]
 
-	uxtb r3, r4, ror #24
-	ldr r1, [r14, r1, lsl #2]
+	eor r1, r1, r6, ror #24
+	ldr r4, [r14, r4, lsl #2]
 
-	eor r4, r8, r0, ror #24
-	ldr r2, [r14, r2, lsl #2]
+	eor r2, r2, r7, ror #24
+	ldr r7, [sp] // assume inherited delay from register offset ldr
 
-	eor r5, r9, r1, ror #24
-	ldr r3, [r14, r3, lsl #2]
+	eor r3, r3, r4, ror #24
+	eor r4, r8, r0
 
-	eor r6, r10, r2, ror #24
-	ldr r0, [sp]
+	eor r5, r9, r1
+	cmp r7, r12
 
-	eor r7, r11, r3, ror #24
-	cmp r0, r12
+	eor r6, r10, r2
+	eor r7, r11, r3
 
 	bne 1b
 	add sp, #4 // we need to dual issue it somewhere anyway
+
 
 	//final round
 	//ldmdb r12, {r8-r11}
