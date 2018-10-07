@@ -70,9 +70,12 @@ ctr_partial_precompute:
 	uxtb r2, r4, ror #16
 	uxtb r3, r5, ror #16
 
-	uxtb r4, r4, ror #24
-	uxtb r5, r5, ror #24
-	uxtb r6, r6, ror #24
+	//uxtb r4, r4, ror #24
+	//uxtb r5, r5, ror #24
+	lsrs r4, #24
+	lsrs r5, #24
+
+	uxtb r6, r6, ror #24 //align to 4 bytes
 
 	ldr r0, [r14, r0, lsl #2]
 	ldr r1, [r14, r1, lsl #2]
@@ -163,11 +166,10 @@ ctr_partial_precompute:
 	str r6, [sp, #8]
 	str r7, [sp, #12]
 
-	//ldr r10, [sp, #16] //load precomputed_x0
 	//the first time, we can skip some loads
 	b ctr_encrypt_first
-	//nop.w //align for 8 byte fetches
-.align 3
+
+.align 3 //align for 8 byte fetching
 
 ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack, p+4*4*4 in r12
 
@@ -189,13 +191,14 @@ ctr_encrypt_first:
 
 	//round 1
 	eors r1, r2
-	uxtb r1, r1, ror #24
+	uxtb r1, r1, ror #24 // align to 4 bytes
 	ldr r1, [r14, r1, lsl #2]
 	eor r3, r3, r1, ror #24
 
 	//round 2
-	uxtb.w r0, r3
-	uxtb r1, r3, ror #24
+	uxtb r0, r3
+	//uxtb r1, r3, ror #24
+	lsrs r1, r3, #24
 	uxtb r2, r3, ror #16
 	uxtb r3, r3, ror #8
 	ldr r0, [r14, r0, lsl #2]
@@ -254,10 +257,14 @@ ctr_encrypt_first:
 	uxtb r2, r4, ror #16
 	uxtb r3, r5, ror #16
 
-	uxtb r7, r7, ror #24
-	uxtb r4, r4, ror #24
-	uxtb r5, r5, ror #24
-	uxtb r6, r6, ror #24
+	//uxtb r7, r7, ror #24
+	//uxtb r4, r4, ror #24
+	//uxtb r5, r5, ror #24
+	//uxtb r6, r6, ror #24
+	lsrs r7, #24
+	lsrs r4, #24
+	lsrs r5, #24
+	lsrs r6, #24
 
 	ldr r0, [r14, r0, lsl #2]
 	ldr r1, [r14, r1, lsl #2]
@@ -407,8 +414,7 @@ ctr_encrypt_first:
 	str r1, [sp, #20+4] // in p
 	str r2, [sp, #20+8] // out p
 
-	//if ctr%256==0: partial_precompute
-	bne ctr_encrypt_block
+	bne ctr_encrypt_block //if ctr%256==0: partial_precompute
 
 	sub r12, #64 //reset to p, as required by partial_precompute
 	b ctr_partial_precompute

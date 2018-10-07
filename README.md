@@ -69,24 +69,24 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 
 | Cipher function     | STM32F1 (0ws/2ws) - cortex-m3 | STM32F4 (0ws/7ws) - cortex-m4 | STM32H7 - cortex-m7 |
 |---------------------|-------------------------------|-------------------------------|---------------------|
-| `setEncKey<128>`    | 302/355   | 306      | 157 |
-| `setEncKey<192>`    | 278/348   | 282      | 140 |
-| `setEncKey<256>`    | 402/516   | 435      | 227 |
-| `encrypt<128>`      | 657/888   | 670      | 337 |
-| `encrypt<192>`      | 779/1054  | 794      | 400 |
-| `encrypt<256>`      | 901/1220  | 918      | 461 |
-| `enc_unrolled<128>` | 604/869   | 607/1070 | 315* |
-| `enc_unrolled<192>` | 714/1031  | 717/1270 | 373* | 
-| `enc_unrolled<256>` | 824/1193  | 827/1470 | 431* | 
+| `setEncKey<128>`    | 302/355   | 305      | 157 |
+| `setEncKey<192>`    | 278/348   | 281      | 140 |
+| `setEncKey<256>`    | 402/516   | 434      | 227 |
+| `encrypt<128>`      | 657/843   | 669      | 337 |
+| `encrypt<192>`      | 779/998   | 793      | 400 |
+| `encrypt<256>`      | 901/1155  | 917      | 461 |
+| `enc_unrolled<128>` | 604/834   | 604/1029 | 315* |
+| `enc_unrolled<192>` | 714/993   | 714/1221 | 373* | 
+| `enc_unrolled<256>` | 824/1148  | 824/1413 | 431* | 
 | `setDecKey<128>`    | 720/997   | 723      | 518 |
 | `setDecKey<192>`    | 874/1211  | 877      | 630 |
 | `setDEcKey<256>`    | 1028/1425 | 1031     | 742 |
-| `decrypt<128>`      | 652/922   | 675      | 333 |
-| `decrypt<192>`      | 772/1097  | 801      | 493 |
-| `decrypt<256>`      | 892/1270  | 923      | 454 |
-| `dec_unrolled<128>` | 607/880   | 610/1074 | 319* |
-| `dec_unrolled<192>` | 717/1041  | 720/1274 | 376* |
-| `dec_unrolled<256>` | 827/1204  | 830/1474 | 434* | 
+| `decrypt<128>`      | 652/898   | 673      | 333 |
+| `decrypt<192>`      | 772/1071  | 797      | 493 |
+| `decrypt<256>`      | 892/1240  | 921      | 454 |
+| `dec_unrolled<128>` | 607/836   | 609/1032 | 319* |
+| `dec_unrolled<192>` | 717/995   | 719/1224 | 376* |
+| `dec_unrolled<256>` | 827/1150  | 829/1416 | 434* | 
 
 Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 
@@ -97,18 +97,18 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 
 | Cipher function            | STM32F1 (0ws/2ws) - cortex-m3 | STM32F4 (0ws/7ws) - cortex-m4 | STM32H7 - cortex-m7 |
 |----------------------------|-------------------------------|-------------------------------|---------------------|
-| CBC_GENERIC<128> enc(+dec) | 43.08(-0.3)/56.97(+2.2)       | 43.9(+0.3)                    | 22.01(-0.12)         |
-| CBC_GENERIC<192> enc(+dec) | 50.71(-0.3)/67.22(+2.4)       | 51.65(+0.3)                   | 25.89(-0.25)         |
-| CBC_GENERIC<256> enc(+dec) | 58.33(-0.3)/77.47(+3.1)       | 59.4(+0.3)                    | 29.76(-0.37)         |
-| CTR_GENERIC<128>           | 42.32/56.32                   | 43.07                         | 21.63               |
-| CTR_GENERIC<192>           | 49.95/66.88                   | 50.82                         | 25.50               |
-| CTR_GENERIC<256>           | 57.57/76.69                   | 58.57                         | 29.38               |
-| CTR<128>                   | 33.78/45.98                   | 34.60                         | 17.65               |
-| CTR<192>                   | 41.41/56.48                   | 42.35                         | 21.52               |
-| CTR<256>                   | 49.03/66.98                   | 50.10                         | 25.40               |
-| CTR_unrolled<128>          | 31.09/44.80                   | 31.47/55.43                   | 16.64               |
-| CTR_unrolled<192>          | 37.97/54.98                   | 38.34/67.93                   | 20.27               |
-| CTR_unrolled<256>          | 44.84/65.11                   | 45.22/80.43                   | 23.89               |
+| CBC_GENERIC<128> enc(+dec) | 43.08(-0.3)/55.28(+3.5)       | 43.96(+0.37)                  | 22.01(-0.12)        |
+| CBC_GENERIC<192> enc(+dec) | 50.71(-0.3)/65.03(+4.37)      | 51.64(+0.44)                  | 25.89(-0.25)        |
+| CBC_GENERIC<256> enc(+dec) | 58.33(-0.3)/74.97(+5.06)      | 59.39(+0.3)                   | 29.76(-0.37)        |
+| CTR_GENERIC<128>           | 42.32/54.81                   | 43.06                         | 21.63               |
+| CTR_GENERIC<192>           | 49.95/64.69                   | 50.81                         | 25.50               |
+| CTR_GENERIC<256>           | 57.57/74.75                   | 58.56                         | 29.38               |
+| CTR<128>                   | 33.78/44.36                   | 34.60                         | 17.65               |
+| CTR<192>                   | 41.41/54.36                   | 42.35                         | 21.52               |
+| CTR<256>                   | 49.03/64.36                   | 50.10                         | 25.40               |
+| CTR_unrolled<128>          | 31.09/43.73                   | 31.47/55.43                   | 16.64               |
+| CTR_unrolled<192>          | 37.97/53.48                   | 38.34/67.93                   | 20.27               |
+| CTR_unrolled<256>          | 44.84/63.23                   | 45.22/80.43                   | 23.89               |
 
 ## todo
 - add proper padding
@@ -116,5 +116,6 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 - fix perf of cm7 unrolled functions
 - doxygen
 - pre generation of lookups
+- gcm
 - forward keyschedule_dec
 - optimize cm7 keyschedule_dec

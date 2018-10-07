@@ -69,10 +69,14 @@ CM34_1T_AES_encrypt:
 	uxtb r2, r4, ror #16
 	uxtb r3, r5, ror #16
 
-	uxtb r7, r7, ror #24
-	uxtb r4, r4, ror #24
-	uxtb r5, r5, ror #24
-	uxtb r6, r6, ror #24
+	//uxtb r7, r7, ror #24
+	//uxtb r4, r4, ror #24
+	//uxtb r5, r5, ror #24
+	//uxtb r6, r6, ror #24
+	lsrs r7, #24
+	lsrs r4, #24
+	lsrs r5, #24
+	lsrs r6, #24
 
 	ldr r0, [r14, r0, lsl #2]
 	ldr r1, [r14, r1, lsl #2]
