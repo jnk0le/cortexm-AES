@@ -10,6 +10,8 @@
 .global CM34_1T_AES_256_CTR_enc_unrolled
 .type   CM34_1T_AES_256_CTR_enc_unrolled,%function
 CM34_1T_AES_256_CTR_enc_unrolled:
+	add r3, r1, r3, lsl #4 // in_p + cnt*16
+
 	push {r1-r11,lr} // push data_in, data_out, blocks_cnt
 
 	mov r12, r0
@@ -1040,8 +1042,7 @@ ctr_encrypt_first:
 	rev r0, r0
 	adds r0, #1
 
-	//dec len counter // set flags early to optimize speculative fetches in cm3
-	subs r3, #1
+	cmp r3, r1 // set flags early to optimize speculative fetches in cm3
 
 	rev r0, r0
 	str r0, [r12, #12]
@@ -1049,7 +1050,6 @@ ctr_encrypt_first:
 	beq ctr_exit //if len==0: exit
 
 	tst r0, #0xff000000 // set flags early to optimize speculative fetches in cm3
-	str r3, [sp, #20+8] // blocks len // argument passed through stack
 	str r1, [sp, #20+0] // in p
 	str r2, [sp, #20+4] // out p
 
