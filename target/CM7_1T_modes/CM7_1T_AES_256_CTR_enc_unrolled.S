@@ -1207,7 +1207,7 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	stmia r2!, {r4-r7}
 
 	cmp r3, r1 // at least exit is an one off case
-	beq ctr_exit //if len==0: exit
+	beq ctr_exit //if in_p == final_p: exit
 
 	str r1, [sp, #20] // in p
 	tst r0, #0xff000000 // set flags early
