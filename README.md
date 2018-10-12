@@ -106,9 +106,9 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 | CTR<128>                   | 33.78/44.36                   | 34.60                         | 17.65               |
 | CTR<192>                   | 41.41/54.36                   | 42.35                         | 21.52               |
 | CTR<256>                   | 49.03/64.36                   | 50.10                         | 25.40               |
-| CTR_unrolled<128>          | 31.09/43.73                   | 31.47/55.43                   | 16.64               |
-| CTR_unrolled<192>          | 37.97/53.48                   | 38.34/67.93                   | 20.27               |
-| CTR_unrolled<256>          | 44.84/63.23                   | 45.22/80.43                   | 23.89               |
+| CTR_unrolled<128>          | 31.09/43.67                   | 31.47/53.56                   | 16.64               |
+| CTR_unrolled<192>          | 37.97/53.48                   | 38.34/65.56                   | 20.27               |
+| CTR_unrolled<256>          | 44.84/63.17                   | 45.22/77.56                   | 23.89               |
 
 ## todo
 - add proper padding

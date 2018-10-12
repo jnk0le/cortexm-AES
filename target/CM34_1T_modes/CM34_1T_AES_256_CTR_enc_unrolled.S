@@ -20,20 +20,20 @@ CM34_1T_AES_256_CTR_enc_unrolled:
 
 ctr_partial_precompute:
 
-	//load from ctx nonce in r0-r3, key in r4-r7
-	//ldmia r12!, {r0-r7}
-	ldr r0, [r12, #0] // nonce
-	ldr r1, [r12, #4]
-	ldr r2, [r12, #8]
-	ldr r3, [r12, #12]
-	ldr r4, [r12, #16] // round 0
-	ldr r5, [r12, #20]
-	ldr r6, [r12, #24]
-	ldr r7, [r12, #28]
-	ldr r8, [r12, #32] // round 1
-	ldr r9, [r12, #36]
-	ldr r10, [r12, #40]
-	ldr r11, [r12, #44]
+	//load from ctx nonce in r0-r3, key in r4-r7, next round in r8-r11
+	ldmia r12, {r0-r11}
+	//ldr r0, [r12, #0] // nonce
+	//ldr r1, [r12, #4]
+	//ldr r2, [r12, #8]
+	//ldr r3, [r12, #12]
+	//ldr r4, [r12, #16] // round 0
+	//ldr r5, [r12, #20]
+	//ldr r6, [r12, #24]
+	//ldr r7, [r12, #28]
+	//ldr r8, [r12, #32] // round 1
+	//ldr r9, [r12, #36]
+	//ldr r10, [r12, #40]
+	//ldr r11, [r12, #44]
 
 	//initial addroundkey
 	eors r4, r0
