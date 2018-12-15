@@ -1,6 +1,5 @@
 /*!
  * \file aes_cipher.hpp
- * \version 3.0.0
  * \brief basic ECB cipher context class
  *
  * \warning Do not use ECB mode for more than 16 bytes of plaintext data per key.

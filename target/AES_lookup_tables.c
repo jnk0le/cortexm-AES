@@ -1,6 +1,5 @@
 /*!
  * \file AES_lookup_tables.c
- * \version 1.1.0
  * \brief lookup tables used in some implementations
  *
  * If something is unused it will not waste memory

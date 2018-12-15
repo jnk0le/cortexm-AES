@@ -1,6 +1,5 @@
 /*!
  * \file cipher_impl.hpp
- * \version 3.2.0
  * \brief implementation wrappers of aes ciphers
  *
  * \author jnk0le <jnk0le@hotmail.com>

@@ -1,6 +1,5 @@
 /*!
  * \file modes_impl.hpp
- * \version 3.8.0
  * \brief wrappers for block mode ciphers
  *
  * \author jnk0le <jnk0le@hotmail.com>

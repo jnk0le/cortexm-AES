@@ -1,6 +1,5 @@
 /*!
  * \file aes_modes.hpp
- * \version 3.4.0
  * \brief block mode implementations
  *
  * \author jnk0le <jnk0le@hotmail.com>
