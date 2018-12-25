@@ -7,6 +7,9 @@
  * \date Jul 2018
  */
 
+#ifndef AES_MODES_HPP
+#define AES_MODES_HPP
+
 #include <stdint.h>
 #include <string.h>
 
@@ -63,7 +66,7 @@ namespace mode
 
 	//SP 800-38A compliant, 32 bit counter
 	template<size_t key_length, template<size_t> class base_impl = aes::target::CM34_1T, template<size_t key_len, template<size_t> class base> class mode_impl = aes::mode::target::CTR_GENERIC>
-		class CTR : protected ctr::Nonce, private mode_impl<key_length, base_impl> // put the nonce before rk, to be compatible with optimized asm implementation
+		class CTR : protected ctr::Nonce, private mode_impl<key_length, base_impl> // put the nonce before rk, to be compatible with current implementations
 		{
 		public:
 			CTR() {}
@@ -100,3 +103,4 @@ namespace mode
 }
 }
 
+#endif //AES_MODES_HPP

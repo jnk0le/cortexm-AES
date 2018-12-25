@@ -12,12 +12,14 @@
  * \date Aug 2018
  */
 
+#ifndef AES_CM34_MODES_H
+#define AES_CM34_MODES_H
+
 #include <stdint.h>
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
-
 
 	// currently requires pointer to ctx struct in form:
 
@@ -38,3 +40,5 @@
 #ifdef __cplusplus
 	}
 #endif
+
+#endif // AES_CM34_MODES_H

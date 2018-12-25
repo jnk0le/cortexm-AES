@@ -9,8 +9,8 @@
  * \date Jun 2018
  */
 
-#ifndef AES_HPP
-#define AES_HPP
+#ifndef AES_CIPHER_HPP
+#define AES_CIPHER_HPP
 
 #include <stdint.h>
 
@@ -64,4 +64,4 @@ namespace aes
 }
 
 
-#endif // AES_HPP
+#endif // AES_CIPHER_HPP

@@ -7,6 +7,9 @@
  * \date Jul 2018
  */
 
+#ifndef AES_MODES_IMPL_HPP
+#define AES_MODES_IMPL_HPP
+
 #include <stdint.h>
 
 #include "AES_CM34_modes.h"
@@ -190,3 +193,5 @@ namespace target
 }
 }
 }
+
+#endif //AES_MODES_IMPL_HPP

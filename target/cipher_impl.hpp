@@ -13,8 +13,10 @@
 #include "AES_CM34.h"
 #include "AES_CM7.h"
 
-namespace aes {
-namespace target {
+namespace aes
+{
+namespace target
+{
 
 //generic
 

@@ -12,6 +12,9 @@
  * \date Jun 2018
  */
 
+#ifndef AES_CM34_H
+#define AES_CM34_H
+
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -40,3 +43,5 @@
 #ifdef __cplusplus
 	}
 #endif
+
+#endif // AES_CM34_H
