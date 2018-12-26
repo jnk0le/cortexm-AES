@@ -10,10 +10,9 @@
 #ifndef AES_MODES_IMPL_HPP
 #define AES_MODES_IMPL_HPP
 
+#include "CM34_modes.h"
+#include "CM7_modes.h"
 #include <stdint.h>
-
-#include "AES_CM34_modes.h"
-#include "AES_CM7_modes.h"
 
 namespace aes
 {

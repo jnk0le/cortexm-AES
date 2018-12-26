@@ -24,10 +24,14 @@ CM34_1T_AES_CTR_enc:
 	movw r14, #:lower16:AES_Te0
 	movt r14, #:upper16:AES_Te0
 
+	ldr r0, [sp, #20+52]
+	add r0, r1, r0, lsl #4 // in_p + cnt*16
+	str r0, [sp, #20+52]
+
 ctr_partial_precompute:
 
-	//load from ctx nonce in r0-r3, key in r4-r7
-	ldmia r12!, {r0-r7}
+	//load from ctx nonce in r0-r3, key in r4-r7, next round in r8-r11
+	ldmia r12!, {r0-r7} // {r0-r11}
 
 	//initial addroundkey
 	eors r4, r0
@@ -45,7 +49,7 @@ ctr_partial_precompute:
 	ldr r2, [r14, r2, lsl #2]
 	ldr r3, [r14, r3, lsl #2]
 
-	ldmia r12!, {r8-r11}
+	ldmia r12!, {r8-r11} // cm3 better perf
 
 	eor r8, r8, r0, ror #16
 	eor r9, r9, r1, ror #16
@@ -366,14 +370,14 @@ ctr_encrypt_first:
 	ldr r2, [sp, #20+8] // out p
 
 #if __ARM_ARCH_7EM__
-	ldr r3, [sp, #20+52] // blocks len // argument passed through stack
+	ldr r3, [sp, #20+52] // final in_p address at which we break encryption // argument passed through stack
 	ldr r5, [r1, #4]
 	// cycle lost if both are moved after ctr load
 
 	ldr r0, [r12, #-52] // ctr
 #else
 	ldr r0, [r12, #-52] // ctr
-	ldr r3, [sp, #20+52] // blocks len // argument passed through stack
+	ldr r3, [sp, #20+52] // final in_p address at which we break encryption  // argument passed through stack
 #endif
 
 	//load input, xor keystream and write to output
@@ -395,22 +399,19 @@ ctr_encrypt_first:
 	str r5, [r2, #4]
 	str r6, [r2, #8]
 	str r7, [r2, #12]
-
-	rev r0, r0 // waitstate reduction
-	adds r0, #1 // also required here, otherwise no yield
-
 	str r4, [r2], #16
 
-	//dec and store len counter // set flags early to optimize speculative fetches in cm3
-	subs r3, #1
+	rev r0, r0
+	adds r0, #1
+
+	cmp r3, r1 // set flags early to optimize speculative fetches in cm3
 
 	rev r0, r0
 	str r0, [r12, #-52]
 
-	beq ctr_exit //if len==0: exit
+	beq ctr_exit //if in_p == final_p: exit
 
 	tst r0, #0xff000000 // set flags early to optimize speculative fetches in cm3
-	str r3, [sp, #20+52] // blocks len // argument passed through stack
 	str r1, [sp, #20+4] // in p
 	str r2, [sp, #20+8] // out p
 

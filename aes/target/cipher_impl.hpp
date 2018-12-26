@@ -10,15 +10,15 @@
 #ifndef AES_CIPHER_IMPL_HPP
 #define AES_CIPHER_IMPL_HPP
 
-#include "AES_CM34.h"
-#include "AES_CM7.h"
+#include "CM34.h"
+#include "CM7.h"
 
 namespace aes
 {
 namespace target
 {
 
-//generic
+	//generic?
 
 	template<size_t key_length>
 		class CM34_1T

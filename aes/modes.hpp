@@ -10,10 +10,10 @@
 #ifndef AES_MODES_HPP
 #define AES_MODES_HPP
 
+#include "cipher.hpp"
 #include <stdint.h>
 #include <string.h>
 
-#include "aes_cipher.hpp"
 #include "target/modes_impl.hpp"
 
 namespace aes
