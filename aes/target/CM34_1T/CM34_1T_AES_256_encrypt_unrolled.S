@@ -11,8 +11,8 @@ CM34_1T_AES_256_encrypt_unrolled:
 
 	mov.w r12, r0  // align following code to 4 bytes
 
-	movw r14, #:lower16:AES_Te0
-	movt r14, #:upper16:AES_Te0
+	movw r14, #:lower16:AES_Te2
+	movt r14, #:upper16:AES_Te2
 
 	//load input
 	//ldmia r1!, {r4-r7}

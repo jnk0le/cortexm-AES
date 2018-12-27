@@ -15,8 +15,8 @@ CM7_1T_AES_192_decrypt_unrolled:
 
 	add r12, r0, #192 // 12 rounds * 16
 
-	movw r14, #:lower16:AES_Td0
-	movt r14, #:upper16:AES_Td0
+	movw r14, #:lower16:AES_Td2
+	movt r14, #:upper16:AES_Td2
 
 	//load input
 	ldm r1, {r4-r7}

@@ -10,8 +10,8 @@ CM34_1T_AES_encrypt:
 	add r3, r0, r3, lsl #4 //rk_end-16 = rk + rounds * 16
 	push {r2,r3,r4-r11,lr} //stack out, rk_end-16
 
-	movw r14, #:lower16:AES_Te0
-	movt r14, #:upper16:AES_Te0
+	movw r14, #:lower16:AES_Te2
+	movt r14, #:upper16:AES_Te2
 
 	mov r12, r0
 

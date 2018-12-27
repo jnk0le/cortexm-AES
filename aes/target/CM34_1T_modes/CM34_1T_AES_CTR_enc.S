@@ -21,8 +21,8 @@ CM34_1T_AES_CTR_enc:
 
 	sub sp, #20
 
-	movw r14, #:lower16:AES_Te0
-	movt r14, #:upper16:AES_Te0
+	movw r14, #:lower16:AES_Te2
+	movt r14, #:upper16:AES_Te2
 
 	ldr r0, [sp, #20+52]
 	add r0, r1, r0, lsl #4 // in_p + cnt*16

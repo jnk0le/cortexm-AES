@@ -9,8 +9,8 @@
 CM34_1T_AES_encrypt_unrolled:
 	push {r2,r4-r11,lr} // stack output pointer
 
-	movw r14, #:lower16:AES_Te0
-	movt r14, #:upper16:AES_Te0
+	movw r14, #:lower16:AES_Te2
+	movt r14, #:upper16:AES_Te2
 
 	mov r12, r0
 

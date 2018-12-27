@@ -16,8 +16,8 @@
 CM7_1T_AES_128_keyschedule_enc:
 	push {r4-r8, lr}
 
-	movw r14, #:lower16:AES_Te0
-	movt r14, #:upper16:AES_Te0
+	movw r14, #:lower16:AES_Te2
+	movt r14, #:upper16:AES_Te2
 
 	//load key once
 	ldmia r1!, {r2-r5}
@@ -31,16 +31,16 @@ CM7_1T_AES_128_keyschedule_enc:
 	//cannot dual issue when load offset is blocked by uxtb
 
 	uxtb r8, r5, ror #24
-	ldrb r6, [r14, r6, lsl #2] //load sbox from Te0
+	ldrb r6, [r14, r6, lsl #2] //load sbox from Te2
 
 	uxtb r12, r5
-	ldrb r7, [r14, r7, lsl #2] //load sbox from Te0
+	ldrb r7, [r14, r7, lsl #2] //load sbox from Te2
 
 	eor r2, r2, r1, lsr #24 // rcon is in highest byte
-	ldrb r8, [r14, r8, lsl #2] //load sbox from Te0
+	ldrb r8, [r14, r8, lsl #2] //load sbox from Te2
 
 	eors r2, r2, r6
-	ldrb r12, [r14, r12, lsl #2] //load sbox from Te0
+	ldrb r12, [r14, r12, lsl #2] //load sbox from Te2
 	//cannot use r12 in the next cycle
 
 	eor r2, r2, r7, lsl #8

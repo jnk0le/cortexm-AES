@@ -18,8 +18,8 @@ CM7_1T_AES_256_CTR_enc_unrolled:
 	mov r12, r0
 	sub sp, #20
 
-	movw r14, #:lower16:AES_Te0
-	movt r14, #:upper16:AES_Te0
+	movw r14, #:lower16:AES_Te2
+	movt r14, #:upper16:AES_Te2
 
 ctr_partial_precompute:
 	//load from ctx nonce in r0-r3, key in r4-r7 + next round in r8-r11

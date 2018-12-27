@@ -16,9 +16,9 @@ CM34_1T_AES_256_keyschedule_enc:
 	//load key
 	ldmia r1!, {r2-r9}
 
-	movw r1, #:lower16:AES_Te0
-	movt r1, #:upper16:AES_Te0
-	str r1, [sp, #-8]! // put Te0 on stack before looping and reserve space on stack
+	movw r1, #:lower16:AES_Te2
+	movt r1, #:upper16:AES_Te2
+	str r1, [sp, #-8]! // put Te2 on stack before looping and reserve space on stack
 
 	//just copy a key
 	stmia r0!, {r2-r9}
@@ -31,10 +31,10 @@ CM34_1T_AES_256_keyschedule_enc:
 	uxtb r12, r9, ror #24
 	uxtb r14, r9
 
-	ldrb r10, [r1, r10, lsl #2] //load sbox from Te0
-	ldrb r11, [r1, r11, lsl #2] //load sbox from Te0
-	ldrb r12, [r1, r12, lsl #2] //load sbox from Te0
-	ldrb r14, [r1, r14, lsl #2] //load sbox from Te0
+	ldrb r10, [r1, r10, lsl #2] //load sbox from Te2
+	ldrb r11, [r1, r11, lsl #2] //load sbox from Te2
+	ldrb r12, [r1, r12, lsl #2] //load sbox from Te2
+	ldrb r14, [r1, r14, lsl #2] //load sbox from Te2
 
 	eor r2, r2, r0, lsr #24 // rcon is in highest byte
 	eor r2, r2, r10
@@ -50,11 +50,11 @@ CM34_1T_AES_256_keyschedule_enc:
 	uxtb r12, r5
 	uxtb r14, r5, ror #24
 
-	ldrb r10, [r1, r10, lsl #2] //load sbox from Te0
-	ldrb r11, [r1, r11, lsl #2] //load sbox from Te0
-	ldrb r12, [r1, r12, lsl #2] //load sbox from Te0
-	ldrb r14, [r1, r14, lsl #2] //load sbox from Te0
-	ldr r1, [sp, #4] //replace Te0 with rk pointer
+	ldrb r10, [r1, r10, lsl #2] //load sbox from Te2
+	ldrb r11, [r1, r11, lsl #2] //load sbox from Te2
+	ldrb r12, [r1, r12, lsl #2] //load sbox from Te2
+	ldrb r14, [r1, r14, lsl #2] //load sbox from Te2
+	ldr r1, [sp, #4] //replace Te2 with rk pointer
 
 	eor r6, r6, r10, lsl #16
 	eor r6, r6, r11, lsl #8
@@ -69,7 +69,7 @@ CM34_1T_AES_256_keyschedule_enc:
 	ittte pl // negative flag is set when r0 = 0x80000000
 	stmiapl r1!, {r2-r9} //write full roundkey
 	strpl r1, [sp, #4] //rk pointer
-	ldrpl r1, [sp] //Te0
+	ldrpl r1, [sp] //Te2
 	stmiami r1!, {r2-r5} //write only 4 words at the last round
 	bpl 1b
 

@@ -14,8 +14,8 @@ CM7_1T_AES_192_encrypt_unrolled:
 
 	mov r12, r0
 
-	movw r14, #:lower16:AES_Te0
-	movt r14, #:upper16:AES_Te0
+	movw r14, #:lower16:AES_Te2
+	movt r14, #:upper16:AES_Te2
 
 	//load input
 	ldmia r1!, {r4-r7}

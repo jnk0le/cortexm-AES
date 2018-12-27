@@ -16,8 +16,8 @@ CM7_1T_AES_decrypt:
 
 	push {r0, r2, r4-r11, lr} //stack rk+16, out
 
-	movw r14, #:lower16:AES_Td0
-	movt r14, #:upper16:AES_Td0
+	movw r14, #:lower16:AES_Td2
+	movt r14, #:upper16:AES_Td2
 
 	//load input
 	ldm.w r1, {r4-r7}
@@ -121,7 +121,6 @@ CM7_1T_AES_decrypt:
 	//final round
 	//ldmdb r12, {r8-r11}
 
-	//do we really need inv_sbox?
 	movw r14, #:lower16:AES_inv_sbox
 	ldr r8, [r12, #-16]!
 

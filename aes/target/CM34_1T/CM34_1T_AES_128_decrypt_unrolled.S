@@ -13,8 +13,8 @@ CM34_1T_AES_128_decrypt_unrolled:
 
 	add r12, r0, #160 // 10 rounds * 16
 
-	movw r14, #:lower16:AES_Td0
-	movt r14, #:upper16:AES_Td0
+	movw r14, #:lower16:AES_Td2
+	movt r14, #:upper16:AES_Td2
 
 	//load input
 	//ldm r1, {r4-r7}
@@ -649,8 +649,6 @@ CM34_1T_AES_128_decrypt_unrolled:
 	eor r7, r11, r3
 
 	//final round
-
-	//do we really need inv_sbox?
 	movw r14, #:lower16:AES_inv_sbox
 	movt r14, #:upper16:AES_inv_sbox
 

@@ -21,9 +21,9 @@ CM7_1T_AES_keyschedule_dec:
 	add r1, r0, r1, lsl #4
 	add r0, #16 //align following code to 4 bytes
 
-	movw r14, #:lower16:AES_Te0
-	movt r14, #:upper16:AES_Te0
-	movw r12, #:lower16:AES_Td0
+	movw r14, #:lower16:AES_Te2
+	movt r14, #:upper16:AES_Te2
+	movw r12, #:lower16:AES_Td2
 	//movt is optimized into wasted cycles
 
 1:	ldmdb r1!, {r2-r5}
@@ -38,7 +38,7 @@ CM7_1T_AES_keyschedule_dec:
 	uxtb r9, r2
 	ldrb r7, [r14, r7, lsl #2] //load sbox from Te0
 
-	movt r12, #:upper16:AES_Td0
+	movt r12, #:upper16:AES_Td2
 	ldrb r8, [r14, r8, lsl #2] //load sbox from Te0
 
 	nop

@@ -17,8 +17,8 @@ CM34_1T_AES_256_CTR_enc_unrolled:
 	mov r12, r0
 	sub sp, #20
 
-	movw r14, #:lower16:AES_Te0
-	movt r14, #:upper16:AES_Te0
+	movw r14, #:lower16:AES_Te2
+	movt r14, #:upper16:AES_Te2
 
 ctr_partial_precompute:
 

@@ -18,10 +18,10 @@ CM34_1T_AES_keyschedule_dec:
 	add r1, r0, r1, lsl #4
 	add.w r0, #16 //align following code to 4 bytes
 
-	movw r14, #:lower16:AES_Te0
-	movt r14, #:upper16:AES_Te0
-	movw r12, #:lower16:AES_Td0
-	movt r12, #:upper16:AES_Td0
+	movw r14, #:lower16:AES_Te2
+	movt r14, #:upper16:AES_Te2
+	movw r12, #:lower16:AES_Td2
+	movt r12, #:upper16:AES_Td2
 
 	//nop.w
 

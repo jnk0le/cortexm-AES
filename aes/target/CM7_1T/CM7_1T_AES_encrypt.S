@@ -15,8 +15,8 @@ CM7_1T_AES_encrypt:
 
 	push {r2,r3,r4-r11,lr} //stack out, rk_end-16
 
-	movw r14, #:lower16:AES_Te0
-	movt r14, #:upper16:AES_Te0
+	movw r14, #:lower16:AES_Te2
+	movt r14, #:upper16:AES_Te2
 
 	//load input
 	ldmia r1!, {r4-r7}

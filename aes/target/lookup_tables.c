@@ -4,6 +4,8 @@
  *
  * If something is unused it will not waste memory
  *
+ * \warning to avoid data dependent timing differences, those tables have to be placed in deterministic memory section
+ *
  * \author jnk0le <jnk0le@hotmail.com>
  * \copyright MIT License
  * \date Jun 2018
@@ -51,7 +53,7 @@ uint8_t AES_inv_sbox[256] __attribute__ ((aligned(256))) =
 	0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D
 };
 
-uint32_t AES_Te0[256] __attribute__ ((aligned(1024))) =
+uint32_t AES_Te2[256] __attribute__ ((aligned(1024))) =
 {
 	0x63c6a563, 0x7cf8847c, 0x77ee9977, 0x7bf68d7b,
 	0xf2ff0df2, 0x6bd6bd6b, 0x6fdeb16f, 0xc59154c5,
@@ -119,7 +121,7 @@ uint32_t AES_Te0[256] __attribute__ ((aligned(1024))) =
 	0xb07bcbb0, 0x54a8fc54, 0xbb6dd6bb, 0x162c3a16,
 };
 
-uint32_t AES_Td0[256] __attribute__ ((aligned(1024))) =
+uint32_t AES_Td2[256] __attribute__ ((aligned(1024))) =
 {
 	0xf45150a7, 0x417e5365, 0x171ac3a4, 0x273a965e,
 	0xab3bcb6b, 0x9d1ff145, 0xfaacab58, 0xe34b9303,

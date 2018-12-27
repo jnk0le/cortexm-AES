@@ -11,8 +11,8 @@
 CM34_1T_AES_decrypt_unrolled:
 	push {r2, r4-r11, lr} //stack output pointer
 
-	movw r14, #:lower16:AES_Td0
-	movt r14, #:upper16:AES_Td0
+	movw r14, #:lower16:AES_Td2
+	movt r14, #:upper16:AES_Td2
 
 	//rk_end-16 = rk + rounds * 16
 	add r12, r0, r3, lsl #4
@@ -752,11 +752,9 @@ CM34_1T_AES_decrypt_unrolled:
 	eor r7, r11, r3, ror #24
 
 	//final round
-	//do we really need inv_sbox?
 	movw r14, #:lower16:AES_inv_sbox
 	movt r14, #:upper16:AES_inv_sbox
 
-	//final round
 	ldmdb r12, {r8-r11}
 
 	uxtb r0, r4
