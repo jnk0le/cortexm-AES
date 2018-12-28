@@ -11,6 +11,7 @@
 #define AES_CIPHER_IMPL_HPP
 
 #include "CM34.h"
+#include "CM4.h"
 #include "CM7.h"
 
 namespace aes
@@ -90,6 +91,16 @@ namespace target
 					break;
 				}
 			}
+		};
+
+	template<size_t key_length>
+		class CM4_DSPsBOX : public CM34_1T<key_length> // recycle stuff from 1T for now
+		{
+		public:
+			void encrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
+				CM4_DSPsBOX_AES_encrypt(rk, data_in, data_out, this->key_rounds);
+			}
+
 		};
 
 	template<size_t key_length>

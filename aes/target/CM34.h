@@ -1,5 +1,5 @@
 /*!
- * \file AES_CM34.h
+ * \file CM34.h
  * \brief FIPS 197 compliant software AES implementations optimized for cortex-m3/4
  *
  * Utilizes a 1K T table per cipher occupying 1 kB + 1.25 kB of memory for encryption + decryption

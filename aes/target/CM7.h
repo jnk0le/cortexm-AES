@@ -1,5 +1,5 @@
 /*!
- * \file AES_CM7.h
+ * \file CM7.h
  * \brief FIPS 197 compliant software AES implementations optimized for cortex-m7
  *
  * Utilizes a 1K T table per cipher occupying 1 kB + 1.25 kB of memory for encryption + decryption

@@ -1,5 +1,5 @@
 /*!
- * \file AES_CM7_modes.h
+ * \file CM7_modes.h
  * \brief SP 800-38A compliant, software AES block modes implementations optimized for cortex-m3/4
  *
  * ctr encryption can be recycled for decryption thus requiring only 1K T table for encryption
