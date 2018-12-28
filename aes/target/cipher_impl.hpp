@@ -56,19 +56,6 @@ namespace target
 		};
 
 	template<size_t key_length>
-		class CM34_1T_dense : public CM34_1T<key_length>
-		{
-		public:
-			void encrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
-				CM34_1T_AES_encrypt_d(rk, data_in, data_out, this->key_rounds);
-			}
-
-			void decrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
-				CM34_1T_AES_decrypt_d(rk, data_in, data_out, this->key_rounds);
-			}
-		};
-
-	template<size_t key_length>
 		class CM34_1T_unrolled : public CM34_1T<key_length>
 		{
 		public: // override only unrolled functions
