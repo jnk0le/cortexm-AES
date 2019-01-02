@@ -24,7 +24,7 @@
 	//sboxed key expander here ?
 
 	void CM4_DSPsBOX_AES_encrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
-	//void CM4_DSPsBOX_AES_decrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
+	void CM4_DSPsBOX_AES_decrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
 
 #ifdef __cplusplus
 	}

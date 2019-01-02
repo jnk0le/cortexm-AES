@@ -153,7 +153,7 @@ CM4_DSPsBOX_AES_encrypt:
 
 	eor r3, r4, r5, ror #8 // effective r5 = s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
 
-	//addroudkey
+	//addroundkey
 	ldr.w r6, [sp, #4] // post indexed loads have to be executed after other loads
 	ldr r4, [r14], #4
 	ldr r5, [r14], #4
