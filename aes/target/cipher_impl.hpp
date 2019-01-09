@@ -57,6 +57,26 @@ namespace target
 		};
 
 	template<size_t key_length>
+		class CM34_1T_deconly : public CM34_1T<key_length>
+		{
+		public: // override only key expansion (encryption will take 1,25kB if used)
+			void key_schedule_enc(uint8_t* rk, const uint8_t* key) {
+				switch(key_length)
+				{
+				case 128:
+					CM34_sBOX_AES_128_keyschedule_enc(rk, key);
+					break;
+				case 192:
+					CM34_sBOX_AES_192_keyschedule_enc(rk, key);
+					break;
+				case 256:
+					CM34_sBOX_AES_256_keyschedule_enc(rk, key);
+					break;
+				}
+			}
+		};
+
+	template<size_t key_length>
 		class CM34_1T_unrolled : public CM34_1T<key_length>
 		{
 		public: // override only unrolled functions
@@ -88,6 +108,26 @@ namespace target
 					break;
 				case 256:
 					CM34_1T_AES_256_decrypt_unrolled(rk, data_in, data_out);
+					break;
+				}
+			}
+		};
+
+	template<size_t key_length>
+		class CM34_1T_unrolled_deconly : public CM34_1T_unrolled<key_length>
+		{
+		public: // override only key expansion (encryption will take 1,25kB if used)
+			void key_schedule_enc(uint8_t* rk, const uint8_t* key) {
+				switch(key_length)
+				{
+				case 128:
+					CM34_sBOX_AES_128_keyschedule_enc(rk, key);
+					break;
+				case 192:
+					CM34_sBOX_AES_192_keyschedule_enc(rk, key);
+					break;
+				case 256:
+					CM34_sBOX_AES_256_keyschedule_enc(rk, key);
 					break;
 				}
 			}
