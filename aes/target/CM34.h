@@ -21,6 +21,10 @@
 	extern "C" {
 #endif
 
+	void CM34_sBOX_AES_128_keyschedule_enc(uint8_t* rk, const uint8_t* key);
+	void CM34_sBOX_AES_192_keyschedule_enc(uint8_t* rk, const uint8_t* key);
+	void CM34_sBOX_AES_256_keyschedule_enc(uint8_t* rk, const uint8_t* key);
+
 	void CM34_1T_AES_128_keyschedule_enc(uint8_t* rk, const uint8_t* key);
 	void CM34_1T_AES_192_keyschedule_enc(uint8_t* rk, const uint8_t* key);
 	void CM34_1T_AES_256_keyschedule_enc(uint8_t* rk, const uint8_t* key);

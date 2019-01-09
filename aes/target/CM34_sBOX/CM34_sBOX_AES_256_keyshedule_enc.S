@@ -1,4 +1,3 @@
-// can be reimplemented to use only 256 byte sbox in case the Te2 is not used anyway
 // precesses 256 bits of key per iteration
 // 7 rounds of rcon can be computed as left shift only
 
@@ -7,17 +6,17 @@
 .text
 
 .align 3
-// void CM34_1T_AES_256_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
-.global CM34_1T_AES_256_keyschedule_enc
-.type   CM34_1T_AES_256_keyschedule_enc,%function
-CM34_1T_AES_256_keyschedule_enc:
+// void CM34_sBOX_AES_256_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
+.global CM34_sBOX_AES_256_keyschedule_enc
+.type   CM34_sBOX_AES_256_keyschedule_enc,%function
+CM34_sBOX_AES_256_keyschedule_enc:
 	push {r4-r11, lr}
 
 	//load key
 	ldmia r1!, {r2-r9}
 
-	movw r1, #:lower16:AES_Te2
-	movt r1, #:upper16:AES_Te2
+	movw r1, #:lower16:AES_sbox
+	movt r1, #:upper16:AES_sbox
 	str r1, [sp, #-8]! // put Te2 on stack before looping and reserve space on stack
 
 	//just copy a key
@@ -31,10 +30,10 @@ CM34_1T_AES_256_keyschedule_enc:
 	uxtb r12, r9, ror #24
 	uxtb r14, r9
 
-	ldrb r10, [r1, r10, lsl #2] //load sbox from Te2
-	ldrb r11, [r1, r11, lsl #2] //load sbox from Te2
-	ldrb r12, [r1, r12, lsl #2] //load sbox from Te2
-	ldrb r14, [r1, r14, lsl #2] //load sbox from Te2
+	ldrb r10, [r1, r10]
+	ldrb r11, [r1, r11]
+	ldrb r12, [r1, r12]
+	ldrb r14, [r1, r14]
 
 	eor r2, r2, r0, lsr #24 // rcon is in highest byte
 	eor r2, r2, r10
@@ -50,11 +49,11 @@ CM34_1T_AES_256_keyschedule_enc:
 	uxtb r12, r5
 	uxtb r14, r5, ror #24
 
-	ldrb r10, [r1, r10, lsl #2] //load sbox from Te2
-	ldrb r11, [r1, r11, lsl #2] //load sbox from Te2
-	ldrb r12, [r1, r12, lsl #2] //load sbox from Te2
-	ldrb r14, [r1, r14, lsl #2] //load sbox from Te2
-	ldr r1, [sp, #4] //replace Te2 with rk pointer
+	ldrb r10, [r1, r10]
+	ldrb r11, [r1, r11]
+	ldrb r12, [r1, r12]
+	ldrb r14, [r1, r14]
+	ldr r1, [sp, #4] //replace sbox with rk pointer
 
 	eor r6, r6, r10, lsl #16
 	eor r6, r6, r11, lsl #8
@@ -69,7 +68,7 @@ CM34_1T_AES_256_keyschedule_enc:
 	ittte pl // negative flag is set when r0 = 0x80000000
 	stmiapl r1!, {r2-r9} //write full roundkey
 	strpl r1, [sp, #4] //rk pointer
-	ldrpl r1, [sp] //Te2
+	ldrpl r1, [sp] //sbox
 	stmiami r1!, {r2-r5} //write only 4 words at the last round
 	bpl 1b
 

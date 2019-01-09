@@ -1,4 +1,3 @@
-// can be reimplemented to use only 256 byte sbox in case the Te2 is not used anyway
 // 10 rounds of rcon can be computed as left shift + conditional reload of rcon to 0x1b after 0x80
 // it can also serve as loop counter to reduce register pressure
 
@@ -7,14 +6,14 @@
 .text
 
 .align 3
-// void CM34_1T_AES_128_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
-.global CM34_1T_AES_128_keyschedule_enc
-.type   CM34_1T_AES_128_keyschedule_enc,%function
-CM34_1T_AES_128_keyschedule_enc:
+// void CM34_sBOX_AES_128_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
+.global CM34_sBOX_AES_128_keyschedule_enc
+.type   CM34_sBOX_AES_128_keyschedule_enc,%function
+CM34_sBOX_AES_128_keyschedule_enc:
 	push {r4-r8, lr}
 
-	movw r14, #:lower16:AES_Te2
-	movt r14, #:upper16:AES_Te2
+	movw r14, #:lower16:AES_sbox
+	movt r14, #:upper16:AES_sbox
 
 	//load key once
 	ldmia.w r1, {r2-r5} // align loop entry to 8 bytes
@@ -28,10 +27,10 @@ CM34_1T_AES_128_keyschedule_enc:
 	uxtb r8, r5, ror #24
 	uxtb r12, r5
 
-	ldrb r6, [r14, r6, lsl #2] //load sbox from Te2
-	ldrb r7, [r14, r7, lsl #2] //load sbox from Te2
-	ldrb r8, [r14, r8, lsl #2] //load sbox from Te2
-	ldrb r12, [r14, r12, lsl #2] //load sbox from Te2
+	ldrb r6, [r14, r6]
+	ldrb r7, [r14, r7]
+	ldrb r8, [r14, r8]
+	ldrb r12, [r14, r12]
 
 	eor r2, r2, r1, lsr #24 // rcon is in highest byte
 	eors r2, r2, r6
