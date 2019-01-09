@@ -97,10 +97,23 @@ namespace target
 		class CM4_DSPsBOX : public CM34_1T<key_length> // recycle stuff from 1T for now
 		{
 		public:
-			//void key_schedule_enc(uint8_t* rk, const uint8_t* key) {}
+			void key_schedule_enc(uint8_t* rk, const uint8_t* key) {
+				switch(key_length)
+				{
+				case 128:
+					CM34_sBOX_AES_128_keyschedule_enc(rk, key);
+					break;
+				case 192:
+					CM34_sBOX_AES_192_keyschedule_enc(rk, key);
+					break;
+				case 256:
+					CM34_sBOX_AES_256_keyschedule_enc(rk, key);
+					break;
+				}
+			}
 
 			void key_schedule_dec(uint8_t* rk) {
-				//nothing to expand, the addroundkey stage is its own inverse
+				(void)rk; //nothing to expand, the addroundkey stage is its own inverse
 			}
 
 			void encrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
