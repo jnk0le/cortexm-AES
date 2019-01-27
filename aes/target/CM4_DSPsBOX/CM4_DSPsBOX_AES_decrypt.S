@@ -114,177 +114,114 @@ CM4_DSPsBOX_AES_decrypt:
 	eor r3, r8
 
 	//do inv mix columns as
-	// tmp = 09 * (s0^s1^s2^s3) // (s0^s1^s2^s3) ^ gmul2(gmul2(gmul2(s0^s1^s2^s3)))
-	// s0` ^= tmp ^ gmul2(gmul2(s0^s2)) ^ gmul2(s0^s1) // s0` = s1^s2^s3 ^ gmul8(s0^s1^s2^s3) ^ gmul2(gmul2(s0^s2)) ^ gmul2(s0^s1)
-	// s1` ^= tmp ^ gmul2(gmul2(s1^s3)) ^ gmul2(s1^s2) // s1` = s0^s2^s3 ^ gmul8(s0^s1^s2^s3) ^ gmul2(gmul2(s1^s3)) ^ gmul2(s1^s2)
-	// s2` ^= tmp ^ gmul2(gmul2(s0^s2)) ^ gmul2(s2^s3) // s2` = s0^s1^s3 ^ gmul8(s0^s1^s2^s3) ^ gmul2(gmul2(s0^s2)) ^ gmul2(s2^s3)
-	// s3` ^= tmp ^ gmul2(gmul2(s1^s3)) ^ gmul2(s3^s0) // s3` = s0^s1^s2 ^ gmul8(s0^s1^s2^s3) ^ gmul2(gmul2(s1^s3)) ^ gmul2(s3^s0)
-
-	//col 0 - STx0
-	eor r4, r0, r0, ror #8 // r4 = s0^s1 | s1^s2 | s2^s3 | s3^s0
-	eor r5, r0, r0, ror #16 // r5 = s0^s2 | s1^s3 | s0^s2 | s1^s3
-	eor r6, r4, r4, ror #16 // r6 = s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
-	eor r10, r4, r0, ror #16 // r10 = s0^s1^s2 | s1^s2^s3 | s0^s2^s3 | s0^s1^s3
+	// r0 = S{1}
+	// r4 = S{2}
+	// r5 = S{4}
+	// r6 = S{8}
+	// r11 - tmp
 
 	//perform quad gfmul in constant time
 
-	//tmp
-	uadd8 r8, r6, r6 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r6, r9, r8 // if uadd carried then take reduced byte
+	uadd8 r4, r0, r0 // quad lsl #1
+	eor r11, r4, #0x1b1b1b1b
+	sel r4, r11, r4 // if uadd carried then take reduced byte
 
-	uadd8 r8, r6, r6 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r6, r9, r8 // if uadd carried then take reduced byte
+	uadd8 r5, r4, r4 // quad lsl #1
+	eor r11, r5, #0x1b1b1b1b
+	sel r5, r11, r5 // if uadd carried then take reduced byte
 
-	uadd8 r8, r6, r6 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r6, r9, r8 // if uadd carried then take reduced byte
+	uadd8 r6, r5, r5 // quad lsl #1
+	eor r11, r6, #0x1b1b1b1b
+	sel r6, r11, r6 // if uadd carried then take reduced byte
 
-	eor r6, r6, r10, ror #8 // effective r10 = s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
+	// r8 - S{9} = S{8} ^ S{1}
+	// r9 - S{b} = S{9} ^ S{2}
+	// r10 - S{d} = S{9} ^ S{4}
+	// r0 - S{e} = S{8} ^ S{4} ^ S{2}
 
-	//gmul2(gmul2())
-	uadd8 r8, r5, r5 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r5, r9, r8 // if uadd carried then take reduced byte
+	eor r8, r6, r0
+	eor r9, r8, r4
+	eor r10, r8, r5
+	eor r0, r6, r5
+	eors r0, r4
 
-	uadd8 r8, r5, r5 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r5, r9, r8 // if uadd carried then take reduced byte
+	// r0 = s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
 
-	eors r6, r5
-
-	//gmul2()
-	uadd8 r8, r4, r4 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r4, r9, r8 // if uadd carried then take reduced byte
-
-	eor r0, r4, r6
+	eor r0, r0, r10, ror #16
+	eor r0, r0, r9, ror #8
+	eor r0, r0, r8, ror #24
 
 	//col 1 - STx1
-	eor r4, r1, r1, ror #8 // r4 = s0^s1 | s1^s2 | s2^s3 | s3^s0
-	eor r5, r1, r1, ror #16 // r5 = s0^s2 | s1^s3 | s0^s2 | s1^s3
-	eor r6, r4, r4, ror #16 // r6 = s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
-	eor r10, r4, r1, ror #16 // r10 = s0^s1^s2 | s1^s2^s3 | s0^s2^s3 | s0^s1^s3
+	uadd8 r4, r1, r1 // quad lsl #1
+	eor r11, r4, #0x1b1b1b1b
+	sel r4, r11, r4 // if uadd carried then take reduced byte
 
-	//perform quad gfmul in constant time
+	uadd8 r5, r4, r4 // quad lsl #1
+	eor r11, r5, #0x1b1b1b1b
+	sel r5, r11, r5 // if uadd carried then take reduced byte
 
-	//tmp
-	uadd8 r8, r6, r6 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r6, r9, r8 // if uadd carried then take reduced byte
+	uadd8 r6, r5, r5 // quad lsl #1
+	eor r11, r6, #0x1b1b1b1b
+	sel r6, r11, r6 // if uadd carried then take reduced byte
 
-	uadd8 r8, r6, r6 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r6, r9, r8 // if uadd carried then take reduced byte
+	eor r8, r6, r1
+	eor r9, r8, r4
+	eor r10, r8, r5
+	eor r1, r6, r5
+	eors r1, r4
 
-	uadd8 r8, r6, r6 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r6, r9, r8 // if uadd carried then take reduced byte
-
-	eor r6, r6, r10, ror #8 // effective r10 = s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
-
-	//gmul2(gmul2())
-	uadd8 r8, r5, r5 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r5, r9, r8 // if uadd carried then take reduced byte
-
-	uadd8 r8, r5, r5 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r5, r9, r8 // if uadd carried then take reduced byte
-
-	eors r6, r5
-
-	//gmul2()
-	uadd8 r8, r4, r4 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r4, r9, r8 // if uadd carried then take reduced byte
-
-	eor r1, r4, r6
+	eor r1, r1, r10, ror #16
+	eor r1, r1, r9, ror #8
+	eor r1, r1, r8, ror #24
 
 	//col 2 - STx2
-	eor r4, r2, r2, ror #8 // r4 = s0^s1 | s1^s2 | s2^s3 | s3^s0
-	eor r5, r2, r2, ror #16 // r5 = s0^s2 | s1^s3 | s0^s2 | s1^s3
-	eor r6, r4, r4, ror #16 // r6 = s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
-	eor r10, r4, r2, ror #16 // r10 = s0^s1^s2 | s1^s2^s3 | s0^s2^s3 | s0^s1^s3
+	uadd8 r4, r2, r2 // quad lsl #1
+	eor r11, r4, #0x1b1b1b1b
+	sel r4, r11, r4 // if uadd carried then take reduced byte
 
-	//perform quad gfmul in constant time
+	uadd8 r5, r4, r4 // quad lsl #1
+	eor r11, r5, #0x1b1b1b1b
+	sel r5, r11, r5 // if uadd carried then take reduced byte
 
-	//tmp
-	uadd8 r8, r6, r6 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r6, r9, r8 // if uadd carried then take reduced byte
+	uadd8 r6, r5, r5 // quad lsl #1
+	eor r11, r6, #0x1b1b1b1b
+	sel r6, r11, r6 // if uadd carried then take reduced byte
 
-	uadd8 r8, r6, r6 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r6, r9, r8 // if uadd carried then take reduced byte
+	eor r8, r6, r2
+	eor r9, r8, r4
+	eor r10, r8, r5
+	eor r2, r6, r5
+	eors r2, r4
 
-	uadd8 r8, r6, r6 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r6, r9, r8 // if uadd carried then take reduced byte
-
-	eor r6, r6, r10, ror #8 // effective r10 = s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
-
-	//gmul2(gmul2())
-	uadd8 r8, r5, r5 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r5, r9, r8 // if uadd carried then take reduced byte
-
-	uadd8 r8, r5, r5 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r5, r9, r8 // if uadd carried then take reduced byte
-
-	eors r6, r5
-
-	//gmul2()
-	uadd8 r8, r4, r4 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r4, r9, r8 // if uadd carried then take reduced byte
-
-	eor r2, r4, r6
+	eor r2, r2, r10, ror #16
+	eor r2, r2, r9, ror #8
+	eor r2, r2, r8, ror #24
 
 	//col 3 - STx3
-	eor r4, r3, r3, ror #8 // r4 = s0^s1 | s1^s2 | s2^s3 | s3^s0
-	eor r5, r3, r3, ror #16 // r5 = s0^s2 | s1^s3 | s0^s2 | s1^s3
-	eor r6, r4, r4, ror #16 // r6 = s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
-	eor r10, r4, r3, ror #16 // r10 = s0^s1^s2 | s1^s2^s3 | s0^s2^s3 | s0^s1^s3
+	uadd8 r4, r3, r3 // quad lsl #1
+	eor r11, r4, #0x1b1b1b1b
+	sel r4, r11, r4 // if uadd carried then take reduced byte
 
-	//perform quad gfmul in constant time
+	uadd8 r5, r4, r4 // quad lsl #1
+	eor r11, r5, #0x1b1b1b1b
+	sel r5, r11, r5 // if uadd carried then take reduced byte
 
-	//tmp
-	uadd8 r8, r6, r6 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r6, r9, r8 // if uadd carried then take reduced byte
+	uadd8 r6, r5, r5 // quad lsl #1
+	eor r11, r6, #0x1b1b1b1b
+	sel r6, r11, r6 // if uadd carried then take reduced byte
 
-	uadd8 r8, r6, r6 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r6, r9, r8 // if uadd carried then take reduced byte
-
-	uadd8 r8, r6, r6 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r6, r9, r8 // if uadd carried then take reduced byte
-
-	eor r6, r6, r10, ror #8 // effective r10 = s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
-
-	//gmul2(gmul2())
-	uadd8 r8, r5, r5 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r5, r9, r8 // if uadd carried then take reduced byte
-
-	uadd8 r8, r5, r5 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r5, r9, r8 // if uadd carried then take reduced byte
-
-	eors r6, r5
-
-	//gmul2()
-	uadd8 r8, r4, r4 // quad lsl #1
-	eor r9, r8, #0x1b1b1b1b
-	sel r4, r9, r8 // if uadd carried then take reduced byte
-
-	eor r3, r4, r6
+	eor r8, r6, r3
+	eor r9, r8, r4
+	eor r10, r8, r5
+	eor r3, r6, r5
+	eors r3, r4
 
 	cmp.w r12, r14
+
+	eor r3, r3, r10, ror #16
+	eor r3, r3, r9, ror #8
+	eor r3, r3, r8, ror #24
+
 	bne.w 1b
 
 	//final round
