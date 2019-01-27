@@ -85,7 +85,7 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 
 ## Base ciphers performance (in cycles per block)
 
-| Cipher function     | STM32F1 (0ws/2ws) - CM34_1T | STM32F4 (0ws/7ws) - CM34_1T | STM32F4 (0ws/7ws) - CM4_DSPsBOX | STM32H7 - CM7_1T |
+| Cipher function     | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32F4 (0ws/7ws) - CM4_DSPsBOX | STM32H7 - CM7_1T |
 |---------------------|-----------------------------|-----------------------------|---------------------------------|------------------|
 | `setEncKey<128>`    | 302/355   | 305      | 305 | 157 |
 | `setEncKey<192>`    | 278/348   | 281      | 281 | 140 |
@@ -114,7 +114,7 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 
 ## Cipher modes performance (in cycles per byte) 
 
-| Cipher function            | STM32F1 (0ws/2ws) - CM34_1T | STM32F4 (0ws/7ws) - CM34_1T | STM32H7 - CM7_1T |
+| Cipher function            | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32H7 - CM7_1T |
 |----------------------------|-----------------------------|-----------------------------|------------------|
 | CBC_GENERIC<128> enc(+dec) | 43.08(-0.3)/55.28(+3.5)     | 43.96(+0.37)                | 22.01(-0.12)     |
 | CBC_GENERIC<192> enc(+dec) | 50.71(-0.3)/65.03(+4.37)    | 51.64(+0.44)                | 25.89(-0.25)     |
