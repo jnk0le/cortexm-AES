@@ -1,11 +1,6 @@
 /*!
  * \file CM7_modes.h
- * \brief SP 800-38A compliant, software AES block modes implementations optimized for cortex-m3/4
- *
- * ctr encryption can be recycled for decryption thus requiring only 1K T table for encryption
- *
- * This part is based on CM34 implementation, carefully reordered for dual issue pipeline, with 2x32 bit DTCM
- * interface, to avoid data dependent stalls when two neighbouring loads both accesses data on even/odd location
+ * \brief AES block mode implementations optimized for cortex-m7
  *
  * \author jnk0le <jnk0le@hotmail.com>
  * \copyright MIT License

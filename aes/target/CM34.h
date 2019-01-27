@@ -2,11 +2,6 @@
  * \file CM34.h
  * \brief FIPS 197 compliant software AES implementations optimized for cortex-m3/4
  *
- * Utilizes a 1K T table per cipher occupying 1 kB + 1.25 kB of memory for encryption + decryption
- *
- * This part is based on "Peter Schwabe and Ko Stoffelen" AES implementation:
- * https://github.com/Ko-/aes-armcortexm
- *
  * \author jnk0le <jnk0le@hotmail.com>
  * \copyright MIT License
  * \date Jun 2018

@@ -1,8 +1,8 @@
 /*!
  * \file aes_cipher.hpp
- * \brief basic ECB cipher context class
+ * \brief basic cipher context class
  *
- * \warning Do not use ECB mode for more than 16 bytes of plaintext data per key.
+ * \warning Do not use ECB mode for any serious encryptions.
  *
  * \author jnk0le <jnk0le@hotmail.com>
  * \copyright MIT License
