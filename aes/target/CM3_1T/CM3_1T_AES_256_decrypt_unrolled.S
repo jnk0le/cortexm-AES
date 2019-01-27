@@ -5,10 +5,10 @@
 .text
 
 .align 3
-// void CM34_1T_AES_256_decrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out) {
-.global CM34_1T_AES_256_decrypt_unrolled
-.type   CM34_1T_AES_256_decrypt_unrolled,%function
-CM34_1T_AES_256_decrypt_unrolled:
+// void CM3_1T_AES_256_decrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out) {
+.global CM3_1T_AES_256_decrypt_unrolled
+.type   CM3_1T_AES_256_decrypt_unrolled,%function
+CM3_1T_AES_256_decrypt_unrolled:
 	push {r2, r4-r11, lr} //stack output pointer
 
 	add r12, r0, #224 // 14 rounds * 16

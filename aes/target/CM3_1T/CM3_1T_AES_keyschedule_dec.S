@@ -1,5 +1,5 @@
 // in place expansion of round key for decryption
-// do it backwards to avoid stacking or redundant code
+// decryprion is done backwards to avoid extra stacking or redundant code
 // requires already expanded encryption key
 
 .syntax unified
@@ -7,10 +7,10 @@
 .text
 
 .align 3
-// void CM34_1T_AES_keyschedule_dec(uint8_t* rk, size_t rounds) {
-.global CM34_1T_AES_keyschedule_dec
-.type   CM34_1T_AES_keyschedule_dec,%function
-CM34_1T_AES_keyschedule_dec:
+// void CM3_1T_AES_keyschedule_dec(uint8_t* rk, size_t rounds) {
+.global CM3_1T_AES_keyschedule_dec
+.type   CM3_1T_AES_keyschedule_dec,%function
+CM3_1T_AES_keyschedule_dec:
 	push {r4-r9, lr}
 
 	//first and last block is ommited

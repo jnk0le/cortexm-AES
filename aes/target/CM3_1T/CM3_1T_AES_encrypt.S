@@ -3,10 +3,10 @@
 .text
 
 .align 3
-// void CM34_1T_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
-.global CM34_1T_AES_encrypt
-.type   CM34_1T_AES_encrypt,%function
-CM34_1T_AES_encrypt:
+// void CM3_1T_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
+.global CM3_1T_AES_encrypt
+.type   CM3_1T_AES_encrypt,%function
+CM3_1T_AES_encrypt:
 	add r3, r0, r3, lsl #4 //rk_end-16 = rk + rounds * 16
 	push {r2,r3,r4-r11,lr} //stack out, rk_end-16
 

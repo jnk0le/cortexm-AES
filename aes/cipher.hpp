@@ -18,7 +18,7 @@
 
 namespace aes
 {
-	template<size_t key_length, template<size_t> class impl = target::CM34_1T>
+	template<size_t key_length, template<size_t> class impl = target::CM3_1T>
 		class CipherContext : protected impl<key_length>
 		{
 		public:

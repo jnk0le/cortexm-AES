@@ -6,10 +6,10 @@
 .text
 
 .align 3
-// void CM34_1T_AES_128_CTR_enc_unrolled(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt) {
-.global CM34_1T_AES_128_CTR_enc_unrolled
-.type   CM34_1T_AES_128_CTR_enc_unrolled,%function
-CM34_1T_AES_128_CTR_enc_unrolled:
+// void CM3_1T_AES_256_CTR_enc_unrolled(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt) {
+.global CM3_1T_AES_256_CTR_enc_unrolled
+.type   CM3_1T_AES_256_CTR_enc_unrolled,%function
+CM3_1T_AES_256_CTR_enc_unrolled:
 	add r3, r1, r3, lsl #4 // in_p + cnt*16
 
 	push {r1-r11,lr} // push data_in, data_out, blocks_cnt
@@ -23,7 +23,7 @@ CM34_1T_AES_128_CTR_enc_unrolled:
 ctr_partial_precompute:
 
 	//load from ctx nonce in r0-r3, key in r4-r7, next round in r8-r11
-	ldm r12, {r0-r11}
+	ldmia r12, {r0-r11}
 	//ldr r0, [r12, #0] // nonce
 	//ldr r1, [r12, #4]
 	//ldr r2, [r12, #8]
@@ -203,7 +203,7 @@ ctr_encrypt_first:
 
 	//round 1
 	eors r1, r2
-	uxtb r1, r1, ror #24 //align to 4 bytes
+	uxtb r1, r1, ror #24 // align to 4 bytes
 	ldr r1, [r14, r1, lsl #2]
 	eor r3, r3, r1, ror #24
 
@@ -684,6 +684,270 @@ ctr_encrypt_first:
 	eor r6, r10, r2
 	eor r7, r11, r3
 
+	//round 10
+	uxtb r0, r4
+	uxtb r1, r5
+	uxtb r2, r6
+	uxtb r3, r7
+	ldr r0, [r14, r0, lsl #2]
+	ldr r1, [r14, r1, lsl #2]
+	ldr r2, [r14, r2, lsl #2]
+	ldr r3, [r14, r3, lsl #2]
+	ldr r8, [r12, #176]
+	ldr r9, [r12, #180]
+	ldr r10, [r12, #184]
+	ldr r11, [r12, #188]
+	eor r8, r8, r0, ror #16
+	eor r9, r9, r1, ror #16
+	eor r10, r10, r2, ror #16
+	eor r11, r11, r3, ror #16
+
+	uxtb r0, r5, ror #8
+	uxtb r1, r6, ror #8
+	uxtb r2, r7, ror #8
+	uxtb r3, r4, ror #8
+	ldr r0, [r14, r0, lsl #2]
+	ldr r1, [r14, r1, lsl #2]
+	ldr r2, [r14, r2, lsl #2]
+	ldr r3, [r14, r3, lsl #2]
+	eor r8, r8, r0, ror #8
+	eor r9, r9, r1, ror #8
+	eor r10, r10, r2, ror #8
+	eor r11, r11, r3, ror #8
+
+	uxtb r0, r6, ror #16
+	uxtb r1, r7, ror #16
+	uxtb r2, r4, ror #16
+	uxtb r3, r5, ror #16
+
+	//uxtb r7, r7, ror #24
+	//uxtb r4, r4, ror #24
+	//uxtb r5, r5, ror #24
+	//uxtb r6, r6, ror #24
+	lsrs r7, #24
+	lsrs r4, #24
+	lsrs r5, #24
+	lsrs r6, #24
+
+	ldr r0, [r14, r0, lsl #2]
+	ldr r1, [r14, r1, lsl #2]
+	ldr r2, [r14, r2, lsl #2]
+	ldr r3, [r14, r3, lsl #2]
+
+	ldr r7, [r14, r7, lsl #2]
+	ldr r4, [r14, r4, lsl #2]
+	ldr r5, [r14, r5, lsl #2]
+	ldr r6, [r14, r6, lsl #2]
+
+	// change xoring order to writeback r4-r7 without extra moves
+	eor r0, r0, r7, ror #24
+	eor r1, r1, r4, ror #24
+	eor r2, r2, r5, ror #24
+	eor r3, r3, r6, ror #24
+
+	eor r4, r8, r0
+	eor r5, r9, r1
+	eor r6, r10, r2
+	eor r7, r11, r3
+
+	//round 11
+	uxtb r0, r4
+	uxtb r1, r5
+	uxtb r2, r6
+	uxtb r3, r7
+	ldr r0, [r14, r0, lsl #2]
+	ldr r1, [r14, r1, lsl #2]
+	ldr r2, [r14, r2, lsl #2]
+	ldr r3, [r14, r3, lsl #2]
+	ldr r8, [r12, #192]
+	ldr r9, [r12, #196]
+	ldr r10, [r12, #200]
+	ldr r11, [r12, #204]
+	eor r8, r8, r0, ror #16
+	eor r9, r9, r1, ror #16
+	eor r10, r10, r2, ror #16
+	eor r11, r11, r3, ror #16
+
+	uxtb r0, r5, ror #8
+	uxtb r1, r6, ror #8
+	uxtb r2, r7, ror #8
+	uxtb r3, r4, ror #8
+	ldr r0, [r14, r0, lsl #2]
+	ldr r1, [r14, r1, lsl #2]
+	ldr r2, [r14, r2, lsl #2]
+	ldr r3, [r14, r3, lsl #2]
+	eor r8, r8, r0, ror #8
+	eor r9, r9, r1, ror #8
+	eor r10, r10, r2, ror #8
+	eor r11, r11, r3, ror #8
+
+	uxtb r0, r6, ror #16
+	uxtb r1, r7, ror #16
+	uxtb r2, r4, ror #16
+	uxtb r3, r5, ror #16
+
+	//uxtb r7, r7, ror #24
+	//uxtb r4, r4, ror #24
+	//uxtb r5, r5, ror #24
+	//uxtb r6, r6, ror #24
+	lsrs r7, #24
+	lsrs r4, #24
+	lsrs r5, #24
+	lsrs r6, #24
+
+	ldr r0, [r14, r0, lsl #2]
+	ldr r1, [r14, r1, lsl #2]
+	ldr r2, [r14, r2, lsl #2]
+	ldr r3, [r14, r3, lsl #2]
+
+	ldr r7, [r14, r7, lsl #2]
+	ldr r4, [r14, r4, lsl #2]
+	ldr r5, [r14, r5, lsl #2]
+	ldr r6, [r14, r6, lsl #2]
+
+	// change xoring order to writeback r4-r7 without extra moves
+	eor r0, r0, r7, ror #24
+	eor r1, r1, r4, ror #24
+	eor r2, r2, r5, ror #24
+	eor r3, r3, r6, ror #24
+
+	eor r4, r8, r0
+	eor r5, r9, r1
+	eor r6, r10, r2
+	eor r7, r11, r3
+
+	//round 12
+	uxtb r0, r4
+	uxtb r1, r5
+	uxtb r2, r6
+	uxtb r3, r7
+	ldr r0, [r14, r0, lsl #2]
+	ldr r1, [r14, r1, lsl #2]
+	ldr r2, [r14, r2, lsl #2]
+	ldr r3, [r14, r3, lsl #2]
+	ldr r8, [r12, #208]
+	ldr r9, [r12, #212]
+	ldr r10, [r12, #216]
+	ldr r11, [r12, #220]
+	eor r8, r8, r0, ror #16
+	eor r9, r9, r1, ror #16
+	eor r10, r10, r2, ror #16
+	eor r11, r11, r3, ror #16
+
+	uxtb r0, r5, ror #8
+	uxtb r1, r6, ror #8
+	uxtb r2, r7, ror #8
+	uxtb r3, r4, ror #8
+	ldr r0, [r14, r0, lsl #2]
+	ldr r1, [r14, r1, lsl #2]
+	ldr r2, [r14, r2, lsl #2]
+	ldr r3, [r14, r3, lsl #2]
+	eor r8, r8, r0, ror #8
+	eor r9, r9, r1, ror #8
+	eor r10, r10, r2, ror #8
+	eor r11, r11, r3, ror #8
+
+	uxtb r0, r6, ror #16
+	uxtb r1, r7, ror #16
+	uxtb r2, r4, ror #16
+	uxtb r3, r5, ror #16
+
+	//uxtb r7, r7, ror #24
+	//uxtb r4, r4, ror #24
+	//uxtb r5, r5, ror #24
+	//uxtb r6, r6, ror #24
+	lsrs r7, #24
+	lsrs r4, #24
+	lsrs r5, #24
+	lsrs r6, #24
+
+	ldr r0, [r14, r0, lsl #2]
+	ldr r1, [r14, r1, lsl #2]
+	ldr r2, [r14, r2, lsl #2]
+	ldr r3, [r14, r3, lsl #2]
+
+	ldr r7, [r14, r7, lsl #2]
+	ldr r4, [r14, r4, lsl #2]
+	ldr r5, [r14, r5, lsl #2]
+	ldr r6, [r14, r6, lsl #2]
+
+	// change xoring order to writeback r4-r7 without extra moves
+	eor r0, r0, r7, ror #24
+	eor r1, r1, r4, ror #24
+	eor r2, r2, r5, ror #24
+	eor r3, r3, r6, ror #24
+
+	eor r4, r8, r0
+	eor r5, r9, r1
+	eor r6, r10, r2
+	eor r7, r11, r3
+
+	//round 13
+	uxtb r0, r4
+	uxtb r1, r5
+	uxtb r2, r6
+	uxtb r3, r7
+	ldr r0, [r14, r0, lsl #2]
+	ldr r1, [r14, r1, lsl #2]
+	ldr r2, [r14, r2, lsl #2]
+	ldr r3, [r14, r3, lsl #2]
+	ldr r8, [r12, #224]
+	ldr r9, [r12, #228]
+	ldr r10, [r12, #232]
+	ldr r11, [r12, #236]
+	eor r8, r8, r0, ror #16
+	eor r9, r9, r1, ror #16
+	eor r10, r10, r2, ror #16
+	eor r11, r11, r3, ror #16
+
+	uxtb r0, r5, ror #8
+	uxtb r1, r6, ror #8
+	uxtb r2, r7, ror #8
+	uxtb r3, r4, ror #8
+	ldr r0, [r14, r0, lsl #2]
+	ldr r1, [r14, r1, lsl #2]
+	ldr r2, [r14, r2, lsl #2]
+	ldr r3, [r14, r3, lsl #2]
+	eor r8, r8, r0, ror #8
+	eor r9, r9, r1, ror #8
+	eor r10, r10, r2, ror #8
+	eor r11, r11, r3, ror #8
+
+	uxtb r0, r6, ror #16
+	uxtb r1, r7, ror #16
+	uxtb r2, r4, ror #16
+	uxtb r3, r5, ror #16
+
+	//uxtb r7, r7, ror #24
+	//uxtb r4, r4, ror #24
+	//uxtb r5, r5, ror #24
+	//uxtb r6, r6, ror #24
+	lsrs r7, #24
+	lsrs r4, #24
+	lsrs r5, #24
+	lsrs r6, #24
+
+	ldr r0, [r14, r0, lsl #2]
+	ldr r1, [r14, r1, lsl #2]
+	ldr r2, [r14, r2, lsl #2]
+	ldr r3, [r14, r3, lsl #2]
+
+	ldr r7, [r14, r7, lsl #2]
+	ldr r4, [r14, r4, lsl #2]
+	ldr r5, [r14, r5, lsl #2]
+	ldr r6, [r14, r6, lsl #2]
+
+	// change xoring order to writeback r4-r7 without extra moves
+	eor r0, r0, r7, ror #24
+	eor r1, r1, r4, ror #24
+	eor r2, r2, r5, ror #24
+	eor r3, r3, r6, ror #24
+
+	eor r4, r8, r0
+	eor r5, r9, r1
+	eor r6, r10, r2
+	eor r7, r11, r3
+
 	//final round
 	uxtb r8, r7, ror #24
 	uxtb r9, r4, ror #24
@@ -731,10 +995,10 @@ ctr_encrypt_first:
 	ldr r1, [r14, r1, lsl #2]
 	ldr r2, [r14, r2, lsl #2]
 	ldr r3, [r14, r3, lsl #2]
-	ldr r4, [r12, #176]
-	ldr r5, [r12, #180]
-	ldr r6, [r12, #184]
-	ldr r7, [r12, #188]
+	ldr r4, [r12, #240]
+	ldr r5, [r12, #244]
+	ldr r6, [r12, #248]
+	ldr r7, [r12, #252]
 
 	bfi r8, r0, #16, #8
 	bfi r9, r1, #16, #8

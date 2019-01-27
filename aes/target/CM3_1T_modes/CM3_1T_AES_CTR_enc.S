@@ -6,10 +6,10 @@
 .text
 
 .align 3
-// void CM34_1T_CTR_enc(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t rounds, uint32_t blocks_cnt) {
-.global CM34_1T_AES_CTR_enc
-.type   CM34_1T_AES_CTR_enc,%function
-CM34_1T_AES_CTR_enc:
+// void CM3_1T_CTR_enc(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t rounds, uint32_t blocks_cnt) {
+.global CM3_1T_AES_CTR_enc
+.type   CM3_1T_AES_CTR_enc,%function
+CM3_1T_AES_CTR_enc:
 	mov r12, r0
 	//use this value to reload context pointer before next block encryption
 	adds r0, #64 // p+4*4*4

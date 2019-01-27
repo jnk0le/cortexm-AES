@@ -1,5 +1,5 @@
 // in place expansion of round key for decryption
-// do it backwards to avoid stacking or redundant code
+// decryprion is done backwards to avoid extra stacking or redundant code
 // requires already expanded encryption key
 
 // LUT loads are splitted to avoid data dependent issuing capability from even/odd DTCM words

@@ -10,17 +10,17 @@
 #ifndef AES_MODES_HPP
 #define AES_MODES_HPP
 
-#include "cipher.hpp"
 #include <stdint.h>
 #include <string.h>
 
+#include "cipher.hpp"
 #include "target/modes_impl.hpp"
 
 namespace aes
 {
 namespace mode
 {
-	template<size_t key_length, template<size_t> class base_impl = aes::target::CM34_1T, template<size_t key_len, template<size_t> class base> class mode_impl = aes::mode::target::CBC_GENERIC>
+	template<size_t key_length, template<size_t> class base_impl = aes::target::CM3_1T, template<size_t key_len, template<size_t> class base> class mode_impl = aes::mode::target::CBC_GENERIC>
 		class CBC : private mode_impl<key_length, base_impl>
 		{
 		public:
@@ -65,7 +65,7 @@ namespace mode
 	}
 
 	//SP 800-38A compliant, 32 bit counter
-	template<size_t key_length, template<size_t> class base_impl = aes::target::CM34_1T, template<size_t key_len, template<size_t> class base> class mode_impl = aes::mode::target::CTR_GENERIC>
+	template<size_t key_length, template<size_t> class base_impl = aes::target::CM3_1T, template<size_t key_len, template<size_t> class base> class mode_impl = aes::mode::target::CTR_GENERIC>
 		class CTR : protected ctr::Nonce, private mode_impl<key_length, base_impl> // put the nonce before rk, to be compatible with current implementations
 		{
 		public:

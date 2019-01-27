@@ -5,10 +5,10 @@
 .text
 
 .align 3
-// void CM34_1T_AES_decrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
-.global CM34_1T_AES_decrypt
-.type   CM34_1T_AES_decrypt,%function
-CM34_1T_AES_decrypt:
+// void CM3_1T_AES_decrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
+.global CM3_1T_AES_decrypt
+.type   CM3_1T_AES_decrypt,%function
+CM3_1T_AES_decrypt:
 	adds r0, #16 //to compare against before final round
 	push {r0, r2, r4-r11, lr} //stack rk+16, out
 

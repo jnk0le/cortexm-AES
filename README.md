@@ -14,7 +14,7 @@ unknown or just implementation defined like section placement or pipeline supris
 
 ## implementations
 
-### CM34_1T
+### CM3_1T
 
 cortex m3 and cortex m4 optimized implementation.
 Uses a single T table per enc/dec cipher and additional inv_sbox for final round in decryption.

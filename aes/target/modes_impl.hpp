@@ -10,7 +10,7 @@
 #ifndef AES_MODES_IMPL_HPP
 #define AES_MODES_IMPL_HPP
 
-#include "CM34_modes.h"
+#include "CM3_modes.h"
 #include "CM7_modes.h"
 #include <stdint.h>
 
@@ -112,7 +112,7 @@ namespace target
 
 	//SP 800-38A compliant
 	template<size_t key_length, template<size_t> class base_impl>
-		class CTR_CM34_1T : private CipherContext<key_length, base_impl>
+		class CTR_CM3_1T : private CipherContext<key_length, base_impl>
 		{
 		public:
 			using CipherContext<key_length, base_impl>::setEncKey;
@@ -120,12 +120,12 @@ namespace target
 			void encrypt(const uint8_t* data_in, uint8_t* data_out, void* nonce, uint32_t blocks_cnt)
 			{
 				//nonce should be placed right before expanded key
-				CM34_1T_AES_CTR_enc(nonce, data_in, data_out, this->key_rounds, blocks_cnt);
+				CM3_1T_AES_CTR_enc(nonce, data_in, data_out, this->key_rounds, blocks_cnt);
 			}
 		};
 
 	template<size_t key_length, template<size_t> class base_impl>
-		class CTR_CM34_1T_unrolled : private CipherContext<key_length, base_impl>
+		class CTR_CM3_1T_unrolled : private CipherContext<key_length, base_impl>
 		{
 		public:
 			using CipherContext<key_length, base_impl>::setEncKey;
@@ -137,13 +137,13 @@ namespace target
 				switch(key_length)
 				{
 				case 128:
-					CM34_1T_AES_128_CTR_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
+					CM3_1T_AES_128_CTR_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
 					break;
 				case 192:
-					CM34_1T_AES_192_CTR_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
+					CM3_1T_AES_192_CTR_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
 					break;
 				case 256:
-					CM34_1T_AES_256_CTR_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
+					CM3_1T_AES_256_CTR_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
 					break;
 				}
 

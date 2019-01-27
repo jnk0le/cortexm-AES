@@ -6,10 +6,10 @@
 .text
 
 .align 3
-// void CM34_sBOX_AES_256_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
-.global CM34_sBOX_AES_256_keyschedule_enc
-.type   CM34_sBOX_AES_256_keyschedule_enc,%function
-CM34_sBOX_AES_256_keyschedule_enc:
+// void CM3_sBOX_AES_256_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
+.global CM3_sBOX_AES_256_keyschedule_enc
+.type   CM4_sBOX_AES_256_keyschedule_enc,%function
+CM3_sBOX_AES_256_keyschedule_enc:
 	push {r4-r11, lr}
 
 	//load key

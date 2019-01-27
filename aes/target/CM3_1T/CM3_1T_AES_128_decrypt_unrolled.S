@@ -5,13 +5,13 @@
 .text
 
 .align 3
-// void CM34_1T_AES_192_decrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out) {
-.global CM34_1T_AES_192_decrypt_unrolled
-.type   CM34_1T_AES_192_decrypt_unrolled,%function
-CM34_1T_AES_192_decrypt_unrolled:
+// void CM3_1T_AES_128_decrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out) {
+.global CM3_1T_AES_128_decrypt_unrolled
+.type   CM3_1T_AES_128_decrypt_unrolled,%function
+CM3_1T_AES_128_decrypt_unrolled:
 	push {r2, r4-r11, lr} //stack output pointer
 
-	add r12, r0, #192 // 12 rounds * 16
+	add r12, r0, #160 // 10 rounds * 16
 
 	movw r14, #:lower16:AES_Td2
 	movt r14, #:upper16:AES_Td2
@@ -581,142 +581,6 @@ CM34_1T_AES_192_decrypt_unrolled:
 	eor r7, r11, r3
 
 	//round 9
-	uxtb r0, r4
-	uxtb r1, r5
-	uxtb r2, r6
-	uxtb r3, r7
-
-	ldr r8, [r12, #-16]! // need to be splitted across other loads
-	ldr r0, [r14, r0, lsl #2]
-	ldr r1, [r14, r1, lsl #2]
-	ldr r2, [r14, r2, lsl #2]
-	ldr r3, [r14, r3, lsl #2]
-	ldr r9, [r12, #4]
-	ldr r10, [r12, #8]
-	ldr r11, [r12, #12]
-
-	eor r8, r8, r0, ror #16
-	eor r9, r9, r1, ror #16
-	eor r10, r10, r2, ror #16
-	eor r11, r11, r3, ror #16
-
-	uxtb r0, r7, ror #8
-	uxtb r1, r4, ror #8
-	uxtb r2, r5, ror #8
-	uxtb r3, r6, ror #8
-	ldr r0, [r14, r0, lsl #2]
-	ldr r1, [r14, r1, lsl #2]
-	ldr r2, [r14, r2, lsl #2]
-	ldr r3, [r14, r3, lsl #2]
-	eor r8, r8, r0, ror #8
-	eor r9, r9, r1, ror #8
-	eor r10, r10, r2, ror #8
-	eor r11, r11, r3, ror #8
-
-	uxtb r0, r6, ror #16
-	uxtb r1, r7, ror #16
-	uxtb r2, r4, ror #16
-	uxtb r3, r5, ror #16
-
-	//uxtb r5, r5, ror #24
-	//uxtb r6, r6, ror #24
-	//uxtb r7, r7, ror #24
-	//uxtb r4, r4, ror #24
-	lsrs r5, #24
-	lsrs r6, #24
-	lsrs r7, #24
-	lsrs r4, #24
-
-	ldr r0, [r14, r0, lsl #2]
-	ldr r1, [r14, r1, lsl #2]
-	ldr r2, [r14, r2, lsl #2]
-	ldr r3, [r14, r3, lsl #2]
-
-	ldr r5, [r14, r5, lsl #2]
-	ldr r6, [r14, r6, lsl #2]
-	ldr r7, [r14, r7, lsl #2]
-	ldr r4, [r14, r4, lsl #2]
-
-	// change xoring order to writeback r4-r7 without extra moves
-	eor r0, r0, r5, ror #24
-	eor r1, r1, r6, ror #24
-	eor r2, r2, r7, ror #24
-	eor r3, r3, r4, ror #24
-
-	eor r4, r8, r0
-	eor r5, r9, r1
-	eor r6, r10, r2
-	eor r7, r11, r3
-
-	//round 10
-	uxtb r0, r4
-	uxtb r1, r5
-	uxtb r2, r6
-	uxtb r3, r7
-
-	ldr r8, [r12, #-16]! // need to be splitted across other loads
-	ldr r0, [r14, r0, lsl #2]
-	ldr r1, [r14, r1, lsl #2]
-	ldr r2, [r14, r2, lsl #2]
-	ldr r3, [r14, r3, lsl #2]
-	ldr r9, [r12, #4]
-	ldr r10, [r12, #8]
-	ldr r11, [r12, #12]
-
-	eor r8, r8, r0, ror #16
-	eor r9, r9, r1, ror #16
-	eor r10, r10, r2, ror #16
-	eor r11, r11, r3, ror #16
-
-	uxtb r0, r7, ror #8
-	uxtb r1, r4, ror #8
-	uxtb r2, r5, ror #8
-	uxtb r3, r6, ror #8
-	ldr r0, [r14, r0, lsl #2]
-	ldr r1, [r14, r1, lsl #2]
-	ldr r2, [r14, r2, lsl #2]
-	ldr r3, [r14, r3, lsl #2]
-	eor r8, r8, r0, ror #8
-	eor r9, r9, r1, ror #8
-	eor r10, r10, r2, ror #8
-	eor r11, r11, r3, ror #8
-
-	uxtb r0, r6, ror #16
-	uxtb r1, r7, ror #16
-	uxtb r2, r4, ror #16
-	uxtb r3, r5, ror #16
-
-	//uxtb r5, r5, ror #24
-	//uxtb r6, r6, ror #24
-	//uxtb r7, r7, ror #24
-	//uxtb r4, r4, ror #24
-	lsrs r5, #24
-	lsrs r6, #24
-	lsrs r7, #24
-	lsrs r4, #24
-
-	ldr r0, [r14, r0, lsl #2]
-	ldr r1, [r14, r1, lsl #2]
-	ldr r2, [r14, r2, lsl #2]
-	ldr r3, [r14, r3, lsl #2]
-
-	ldr r5, [r14, r5, lsl #2]
-	ldr r6, [r14, r6, lsl #2]
-	ldr r7, [r14, r7, lsl #2]
-	ldr r4, [r14, r4, lsl #2]
-
-	// change xoring order to writeback r4-r7 without extra moves
-	eor r0, r0, r5, ror #24
-	eor r1, r1, r6, ror #24
-	eor r2, r2, r7, ror #24
-	eor r3, r3, r4, ror #24
-
-	eor r4, r8, r0
-	eor r5, r9, r1
-	eor r6, r10, r2
-	eor r7, r11, r3
-
-	//round 11
 	uxtb r0, r4
 	uxtb r1, r5
 	uxtb r2, r6
