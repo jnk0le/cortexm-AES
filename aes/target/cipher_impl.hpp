@@ -59,7 +59,7 @@ namespace target
 	template<size_t key_length>
 		class CM3_1T_deconly : public CM3_1T<key_length>
 		{
-		public: // override only key expansion (encryption will take 1,25kB if used)
+		public: // override only key expansions (encryption will take extra 256 bytes if used)
 			void key_schedule_enc(uint8_t* rk, const uint8_t* key) {
 				switch(key_length)
 				{
@@ -73,6 +73,10 @@ namespace target
 					CM3_sBOX_AES_256_keyschedule_enc(rk, key);
 					break;
 				}
+			}
+
+			void key_schedule_dec(uint8_t* rk) {
+				CM3_1T_AES_keyschedule_dec_noTe(rk, this->key_rounds);
 			}
 		};
 
@@ -116,7 +120,7 @@ namespace target
 	template<size_t key_length>
 		class CM3_1T_unrolled_deconly : public CM3_1T_unrolled<key_length>
 		{
-		public: // override only key expansion (encryption will take 1,25kB if used)
+		public: // override only key expansions (encryption will take extra 256 bytes if used)
 			void key_schedule_enc(uint8_t* rk, const uint8_t* key) {
 				switch(key_length)
 				{
@@ -130,6 +134,10 @@ namespace target
 					CM3_sBOX_AES_256_keyschedule_enc(rk, key);
 					break;
 				}
+			}
+
+			void key_schedule_dec(uint8_t* rk) {
+				CM3_1T_AES_keyschedule_dec_noTe(rk, this->key_rounds);
 			}
 		};
 
