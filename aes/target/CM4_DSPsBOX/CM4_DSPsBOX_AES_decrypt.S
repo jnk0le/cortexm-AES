@@ -40,32 +40,36 @@ CM4_DSPsBOX_AES_decrypt:
 
 1:	//inv shiftrows and subbytes
 	//row 2 - ST2x
-	uxtb r4, r2, ror #16
-	uxtb r5, r3, ror #16
-	uxtb r6, r0, ror #16
-	uxtb r12, r1, ror #16
+	uxtb r8, r2, ror #16
+	uxtb r9, r3, ror #16
+	uxtb r10, r0, ror #16
+	uxtb r11, r1, ror #16
 
 	//row 3 - ST3x
-	uxtb r8, r1, ror #24
-	uxtb r9, r2, ror #24
-	uxtb r10, r3, ror #24
-	uxtb r11, r0, ror #24
+	//uxtb r4, r1, ror #24
+	//uxtb r5, r2, ror #24
+	//uxtb r6, r3, ror #24
+	lsrs r4, r1, #24
+	lsrs r5, r2, #24
+	lsrs r6, r3, #24
+
+	uxtb r12, r0, ror #24
 
 	//halfway sboxing
 	ldrb r4, [r7, r4]
 	ldrb r5, [r7, r5]
+	ldrb r6, [r7, r6]
 	ldrb r12, [r7, r12]
 	ldrb r8, [r7, r8]
 	ldrb r9, [r7, r9]
 	ldrb r10, [r7, r10]
 	ldrb r11, [r7, r11]
-	ldrb r6, [r7, r6] // put after high reg loads to realign wide ldrs
 
 	//repack upper part (keep in bottom half)
-	orr r8, r4, r8, lsl #8
-	orr r9, r5, r9, lsl #8
-	orr r10, r6, r10, lsl #8
-	orr r11, r12, r11, lsl #8
+	orr r8, r8, r4, lsl #8
+	orr r9, r9, r5, lsl #8
+	orr r10, r10, r6, lsl #8
+	orr r11, r11, r12, lsl #8
 
 	//row 1 - ST1x
 	uxtb r4, r3, ror #8
@@ -86,7 +90,7 @@ CM4_DSPsBOX_AES_decrypt:
 	ldrb r3, [r7, r3]
 	ldrb r4, [r7, r4]
 	ldrb r5, [r7, r5]
-	ldrb r6, [r7, r6]
+	ldrb.w r6, [r7, r6] // align to 4 bytes for the following loads
 	ldrb r12, [r7, r12]
 
 	//repack bottom part
@@ -110,7 +114,7 @@ CM4_DSPsBOX_AES_decrypt:
 
 	eors r0, r4
 	eors r1, r5
-	eor r2, r6
+	eors r2, r6 // realign later
 	eor r3, r8
 
 	//do inv mix columns as
@@ -216,7 +220,7 @@ CM4_DSPsBOX_AES_decrypt:
 	eors r6, r5
 	eors r6, r4
 
-	cmp.w r12, r14
+	cmp r12, r14 // realigned here
 
 	eor r3, r6, r10, ror #16
 	eor r3, r3, r9, ror #8
@@ -226,32 +230,36 @@ CM4_DSPsBOX_AES_decrypt:
 
 	//final round
 	//row 2 - ST2x
-	uxtb r4, r2, ror #16
-	uxtb r5, r3, ror #16
-	uxtb r6, r0, ror #16
-	uxtb r12, r1, ror #16
+	uxtb r8, r2, ror #16
+	uxtb r9, r3, ror #16
+	uxtb r10, r0, ror #16
+	uxtb r11, r1, ror #16
 
 	//row 3 - ST3x
-	uxtb r8, r1, ror #24
-	uxtb r9, r2, ror #24
-	uxtb r10, r3, ror #24
-	uxtb r11, r0, ror #24
+	//uxtb r4, r1, ror #24
+	//uxtb r5, r2, ror #24
+	//uxtb r6, r3, ror #24
+	lsrs r4, r1, #24
+	lsrs r5, r2, #24
+	lsrs r6, r3, #24
+
+	uxtb r12, r0, ror #24
 
 	//halfway sboxing
 	ldrb r4, [r7, r4]
 	ldrb r5, [r7, r5]
+	ldrb r6, [r7, r6]
 	ldrb r12, [r7, r12]
 	ldrb r8, [r7, r8]
 	ldrb r9, [r7, r9]
 	ldrb r10, [r7, r10]
 	ldrb r11, [r7, r11]
-	ldrb r6, [r7, r6] // put after high reg loads to realign wide ldrs
 
 	//repack upper part (keep in bottom half)
-	orr r8, r4, r8, lsl #8
-	orr r9, r5, r9, lsl #8
-	orr r10, r6, r10, lsl #8
-	orr r11, r12, r11, lsl #8
+	orr r8, r8, r4, lsl #8
+	orr r9, r9, r5, lsl #8
+	orr r10, r10, r6, lsl #8
+	orr r11, r11, r12, lsl #8
 
 	//row 1 - ST1x
 	uxtb r4, r3, ror #8
@@ -272,7 +280,7 @@ CM4_DSPsBOX_AES_decrypt:
 	ldrb r3, [r7, r3]
 	ldrb r4, [r7, r4]
 	ldrb r5, [r7, r5]
-	ldrb r6, [r7, r6]
+	ldrb.w r6, [r7, r6] // align to 4 bytes for the following loads
 	ldrb r12, [r7, r12]
 
 	//repack bottom part
@@ -307,7 +315,6 @@ CM4_DSPsBOX_AES_decrypt:
 	str r3, [r7, #12]
 
 	pop {r4-r11,pc}
-
 #else
 	//crash in case the function was called on non dsp cortex m3
 	b .
