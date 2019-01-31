@@ -137,17 +137,17 @@ CM4_DSPsBOX_AES_decrypt:
 	// r8 - S{9} = S{8} ^ S{1}
 	// r9 - S{b} = S{9} ^ S{2}
 	// r10 - S{d} = S{9} ^ S{4}
-	// r0 - S{e} = S{8} ^ S{4} ^ S{2}
+	// r6 - S{e} = S{8} ^ S{4} ^ S{2}
 
 	eor r8, r6, r0
 	eor r9, r8, r4
 	eor r10, r8, r5
-	eor r0, r6, r5
-	eors r0, r4
+	eors r6, r5
+	eors r6, r4
 
 	// r0 = s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
 
-	eor r0, r0, r10, ror #16
+	eor r0, r6, r10, ror #16
 	eor r0, r0, r9, ror #8
 	eor r0, r0, r8, ror #24
 
@@ -167,10 +167,10 @@ CM4_DSPsBOX_AES_decrypt:
 	eor r8, r6, r1
 	eor r9, r8, r4
 	eor r10, r8, r5
-	eor r1, r6, r5
-	eors r1, r4
+	eors r6, r5
+	eors r6, r4
 
-	eor r1, r1, r10, ror #16
+	eor r1, r6, r10, ror #16
 	eor r1, r1, r9, ror #8
 	eor r1, r1, r8, ror #24
 
@@ -190,10 +190,10 @@ CM4_DSPsBOX_AES_decrypt:
 	eor r8, r6, r2
 	eor r9, r8, r4
 	eor r10, r8, r5
-	eor r2, r6, r5
-	eors r2, r4
+	eors r6, r5
+	eors r6, r4
 
-	eor r2, r2, r10, ror #16
+	eor r2, r6, r10, ror #16
 	eor r2, r2, r9, ror #8
 	eor r2, r2, r8, ror #24
 
@@ -213,12 +213,12 @@ CM4_DSPsBOX_AES_decrypt:
 	eor r8, r6, r3
 	eor r9, r8, r4
 	eor r10, r8, r5
-	eor r3, r6, r5
-	eors r3, r4
+	eors r6, r5
+	eors r6, r4
 
 	cmp.w r12, r14
 
-	eor r3, r3, r10, ror #16
+	eor r3, r6, r10, ror #16
 	eor r3, r3, r9, ror #8
 	eor r3, r3, r8, ror #24
 
