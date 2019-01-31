@@ -1,6 +1,5 @@
-// in place expansion of round key for decryption
-// decryprion is done backwards to avoid extra stacking or redundant code
-// requires already expanded encryption key
+// performs perform equivalent inverse cipher transformation on expanded encryption key
+// decryprion will be done backwards to avoid extra stacking or redundant code
 
 .syntax unified
 .thumb
@@ -11,91 +10,44 @@
 .global CM3_1T_AES_keyschedule_dec
 .type   CM3_1T_AES_keyschedule_dec,%function
 CM3_1T_AES_keyschedule_dec:
-	push {r4-r9, lr}
+	push {r4-r6, lr}
 
 	//first and last block is ommited
 	//rk_end-16 = rk + rounds * 16
 	add r1, r0, r1, lsl #4
-	add.w r0, #16 //align following code to 4 bytes
+	adds r0, #16 //align following code to 4 bytes
 
 	movw r14, #:lower16:AES_Te2
 	movt r14, #:upper16:AES_Te2
 	movw r12, #:lower16:AES_Td2
 	movt r12, #:upper16:AES_Td2
 
-	//nop.w
+1:	ldr r2, [r1, #-4]!
 
-1:	ldmdb r1!, {r2-r5}
+	uxtb r3, r2
+	uxtb r4, r2, ror #8
+	//uxtb r5, r2, ror #24
+	lsrs r5, r2, #24
+	uxtb r2, r2, ror #16
 
-	uxtb r6, r2, ror #8
-	uxtb r7, r2, ror #16
-	uxtb r8, r2, ror #24
-	uxtb r9, r2
-	ldrb r6, [r14, r6, lsl #2] //load sbox from Te0
-	ldrb r7, [r14, r7, lsl #2] //load sbox from Te0
-	ldrb r8, [r14, r8, lsl #2] //load sbox from Te0
-	ldrb r9, [r14, r9, lsl #2] //load sbox from Te0
-	ldr r6, [r12, r6, lsl #2]
-	ldr r2, [r12, r7, lsl #2]
-	ldr r8, [r12, r8, lsl #2]
-	ldr r9, [r12, r9, lsl #2]
-	eor r2, r2, r8, ror #24
-	eor r2, r2, r9, ror #16
-	eor r2, r2, r6, ror #8
+	ldrb r3, [r14, r3, lsl #2] //load sbox from Te0
+	ldrb r4, [r14, r4, lsl #2] //load sbox from Te0
+	ldrb r2, [r14, r2, lsl #2] //load sbox from Te0
+	ldrb r5, [r14, r5, lsl #2] //load sbox from Te0
+	ldr r3, [r12, r3, lsl #2]
+	ldr r4, [r12, r4, lsl #2]
+	ldr r2, [r12, r2, lsl #2]
+	ldr r5, [r12, r5, lsl #2]
 
-	uxtb r6, r3, ror #8
-	uxtb r7, r3, ror #16
-	uxtb r8, r3, ror #24
-	uxtb r9, r3
-	ldrb r6, [r14, r6, lsl #2] //load sbox from Te0
-	ldrb r7, [r14, r7, lsl #2] //load sbox from Te0
-	ldrb r8, [r14, r8, lsl #2] //load sbox from Te0
-	ldrb r9, [r14, r9, lsl #2] //load sbox from Te0
-	ldr r6, [r12, r6, lsl #2]
-	ldr r3, [r12, r7, lsl #2]
-	ldr r8, [r12, r8, lsl #2]
-	ldr r9, [r12, r9, lsl #2]
-	eor r3, r3, r8, ror #24
-	eor r3, r3, r9, ror #16
-	eor r3, r3, r6, ror #8
-
-	uxtb r6, r4, ror #8
-	uxtb r7, r4, ror #16
-	uxtb r8, r4, ror #24
-	uxtb r9, r4
-	ldrb r6, [r14, r6, lsl #2] //load sbox from Te0
-	ldrb r7, [r14, r7, lsl #2] //load sbox from Te0
-	ldrb r8, [r14, r8, lsl #2] //load sbox from Te0
-	ldrb r9, [r14, r9, lsl #2] //load sbox from Te0
-	ldr r6, [r12, r6, lsl #2]
-	ldr r4, [r12, r7, lsl #2]
-	ldr r8, [r12, r8, lsl #2]
-	ldr r9, [r12, r9, lsl #2]
-	eor r4, r4, r8, ror #24
-	eor r4, r4, r9, ror #16
-	eor r4, r4, r6, ror #8
-
-	uxtb r6, r5, ror #8
-	uxtb r7, r5, ror #16
-	uxtb r8, r5, ror #24
-	uxtb r9, r5
-	ldrb r6, [r14, r6, lsl #2] //load sbox from Te0
-	ldrb r7, [r14, r7, lsl #2] //load sbox from Te0
-	ldrb r8, [r14, r8, lsl #2] //load sbox from Te0
-	ldrb r9, [r14, r9, lsl #2] //load sbox from Te0
-	ldr r6, [r12, r6, lsl #2]
-	ldr r5, [r12, r7, lsl #2]
-	ldr r8, [r12, r8, lsl #2]
-	ldr r9, [r12, r9, lsl #2]
-	eor r5, r5, r8, ror #24
-	eor r5, r5, r9, ror #16
-	eor r5, r5, r6, ror #8
-
+	// set flags early to optimize speculative fetches in cm3
+	// cmp have to be close to branch, otherwise speculative code loads doesn't work
 	cmp r1, r0
 
-	//write roundkey
-	stm r1, {r2-r5}
+	eor r2, r2, r3, ror #16
+	eor r2, r2, r4, ror #8
+	eor r2, r2, r5, ror #24
+	str r2, [r1] // write back transformed key
 
 	bne 1b
 
-	pop {r4-r9, pc}
+	pop {r4-r6, pc}

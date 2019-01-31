@@ -96,9 +96,9 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 | `enc_unrolled<128>` | 604/834   | 604/1029 | - | 315* |
 | `enc_unrolled<192>` | 714/993   | 714/1221 | - | 373* | 
 | `enc_unrolled<256>` | 824/1148  | 824/1413 | - | 431* | 
-| `setDecKey<128>`    | 720/997   | 723      | 0 | 518 |
-| `setDecKey<192>`    | 874/1211  | 877      | 0 | 630 |
-| `setDecKey<256>`    | 1028/1425 | 1031     | 0 | 742 |
+| `setDecKey<128>`    | 813/1102   | 816      | 0 | 518 |
+| `setDecKey<192>`    | 989/1342  | 992      | 0 | 630 |
+| `setDecKey<256>`    | 1165/1585 | 1168     | 0 | 742 |
 | `decrypt<128>`      | 652/898   | 673      | 1282 | 333 |
 | `decrypt<192>`      | 772/1071  | 797      | 1542 | 493 |
 | `decrypt<256>`      | 892/1240  | 921      | 1802 | 454 |
@@ -130,13 +130,11 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 | CTR_unrolled<256>          | 44.78/63.04                 | 45.16/77.68                 | 23.89            |
 
 ## todo
+- optimize cm7 keyschedule_dec (+ check if nops could exceed 2.0 IPC limit)
 - cm7 dsp
-- opt sbox keyexp
 - add proper padding
-- add bitsliced/masked implementations
-- fix perf of cm7 unrolled functions
 - doxygen
 - pre generation of lookups
 - gcm
-- forward keyschedule_dec
-- optimize cm7 keyschedule_dec (+ check if nops could exceed 2.0 IPC limit)
+- add bitsliced/masked implementations
+- fix perf of cm7 unrolled functions
