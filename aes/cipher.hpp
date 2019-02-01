@@ -13,6 +13,7 @@
 #define AES_CIPHER_HPP
 
 #include <stdint.h>
+#include <stddef.h>
 
 #include "target/cipher_impl.hpp"
 

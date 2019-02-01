@@ -10,6 +10,9 @@
 #ifndef AES_CIPHER_IMPL_HPP
 #define AES_CIPHER_IMPL_HPP
 
+#include <stdint.h>
+#include <stddef.h>
+
 #include "CM3.h"
 #include "CM4.h"
 #include "CM7.h"

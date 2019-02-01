@@ -11,6 +11,7 @@
 #define AES_MODES_HPP
 
 #include <stdint.h>
+#include <stddef.h>
 #include <string.h>
 
 #include "cipher.hpp"
