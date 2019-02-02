@@ -30,10 +30,10 @@ CM3_1T_AES_keyschedule_dec:
 	lsrs r5, r2, #24
 	uxtb r2, r2, ror #16
 
-	ldrb r3, [r14, r3, lsl #2] //load sbox from Te0
-	ldrb r4, [r14, r4, lsl #2] //load sbox from Te0
-	ldrb r2, [r14, r2, lsl #2] //load sbox from Te0
-	ldrb r5, [r14, r5, lsl #2] //load sbox from Te0
+	ldrb r3, [r14, r3, lsl #2] //load sbox from Te2
+	ldrb r4, [r14, r4, lsl #2] //load sbox from Te2
+	ldrb r2, [r14, r2, lsl #2] //load sbox from Te2
+	ldrb r5, [r14, r5, lsl #2] //load sbox from Te2
 	ldr r3, [r12, r3, lsl #2]
 	ldr r4, [r12, r4, lsl #2]
 	ldr r2, [r12, r2, lsl #2]
