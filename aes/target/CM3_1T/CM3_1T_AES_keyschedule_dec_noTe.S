@@ -13,7 +13,7 @@
 CM3_1T_AES_keyschedule_dec_noTe:
 	push {r4-r5, lr}
 
-	//first and last block is ommited
+	//first and last block are ommited
 	//rk_end-16 = rk + rounds * 16
 	add r1, r0, r1, lsl #4
 	add r14, r0, #16

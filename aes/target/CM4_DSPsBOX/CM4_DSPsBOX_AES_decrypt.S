@@ -117,7 +117,7 @@ CM4_DSPsBOX_AES_decrypt:
 	eors r2, r6 // realign later
 	eor r3, r8
 
-	//do inv mix columns as
+	//do invMixColumns as
 	// r0 = S{1}
 	// r4 = S{2}
 	// r5 = S{4}
