@@ -22,7 +22,7 @@ CM7_1T_AES_keyschedule_dec:
 	movw r12, #:lower16:AES_Td2
 	movt r12, #:upper16:AES_Td2
 
-	//11 regs available for processing
+	//12 regs available for processing
 	//Td[sbox[]] - 3+1(+2) regs, cannot be dual issued with itself or other block
 	//dsp invMixColums - 5+1 regs + few more insns, cannot be dual issued with itself
 	// r2 = S{1}
