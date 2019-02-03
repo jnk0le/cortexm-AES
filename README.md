@@ -96,9 +96,9 @@ The effects of DMA access to DTCM memory when core have equal priority is unknow
 | `enc_unrolled<128>` | 604/834   | 604/1029 | - | 315* |
 | `enc_unrolled<192>` | 714/993   | 714/1221 | - | 373* | 
 | `enc_unrolled<256>` | 824/1148  | 824/1413 | - | 431* | 
-| `setDecKey<128>`    | 813/1102   | 816      | 0 | 518 |
-| `setDecKey<192>`    | 989/1342  | 992      | 0 | 630 |
-| `setDecKey<256>`    | 1165/1585 | 1168     | 0 | 742 |
+| `setDecKey<128>`    | 813/1102   | 816      | 0 | 412 |
+| `setDecKey<192>`    | 989/1342  | 992      | 0 | 500 |
+| `setDecKey<256>`    | 1165/1585 | 1168     | 0 | 588 |
 | `decrypt<128>`      | 652/898   | 673      | 1272 | 333 |
 | `decrypt<192>`      | 772/1071  | 797      | 1530 | 493 |
 | `decrypt<256>`      | 892/1240  | 921      | 1788 | 454 |
@@ -130,7 +130,6 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 | CTR_unrolled<256>          | 44.78/63.04                 | 45.16/77.68                 | 23.89            |
 
 ## todo
-- optimize cm7 keyschedule_dec (+ check if nops could exceed 2.0 IPC limit)
 - cm7 dsp
 - add proper padding
 - doxygen
