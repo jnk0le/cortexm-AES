@@ -11,6 +11,7 @@
 .global CM7_1T_AES_keyschedule_dec
 .type   CM7_1T_AES_keyschedule_dec,%function
 CM7_1T_AES_keyschedule_dec:
+#if __ARM_ARCH_7EM__
 	push {r4-r11, lr}
 
 	//first and last block are ommited
@@ -96,7 +97,10 @@ CM7_1T_AES_keyschedule_dec:
 	bne 1b
 
 	pop {r4-r11, pc}
-
+#else
+	//crash in case the function was called on non dsp cortex m3
+	b .
+#endif
 
 
 
