@@ -51,4 +51,4 @@ CM3_1T_AES_keyschedule_dec_noTe:
 
 	bne 1b
 
-	pop {r4-r6, pc}
+	pop {r4-r5, pc}
