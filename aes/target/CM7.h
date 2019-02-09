@@ -17,10 +17,16 @@
 	extern "C" {
 #endif
 
+	void CM7_sBOX_AES_128_keyschedule_enc(uint8_t* rk, const uint8_t* key); // __attribute__ ((section(".itcm.text")));
+	void CM7_sBOX_AES_192_keyschedule_enc(uint8_t* rk, const uint8_t* key); // __attribute__ ((section(".itcm.text")));
+	void CM7_sBOX_AES_256_keyschedule_enc(uint8_t* rk, const uint8_t* key); // __attribute__ ((section(".itcm.text")));
+
 	void CM7_1T_AES_128_keyschedule_enc(uint8_t* rk, const uint8_t* key); // __attribute__ ((section(".itcm.text")));
 	void CM7_1T_AES_192_keyschedule_enc(uint8_t* rk, const uint8_t* key); // __attribute__ ((section(".itcm.text")));
 	void CM7_1T_AES_256_keyschedule_enc(uint8_t* rk, const uint8_t* key); // __attribute__ ((section(".itcm.text")));
+
 	void CM7_1T_AES_keyschedule_dec(uint8_t* rk, size_t rounds); // __attribute__ ((section(".itcm.text")));
+	void CM7_1T_AES_keyschedule_dec_noTe(uint8_t* rk, size_t rounds); // __attribute__ ((section(".itcm.text")));
 
 	void CM7_1T_AES_encrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds); // __attribute__ ((section(".itcm.text")));
 	void CM7_1T_AES_encrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds); // __attribute__ ((section(".itcm.text")));

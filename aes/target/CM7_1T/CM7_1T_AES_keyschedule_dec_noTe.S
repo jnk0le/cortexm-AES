@@ -7,19 +7,19 @@
 //.section .itcm.text, "x"
 
 .align 3
-// void CM7_1T_AES_keyschedule_dec(uint8_t* rk, size_t rounds) {
-.global CM7_1T_AES_keyschedule_dec
-.type   CM7_1T_AES_keyschedule_dec,%function
-CM7_1T_AES_keyschedule_dec:
+// void CM7_1T_AES_keyschedule_dec_noTe(uint8_t* rk, size_t rounds) {
+.global CM7_1T_AES_keyschedule_dec_noTe
+.type   CM7_1T_AES_keyschedule_dec_noTe,%function
+CM7_1T_AES_keyschedule_dec_noTe:
 #if __ARM_ARCH_7EM__
-	push {r4-r11, lr}
+	push {r4-r11, lr} // -1
 
 	//first and last block are ommited
 	add r11, r0, #16
 	add r0, r0, r1, lsl #4 //rk_end-16 = rk + rounds * 16
 
-	movw r14, #:lower16:AES_Te2
-	movt r14, #:upper16:AES_Te2
+	movw r14, #:lower16:AES_sbox
+	movt r14, #:upper16:AES_sbox
 	movw r12, #:lower16:AES_Td2
 	movt r12, #:upper16:AES_Td2
 
@@ -30,9 +30,9 @@ CM7_1T_AES_keyschedule_dec:
 	// r6 = S{4}
 	// r7 = S{8}
 
-	// r9 - S{9} = S{8} ^ S{1}
+	// r8 - S{9} = S{8} ^ S{1}
 	// r4 - S{b} = S{9} ^ S{2}
-	// r10 - S{d} = S{9} ^ S{4}
+	// r9 - S{d} = S{9} ^ S{4}
 	// r7 - S{e} = S{8} ^ S{4} ^ S{2}
 
 	// r2 = s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
@@ -50,19 +50,19 @@ CM7_1T_AES_keyschedule_dec:
 	lsrs r4, r1, #24
 	sel r5, r10, r5 // if uadd carried then take reduced byte
 
-	uxtb r1, r1, ror #16
+	uxtb r1, r1, ror #16 // uxtab can save 2 bytes but will break awkward alignment requirement and lose cycle
 	uadd8 r6, r5, r5 // quad lsl #1
 
-	ldrb r3, [r14, r3, lsl #2] //load sbox from Te2
+	ldrb r3, [r14, r3]
 	eor r10, r6, #0x1b1b1b1b
 
-	ldrb r8, [r14, r8, lsl #2] //load sbox from Te2
+	ldrb r8, [r14, r8]
 	sel r6, r10, r6 // if uadd carried then take reduced byte
 
-	ldrb r1, [r14, r1, lsl #2] //load sbox from Te2
+	ldrb r1, [r14, r1]
 	uadd8 r7, r6, r6 // quad lsl #1
 
-	ldrb r4, [r14, r4, lsl #2] //load sbox from Te2
+	ldrb r4, [r14, r4]
 	eor r10, r7, #0x1b1b1b1b
 
 	ldr r3, [r12, r3, lsl #2]
@@ -78,10 +78,10 @@ CM7_1T_AES_keyschedule_dec:
 	eor r10, r9, r6
 
 	eor r1, r1, r3, ror #16
-	eors r7, r6
+	eors.w r7, r6
 
 	eor r1, r1, r8, ror #8
-	eors r7, r5
+	eors.w r7, r5
 
 	eor r1, r1, r4, ror #24
 	eor r7, r7, r10, ror #16
@@ -100,7 +100,3 @@ CM7_1T_AES_keyschedule_dec:
 	//crash in case the function was called on non dsp cortex m3
 	b .
 #endif
-
-
-
-
