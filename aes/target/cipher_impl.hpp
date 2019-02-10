@@ -174,6 +174,9 @@ namespace target
 			void decrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
 				CM4_DSPsBOX_AES_decrypt(rk, data_in, data_out, this->key_rounds);
 			}
+
+		protected:
+			static constexpr size_t key_rounds = (key_length == 128) ? 10 : ((key_length == 192) ? 12 : 14);
 		};
 
 	template<size_t key_length>
