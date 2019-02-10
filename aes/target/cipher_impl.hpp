@@ -145,7 +145,7 @@ namespace target
 		};
 
 	template<size_t key_length>
-		class CM4_DSPsBOX : public CM3_1T<key_length> // recycle stuff from 1T for now
+		class CM4_DSPsBOX
 		{
 		public:
 			void key_schedule_enc(uint8_t* rk, const uint8_t* key) {
