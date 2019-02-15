@@ -131,7 +131,7 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 
 ## todo
 - cm7 dsp
-- fix cm7 pre and post ldr dependency fuckup as well as branches that seem to dual issue with first instruction in loop
+- fix cm7 pre and post ldr dependency fuckup
 - fix perf of cm7 unrolled functions
 - add proper padding
 - doxygen
