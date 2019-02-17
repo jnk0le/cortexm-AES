@@ -81,7 +81,7 @@ The timmming issue can be visualized by following snippet:
 ```
 
 Only DTCM memory can be used for LUT tables, since everything else is cached through AXI bus.
-The effects of DMA access to DTCM memory when core have equal priority is unknown.
+The effects of simultaneous access to DTCM memory by core and DMA/AHBS are yet unknown. (there was some changes in r1p0 revision "Improved handling of simultaneous AHBS and software activity relating to the same TCM")
 
 ## Base ciphers performance (in cycles per block)
 
@@ -131,7 +131,7 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 
 ## todo
 - cm7 dsp
-- fix cm7 pre and post ldr dependency fuckup
+- fix cm7 pre and post ldr dependency fuckup and other dependency bullshit
 - fix perf of cm7 unrolled functions
 - add proper padding
 - doxygen
