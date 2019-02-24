@@ -21,9 +21,9 @@ uint8_t expected_ciphertext_256[16] = {0x8e, 0xa2, 0xb7, 0xca, 0x51, 0x67, 0x45,
 
 uint8_t tmp[16];
 
-aes::CipherContext<128, aes::target::CM3_1T> t128;
-aes::CipherContext<192, aes::target::CM3_1T> t192;
-aes::CipherContext<256, aes::target::CM3_1T> t256;
+aes::CipherContext<128, aes::target::CM7_DSPsBOX> t128;
+aes::CipherContext<192, aes::target::CM7_DSPsBOX> t192;
+aes::CipherContext<256, aes::target::CM7_DSPsBOX> t256;
 
 //__attribute__ ((section(".itcm.text"), noinline))
 void aes_ecb_test(void)

@@ -1,6 +1,6 @@
 /*!
  * \file CM4_DSPsBOX_AES_decrypt.S
- * \brief ?
+ * \brief
  *
  * \author jnk0le <jnk0le@hotmail.com>
  * \copyright MIT License

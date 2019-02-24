@@ -85,26 +85,26 @@ The effects of simultaneous access to DTCM memory by core and DMA/AHBS are yet u
 
 ## Base ciphers performance (in cycles per block)
 
-| Cipher function     | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32F4 (0ws/7ws) - CM4_DSPsBOX | STM32H7 - CM7_1T |
-|---------------------|-----------------------------|-----------------------------|---------------------------------|------------------|
-| `setEncKey<128>`    | 302/355   | 305      | 305 | 157 |
-| `setEncKey<192>`    | 278/348   | 281      | 281 | 140 |
-| `setEncKey<256>`    | 402/516   | 434      | 434 | 227 |
-| `encrypt<128>`      | 657/843   | 669      | 884 | 337 |
-| `encrypt<192>`      | 779/998   | 793      | 1056 | 400 |
-| `encrypt<256>`      | 901/1155  | 917      | 1228 | 461 |
-| `enc_unrolled<128>` | 604/834   | 604/1029 | - | 315* |
-| `enc_unrolled<192>` | 714/993   | 714/1221 | - | 373* | 
-| `enc_unrolled<256>` | 824/1148  | 824/1413 | - | 431* | 
-| `setDecKey<128>`    | 813/1102   | 816      | 0 | 412 |
-| `setDecKey<192>`    | 989/1342  | 992      | 0 | 500 |
-| `setDecKey<256>`    | 1165/1585 | 1168     | 0 | 588 |
-| `decrypt<128>`      | 652/898   | 673      | 1272 | 333 |
-| `decrypt<192>`      | 772/1071  | 797      | 1530 | 493 |
-| `decrypt<256>`      | 892/1240  | 921      | 1788 | 454 |
-| `dec_unrolled<128>` | 607/836   | 609/1032 | - | 319* |
-| `dec_unrolled<192>` | 717/995   | 719/1224 | - | 376* |
-| `dec_unrolled<256>` | 827/1150  | 829/1416 | - | 434* | 
+| Cipher function     | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32F4 (0ws/7ws) - CM4_DSPsBOX | STM32H7 - CM7_1T | STM32H7 - CM7_DSPsBOX |
+|---------------------|----------------------------|----------------------------|---------------------------------|------------------|-----------------------|
+| `setEncKey<128>`    | 302/355   | 305      | 305 | 157 | 157 |
+| `setEncKey<192>`    | 278/348   | 281      | 281 | 140 | 140 |
+| `setEncKey<256>`    | 402/516   | 434      | 434 | 227 | 227 |
+| `encrypt<128>`      | 657/843   | 669      | 884 | 337 | 412 |
+| `encrypt<192>`      | 779/998   | 793      | 1056 | 400 | 492 |
+| `encrypt<256>`      | 901/1155  | 917      | 1228 | 461 | 572 |
+| `enc_unrolled<128>` | 604/834   | 604/1029 | - | 315* | - |
+| `enc_unrolled<192>` | 714/993   | 714/1221 | - | 373* | - |
+| `enc_unrolled<256>` | 824/1148  | 824/1413 | - | 431* | - |
+| `setDecKey<128>`    | 813/1102  | 816      | 0 | 412 | (1T) |
+| `setDecKey<192>`    | 989/1342  | 992      | 0 | 500 | (1T) |
+| `setDecKey<256>`    | 1165/1585 | 1168     | 0 | 588 | (1T) |
+| `decrypt<128>`      | 652/898   | 673      | 1272 | 333 | (1T) |
+| `decrypt<192>`      | 772/1071  | 797      | 1530 | 393 | (1T) |
+| `decrypt<256>`      | 892/1240  | 921      | 1788 | 454 | (1T) |
+| `dec_unrolled<128>` | 607/836   | 609/1032 | - | 319* | - |
+| `dec_unrolled<192>` | 717/995   | 719/1224 | - | 376* | - |
+| `dec_unrolled<256>` | 827/1150  | 829/1416 | - | 434* | - |
 
 Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 `setDecKey<>` counts cycles required to perform equivalent inverse cipher transformation on expanded encryption key.
