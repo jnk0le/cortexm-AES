@@ -39,6 +39,7 @@ CM7_DSPsBOX_AES_encrypt:
 	eors r2, r6
 	eors r3, r7
 
+	//any attempt to reduce size of this loop will yield in multi cycle stalls
 1:	//shiftrows and subbytes
 
 	//prepare column 0 asap
@@ -248,28 +249,28 @@ CM7_DSPsBOX_AES_encrypt:
 	//and now uxtb have to be younger op // ubfx does the same
 
 	uxtb r9, r2, ror #16 //row 2 col 0
-	lsr.w r8, r3, #24 //row 3 col 0
+	lsr.w r7, r3, #24 //row 3 col 0 // cannot use .n opcode
 
 	uxtb r10, r1, ror #8 //row 1 col 0
 	and r11, r0, #0x000000ff //row 0 col 0
 
-	lsr.w r4, r0, #24 //row 3 col 1
-	ldrb r8, [r14, r8]
+	lsrs r4, r0, #24 //row 3 col 1
+	ldrb r8, [r14, r7]
 
-	uxtb r5, r3, ror #16 //row 2 col 1
+	uxtab r5, r14, r3, ror #16
 	ldrb r9, [r14, r9]
 
-	and r6, r1, #0x000000ff//uxtb.w r6, r1 //row 0 col 1
+	uxtb r6, r1 //row 0 col 1
 	ldrb r10, [r14, r10]
 
-	uxtb r7, r2, ror #8 //row 1 col 1
+	uxtb r7, r2, ror #8 //row 1 col 1 // cant uxtab and .n load
 	ldrb r11, [r14, r11]
 
 	orr.w r9, r9, r8, lsl #8 // column 0 upper part
 	ldrb r4, [r14, r4]
 
 	uxtb r8, r0, ror #16 //row 2 col 2
-	ldrb r5, [r14, r5]
+	ldrb r5, [r5]
 
 	orr.w r11, r11, r10, lsl #8 // column 0 bottom part
 	ldrb r6, [r14, r6]
@@ -287,7 +288,7 @@ CM7_DSPsBOX_AES_encrypt:
 	ldrb r10, [r14, r10]
 
 	orr.w r7, r7, r5, lsl #16 //col 1
-	lsr.w r4, r1, #24 //row 3 col 2
+	lsrs r4, r1, #24 //row 3 col 2
 
 	uxtb r5, r3, ror #8 //row 1 col 2
 	and.w r6, r2, 0x000000ff //row 0 col 2
@@ -309,11 +310,11 @@ CM7_DSPsBOX_AES_encrypt:
 	uxtb r9, r1, ror #16 //row 2 col 3
 	ldrb r4, [r14, r4]
 
-	lsr.w r2, r2, #24 //row 3 col 3
-	ldrb r6, [r14, r6] // swp
+	lsr.w r2, r2, #24 //row 3 col 3 // cant .n
+	ldrb r6, [r14, r6]
 
-	and.w r3, r3, #0x000000ff //row 0 col 3
-	ldrb r5, [r14, r5] // swp
+	and.w r3, r3, #0x000000ff //row 0 col 3 // cant .n
+	ldrb r5, [r14, r5]
 
 	orr.w r4, r8, r4, lsl #8 // col 2 upper part
 	ldrb r9, [r14, r9]
@@ -347,20 +348,20 @@ CM7_DSPsBOX_AES_encrypt:
 	orr.w r10, r3, r10, lsl #8 // col 3 bottom part
 	ldr r2, [r12, #8] // rk[2]
 
-	eor.w r1, r1, r7
+	eors r1, r7
 	ldr r3, [r12, #12]
 
-	eor.w r2, r2, r4
-	str.w r0, [r5, #0]
+	eors r2, r4
+	str r0, [r5, #0]
 
 	orr.w r6, r10, r6, lsl #16 // finish col 3
-	str.w r1, [r5, #4]
+	str r1, [r5, #4]
 
-	str.w r2, [r5, #8]
+	str r2, [r5, #8]
 	ldr r4, [sp], #4 // pop early to pop even number of registers
 
-	eor.w r3, r3, r6
-	str.w r3, [r5, #12]
+	eors r3, r6
+	str r3, [r5, #12]
 
 	pop {r5-r11,pc}
 #else
