@@ -13,17 +13,15 @@
 .text
 
 .align 3
-	nop.w // 8 byte alignment
 // void CM7_DSPsBOX_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
 .global CM7_DSPsBOX_AES_encrypt
 .type   CM7_DSPsBOX_AES_encrypt,%function
 CM7_DSPsBOX_AES_encrypt:
 #if __ARM_ARCH_7EM__
 	add r3, r0, r3, lsl #4 //rk_end-16 = rk + rounds * 16
-	push {r3,r4-r11,lr} //stack rk_end-16
-
 	mov r12, r0
-	str r2, [sp, #-4]! // push evenly // stack out
+
+	push {r2,r3,r4-r11,lr} //stack out, rk_end-16
 
 	movw r14, #:lower16:AES_sbox
 	movt r14, #:upper16:AES_sbox
