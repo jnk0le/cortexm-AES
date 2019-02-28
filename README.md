@@ -87,47 +87,48 @@ The effects of simultaneous access to DTCM memory by core and DMA/AHBS are yet u
 
 | Cipher function     | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32F4 (0ws/7ws) - CM4_DSPsBOX | STM32H7 - CM7_1T | STM32H7 - CM7_DSPsBOX |
 |---------------------|----------------------------|----------------------------|---------------------------------|------------------|-----------------------|
-| `setEncKey<128>`    | 302/355   | 305      | 305 | 157 | 157 |
-| `setEncKey<192>`    | 278/348   | 281      | 281 | 140 | 140 |
-| `setEncKey<256>`    | 402/516   | 434      | 434 | 227 | 227 |
-| `encrypt<128>`      | 657/843   | 669      | 884 | 337 | 411 |
-| `encrypt<192>`      | 779/998   | 793      | 1056 | 400 | 491 |
-| `encrypt<256>`      | 901/1155  | 917      | 1228 | 461 | 571 |
+| `setEncKey<128>`    | 302/355   | 305      | 305 | 157* | 157* |
+| `setEncKey<192>`    | 278/348   | 281      | 281 | 140* | 140* |
+| `setEncKey<256>`    | 402/516   | 434      | 434 | 227* | 227* |
+| `encrypt<128>`      | 657/843   | 669      | 884 | 302 | 411 |
+| `encrypt<192>`      | 779/998   | 793      | 1056 | 358 | 491 |
+| `encrypt<256>`      | 901/1155  | 917      | 1228 | 414 | 571 |
 | `enc_unrolled<128>` | 604/834   | 604/1029 | - | 315* | - |
 | `enc_unrolled<192>` | 714/993   | 714/1221 | - | 373* | - |
 | `enc_unrolled<256>` | 824/1148  | 824/1413 | - | 431* | - |
-| `setDecKey<128>`    | 813/1102  | 816      | 0 | 412 | (1T) |
-| `setDecKey<192>`    | 989/1342  | 992      | 0 | 500 | (1T) |
-| `setDecKey<256>`    | 1165/1585 | 1168     | 0 | 588 | (1T) |
-| `decrypt<128>`      | 652/898   | 673      | 1272 | 333 | (1T) |
-| `decrypt<192>`      | 772/1071  | 797      | 1530 | 393 | (1T) |
-| `decrypt<256>`      | 892/1240  | 921      | 1788 | 454 | (1T) |
+| `setDecKey<128>`    | 813/1102  | 816      | 0 | 412* | (1T) |
+| `setDecKey<192>`    | 989/1342  | 992      | 0 | 500* | (1T) |
+| `setDecKey<256>`    | 1165/1585 | 1168     | 0 | 588* | (1T) |
+| `decrypt<128>`      | 652/898   | 673      | 1272 | 333* | (1T) |
+| `decrypt<192>`      | 772/1071  | 797      | 1530 | 393* | (1T) |
+| `decrypt<256>`      | 892/1240  | 921      | 1788 | 454* | (1T) |
 | `dec_unrolled<128>` | 607/836   | 609/1032 | - | 319* | - |
 | `dec_unrolled<192>` | 717/995   | 719/1224 | - | 376* | - |
 | `dec_unrolled<256>` | 827/1150  | 829/1416 | - | 434* | - |
 
 Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 `setDecKey<>` counts cycles required to perform equivalent inverse cipher transformation on expanded encryption key.
-
-`*` When at least 2 unrolled functions are compiled in, everything else (including those functions) gets +9/10 cycles to execution (at least in [aes tests](aes_tests.hpp)).  
-`long_call` attribute will only add a few cycles in both cases.
+`*` pipeline performance not fixed yet
+`**` Cortex-M7 results may differ by 6-12 cycles depending on the code around the caller (and it may not be just the bpu)
 
 ## Cipher modes performance (in cycles per byte) 
 
 | Cipher function            | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32H7 - CM7_1T |
 |----------------------------|-----------------------------|-----------------------------|------------------|
-| CBC_GENERIC<128> enc(+dec) | 43.08(-0.3)/55.28(+3.5)     | 43.96(+0.37)                | 22.01(-0.12)     |
-| CBC_GENERIC<192> enc(+dec) | 50.71(-0.3)/65.03(+4.37)    | 51.64(+0.44)                | 25.89(-0.25)     |
-| CBC_GENERIC<256> enc(+dec) | 58.33(-0.3)/74.97(+5.06)    | 59.39(+0.3)                 | 29.76(-0.37)     |
-| CTR_GENERIC<128>           | 42.32/54.81                 | 43.06                       | 21.63            |
-| CTR_GENERIC<192>           | 49.95/64.69                 | 50.81                       | 25.50            |
-| CTR_GENERIC<256>           | 57.57/74.75                 | 58.56                       | 29.38            |
-| CTR<128>                   | 33.72/44.23                 | 34.53                       | 17.65            |
-| CTR<192>                   | 41.35/54.23                 | 42.28                       | 21.52            |
-| CTR<256>                   | 48.97/64.23                 | 50.03                       | 25.40            |
-| CTR_unrolled<128>          | 31.03/43.54                 | 31.41/53.68                 | 16.64            |
-| CTR_unrolled<192>          | 37.91/53.35                 | 38.28/65.67                 | 20.27            |
-| CTR_unrolled<256>          | 44.78/63.04                 | 45.16/77.68                 | 23.89            |
+| CBC_GENERIC<128> enc(+dec) | 43.08(-0.3)/55.28(+3.5)     | 43.96(+0.37)                | 19.83(~+3*)       |
+| CBC_GENERIC<192> enc(+dec) | 50.71(-0.3)/65.03(+4.37)    | 51.64(+0.44)                | 23.39(~+3*)       |
+| CBC_GENERIC<256> enc(+dec) | 58.33(-0.3)/74.97(+5.06)    | 59.39(+0.3)                 | 26.88(~+3*)       |
+| CTR_GENERIC<128>           | 42.32/54.81                 | 43.06                       | 19.50            |
+| CTR_GENERIC<192>           | 49.95/64.69                 | 50.81                       | 23.00            |
+| CTR_GENERIC<256>           | 57.57/74.75                 | 58.56                       | 26.50            |
+| CTR<128>                   | 33.72/44.23                 | 34.53                       | 17.65*            |
+| CTR<192>                   | 41.35/54.23                 | 42.28                       | 21.52*            |
+| CTR<256>                   | 48.97/64.23                 | 50.03                       | 25.40*            |
+| CTR_unrolled<128>          | 31.03/43.54                 | 31.41/53.68                 | 16.64*            |
+| CTR_unrolled<192>          | 37.91/53.35                 | 38.28/65.67                 | 20.27*            |
+| CTR_unrolled<256>          | 44.78/63.04                 | 45.16/77.68                 | 23.89*            |
+
+`*` pipeline performance not fixed yet
 
 ## todo
 - cm7 dsp

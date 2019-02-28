@@ -355,8 +355,8 @@ CM7_DSPsBOX_AES_encrypt:
 	orr.w r6, r10, r6, lsl #16 // finish col 3
 	str r1, [r5, #4]
 
-	str r2, [r5, #8]
 	ldr r4, [sp], #4 // pop early to pop even number of registers
+	str r2, [r5, #8]
 
 	eors r3, r6
 	str r3, [r5, #12]

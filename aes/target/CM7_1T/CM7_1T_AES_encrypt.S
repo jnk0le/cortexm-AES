@@ -22,185 +22,236 @@ CM7_1T_AES_encrypt:
 	ldmia r1!, {r4-r7}
 
 	//load key
-	//ldmia r12!, {r0-r3}
-	ldrd r0,r1, [r12], #8
-	ldrd r2,r3, [r12], #8
+	ldmia r12!, {r0-r3}
 
 	//initial addroundkey
-	eors r4, r0
-	eors r5, r1
+	eors r0, r4
+	eors r1, r5
+	eors r2, r6
+	eors r3, r7
 
-	eors r6, r2
-	eors r7, r3
+	//and here uxtb can be younger and older // the yonger one saves one cycle in whole call
+1:
+	//start extending from the highest byte and load key/loop later
 
-	//8 + 4 alignment required here
-1:	//ldmia r12!, {r8-r11}
-	ldrd r8,r9, [r12], #8
+	uxtb r8, r2, ror #16
+	lsr.w r4, r3, #24
 
-	uxtb r0, r4
-	ldr r10, [r12], #4
+	uxtb r9, r3, ror #16
+	lsr.w r5, r0, #24
 
-	uxtb r1, r5
-	ldr r11, [r12], #4
-
-	uxtb r2, r6
-	ldr r0, [r14, r0, lsl #2]
-
-	uxtb r3, r7
-	ldr r1, [r14, r1, lsl #2]
-
-	eor r8, r8, r0, ror #16
-	ldr r2, [r14, r2, lsl #2]
-
-	eor r9, r9, r1, ror #16
-	ldr r3, [r14, r3, lsl #2]
-
-	eor r10, r10, r2, ror #16
-	eor r11, r11, r3, ror #16
-
-	uxtb r0, r5, ror #8
-	uxtb r1, r6, ror #8
-
-	uxtb r2, r7, ror #8
-	ldr r0, [r14, r0, lsl #2]
-
-	uxtb r3, r4, ror #8
-	ldr r1, [r14, r1, lsl #2]
-
-	eor r8, r8, r0, ror #8
-	ldr r2, [r14, r2, lsl #2]
-
-	eor r9, r9, r1, ror #8
-	ldr r3, [r14, r3, lsl #2]
-
-	eor r10, r10, r2, ror #8
-	uxtb r0, r6, ror #16
-
-	eor r11, r11, r3, ror #8
-	uxtb r1, r7, ror #16
-
-	uxtb r2, r4, ror #16
-	ldr r0, [r14, r0, lsl #2]
-
-	uxtb r3, r5, ror #16
-	ldr r1, [r14, r1, lsl #2]
-
-	uxtb r7, r7, ror #24
-	ldr r2, [r14, r2, lsl #2]
-
-	uxtb r4, r4, ror #24
-	ldr r3, [r14, r3, lsl #2]
-
-	uxtb r5, r5, ror #24
-	ldr r7, [r14, r7, lsl #2]
-
-	uxtb r6, r6, ror #24
+	lsr.w r6, r1, #24
 	ldr r4, [r14, r4, lsl #2]
 
-	// change xoring order to writeback r4-r7 without extra moves
-	eor r0, r0, r7, ror #24
+	uxtb r10, r0, ror #16
+	ldr r8, [r14, r8, lsl #2]
+
+	lsr.w r7, r2, #24
 	ldr r5, [r14, r5, lsl #2]
 
-	eor r1, r1, r4, ror #24
+	uxtb r11, r1, ror #16
+	ldr r9, [r14, r9, lsl #2]
+
+	eor r4, r8, r4, ror #24
 	ldr r6, [r14, r6, lsl #2]
 
-	eor r2, r2, r5, ror #24
-	ldr r7, [sp, #4] // assume inherited delay from register offset ldr, it works somehow on next cycle but better to avoid it
+	eor r5, r9, r5, ror #24
+	ldr r10, [r14, r10, lsl #2]
 
-	eor r3, r3, r6, ror #24
-	eor r4, r8, r0
+	//cannot eor yet - so try to free up r0
+	// r8 -> r4 ror16
+	// r9 -> r7 ror8
 
-	eor r5, r9, r1
-	cmp r7, r12
+	uxtb r9, r0, ror #8
+	ldr r7, [r14, r7, lsl #2]
 
-	eor r6, r10, r2
-	eor r7, r11, r3
+	eor r6, r10, r6, ror #24
+	ldr r11, [r14, r11, lsl #2]
 
-	nop //
-	bne 1b
+	uxtb r8, r0 // and
+	ldr r9, [r14, r9, lsl #2]
+
+	eor r7, r11, r7, ror #24
+	ldr r0, [r12], #4 // increment in advance for loop comparion
+
+	//free up r1
+	// r10 -> r5 ror16
+	// r11 -> r4 ror8
+
+	uxtb r10, r1
+	ldr r8, [r14, r8, lsl #2]
+
+	uxtb r11, r1, ror #8
+	ldr r1, [r12], #4
+
+	eor r7, r7, r9, ror #8
+	ldr r10, [r14, r10, lsl #2]
+
+	eor r4, r4, r8, ror #16
+	ldr r11, [r14, r11, lsl #2]
+
+	// now r2
+	// r8 -> r6 ror16
+	// r9 -> r5 ror8
+
+	uxtb r8, r2
+	eor r5, r5, r10, ror #16
+
+	uxtb r9, r2, ror #8
+	ldr r2, [r12], #4
+
+	eor r4, r4, r11, ror #8
+	ldr r8, [r14, r8, lsl #2]
+
+	// r3
+	// r10 -> r7 ror16
+	// r11 -> r6 ror8
+
+	uxtb r10, r3
+	ldr r9, [r14, r9, lsl #2]
+
+	uxtb r11, r3, ror #8
+	ldr r3, [r12], #4
+
+	eor r6, r6, r8, ror #16
+	ldr.w r8, [sp, #4] // we need compare soon
+
+	eor r5, r5, r9, ror #8
+	ldr r10, [r14, r10, lsl #2]
+
+	cmp.w r8, r12 // cmp at least 3 cycles before branch
+	ldr r11, [r14, r11, lsl #2]
+
+	eor r7, r7, r10, ror #16
+	eor.w r0, r4
+
+	eor r6, r6, r11, ror #8
+	eor.w r1, r5
+
+	eor.w r2, r6
+	eor.w r3, r7
+
+	nop.w
+	bne.w 1b
 
 	//final round
-	uxtb r0, r7, ror #24
-	uxtb r1, r4, ror #24
 
-	uxtb r2, r5, ror #24
-	ldr r8, [r14, r0, lsl #2]
+	//recycle final round from DSPsBOX
+	//bfi way should be similar
 
-	uxtb r3, r6, ror #24
-	ldr r9, [r14, r1, lsl #2]
+	uxtb r9, r2, ror #16 //row 2 col 0
+	lsr.w r7, r3, #24 //row 3 col 0 // cannot use .n opcode
 
-	uxtb r0, r6, ror #16
-	ldr r10, [r14, r2, lsl #2]
+	uxtb r10, r1, ror #8 //row 1 col 0
+	and r11, r0, #0x000000ff //row 0 col 0
 
-	uxtb r1, r7, ror #16
-	ldr r11, [r14, r3, lsl #2]
+	lsrs r4, r0, #24 //row 3 col 1
+	ldrb r8, [r14, r7, lsl #2]
 
-	uxtb r2, r4, ror #16
-	ldr r0, [r14, r0, lsl #2]
+	uxtb r5, r3, ror #16
+	ldrb r9, [r14, r9, lsl #2]
 
-	uxtb r3, r5, ror #16
-	ldr r1, [r14, r1, lsl #2]
+	uxtb r6, r1 //row 0 col 1
+	ldrb r10, [r14, r10, lsl #2]
 
-	bfi r8, r0, #24, #8
-	ldr r2, [r14, r2, lsl #2]
+	uxtb r7, r2, ror #8 //row 1 col 1 // cant uxtab and .n load
+	ldrb r11, [r14, r11, lsl #2]
 
-	bfi r9, r1, #24, #8
-	ldr r3, [r14, r3, lsl #2]
+	orr.w r9, r9, r8, lsl #8 // column 0 upper part
+	ldrb r4, [r14, r4, lsl #2]
 
-	bfi r10, r2, #24, #8
-	uxtb r0, r4
+	uxtb r8, r0, ror #16 //row 2 col 2
+	ldrb r5, [r14, r5, lsl #2]
 
-	bfi r11, r3, #24, #8
-	uxtb r1, r5
+	orr.w r11, r11, r10, lsl #8 // column 0 bottom part
+	ldrb r6, [r14, r6, lsl #2]
 
-	uxtb r3, r7
-	ldr r0, [r14, r0, lsl #2]
+	uxtb r10, r0, ror #8 //row 1 col 3
+	ldrb r7, [r14, r7, lsl #2]
 
-	uxtb r2, r6
-	ldr r1, [r14, r1, lsl #2]
+	orr.w r11, r11, r9, lsl #16 // col 0
+	ldr r0, [r12, #0] // column 0 is ready to eor and store
 
-	bfi r8, r0, #8, #8
-	ldr r2, [r14, r2, lsl #2]
+	orr.w r5, r5, r4, lsl #8 // column 1 upper part
+	ldrb r8, [r14, r8, lsl #2]
 
-	bfi r9, r1, #8, #8
-	ldr r3, [r14, r3, lsl #2]
+	orr.w r7, r6, r7, lsl #8 //column 1 bottom part
+	ldrb r10, [r14, r10, lsl #2]
 
-	bfi r10, r2, #8, #8
-	uxtb r0, r5, ror #8
+	orr.w r7, r7, r5, lsl #16 //col 1
+	lsrs r4, r1, #24 //row 3 col 2
 
-	bfi r11, r3, #8, #8
-	uxtb r1, r6, ror #8
+	uxtb r5, r3, ror #8 //row 1 col 2
+	and.w r6, r2, 0x000000ff //row 0 col 2
 
-	uxtb r2, r7, ror #8
-	ldr r0, [r14, r0, lsl #2]
+	//current allocation
+	// r0 - rk[0]
+	// r1 - old col 1
+	// r2 - old col 2
+	// r3 - old col 3
+	// r4 - (row 3 col 2)
+	// r5 - (row 1 col 2)
+	// r6 - (row 0 col 2)
+	// r7 - col 1
+	// r8 - row 2 col 2
+	// r9 -
+	// r10 - row 1 col 3
+	// r11 - col 0
 
-	uxtb r3, r4, ror #8
-	ldr r1, [r14, r1, lsl #2]
+	uxtb r9, r1, ror #16 //row 2 col 3
+	ldrb r4, [r14, r4, lsl #2]
 
-	bfi r8, r0, #16, #8
-	ldr r2, [r14, r2, lsl #2]
+	lsr.w r2, r2, #24 //row 3 col 3 // cant .n
+	ldrb r6, [r14, r6, lsl #2]
 
-	bfi r9, r1, #16, #8
-	ldr r3, [r14, r3, lsl #2]
+	and.w r3, r3, #0x000000ff //row 0 col 3 // cant .n
+	ldrb r5, [r14, r5, lsl #2]
 
-	bfi r10, r2, #16, #8
-	ldr r0, [r12]
+	orr.w r4, r8, r4, lsl #8 // col 2 upper part
+	ldrb r9, [r14, r9, lsl #2]
 
-	bfi r11, r3, #16, #8
-	ldr r1, [r12, #4]
+	eor r0, r0, r11 // finish col 0
+	ldrb r2, [r14, r2, lsl #2]
 
-	eor r0, r0, r8, ror #8
-	ldr r2, [r12, #8]
+	orr.w r5, r6, r5, lsl #8 // col 2 bottom part
+	ldrb r3, [r14, r3, lsl #2]
 
-	eor r1, r1, r9, ror #8
+	orr.w r4, r5, r4, lsl #16 // col 2
+	ldr r1, [r12, #4] // rk[1]
+
+	//current allocation
+	// r0 - finished col 0
+	// r1 - rk[1]
+	// r2 - row 3 col 3  -> rk[2]
+	// r3 - row 0 col 3
+	// r4 - col 2
+	// r5 -              -> output p
+	// r6 -              -> col 3 upper
+	// r7 - col 1
+	// r8 -
+	// r9 - row 2 col 3  ->
+	// r10 - row 1 col 3 -> col 3 bottom
+	// r11 -
+
+	orr.w r6, r9, r2, lsl #8 //col 3 upper part
+	ldr r5, [sp], #8 // load output pointer and clear stack
+
+	orr.w r10, r3, r10, lsl #8 // col 3 bottom part
+	ldr r2, [r12, #8] // rk[2]
+
+	eors r1, r7
 	ldr r3, [r12, #12]
 
-	eor r2, r2, r10, ror #8
-	ldr r5, [sp], #8 //load output pointer and clear stack
+	eors r2, r4
+	str r0, [r5, #0]
 
-	eor r3, r3, r11, ror #8
-	ldr r4, [sp], #4 // pop early to pop even number of registers later
+	orr.w r6, r10, r6, lsl #16 // finish col 3
+	str r1, [r5, #4]
 
-	stmia r5, {r0-r3}
+	ldr r4, [sp], #4 // pop early to pop even number of registers
+	str r2, [r5, #8]
+
+	eors r3, r6
+	str r3, [r5, #12]
 
 	pop {r5-r11,pc}
