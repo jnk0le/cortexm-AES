@@ -31,6 +31,7 @@ CM7_1T_AES_encrypt:
 	eors r3, r7
 
 	//and here uxtb can be younger and older // the yonger one saves one cycle in whole call
+	//cycle lost after changing lsr.w to lsrs.n, the rest is even worser
 1:
 	//start extending from the highest byte and load key/loop later
 
@@ -140,7 +141,7 @@ CM7_1T_AES_encrypt:
 	//bfi way should be similar
 
 	uxtb r9, r2, ror #16 //row 2 col 0
-	lsr.w r7, r3, #24 //row 3 col 0 // cannot use .n opcode
+	lsrs r7, r3, #24 //row 3 col 0
 
 	uxtb r10, r1, ror #8 //row 1 col 0
 	and r11, r0, #0x000000ff //row 0 col 0
@@ -154,7 +155,7 @@ CM7_1T_AES_encrypt:
 	uxtb r6, r1 //row 0 col 1
 	ldrb r10, [r14, r10, lsl #2]
 
-	uxtb r7, r2, ror #8 //row 1 col 1 // cant uxtab and .n load
+	uxtb r7, r2, ror #8 //row 1 col 1
 	ldrb r11, [r14, r11, lsl #2]
 
 	orr.w r9, r9, r8, lsl #8 // column 0 upper part
