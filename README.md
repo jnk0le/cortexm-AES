@@ -35,7 +35,7 @@ Uses simple sbox/inv_sbox for encryption/decryption in subbytes stage.
 Utilizes dsp instructions to perform constant time, quad multiplications in mixcolumns stage.
 Encryption is parallelized according to [this paper](http://www.wseas.us/e-library/conferences/2009/moscow/AIC/AIC44.pdf), decryption is done through more straightforward representation.
 
-32 bit LDR opcodes are aligned to 4 byte boundaries to prevent weird undocumented "feature" of cortex m4 that prevents some pipelining of neighbouring loads.
+32 bit LDR opcodes are aligned to 4 byte boundaries to prevent weird undocumented "feature" of cortex-m3/4 that prevents some pipelining of neighbouring loads.
 As well as other architecture specific optimizations.
 
 LUT tables have to be placed in non cached and non waitstated SRAM memory with 32bit wide access, that is not crossing different memory domains (eg. AHB slaves).
