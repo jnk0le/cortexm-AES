@@ -73,7 +73,7 @@ CM7_1T_AES_encrypt:
 	ldr r9, [r14, r9, lsl #2]
 
 	eor r7, r11, r7, ror #24
-	ldr r0, [r12], #4 // increment in advance for loop comparion
+	ldr r0, [r12], #4
 
 	//free up r1
 	// r10 -> r5 ror16
@@ -144,7 +144,7 @@ CM7_1T_AES_encrypt:
 	lsrs r7, r3, #24 //row 3 col 0
 
 	uxtb r10, r1, ror #8 //row 1 col 0
-	and r11, r0, #0x000000ff //row 0 col 0
+	and r11, r0, #0xff //row 0 col 0
 
 	lsrs r4, r0, #24 //row 3 col 1
 	ldrb r8, [r14, r7, lsl #2]
@@ -183,7 +183,7 @@ CM7_1T_AES_encrypt:
 	lsrs r4, r1, #24 //row 3 col 2
 
 	uxtb r5, r3, ror #8 //row 1 col 2
-	and.w r6, r2, 0x000000ff //row 0 col 2
+	and.w r6, r2, 0xff //row 0 col 2
 
 	//current allocation
 	// r0 - rk[0]
@@ -205,7 +205,7 @@ CM7_1T_AES_encrypt:
 	lsr.w r2, r2, #24 //row 3 col 3 // cant .n
 	ldrb r6, [r14, r6, lsl #2]
 
-	and.w r3, r3, #0x000000ff //row 0 col 3 // cant .n
+	and.w r3, r3, #0xff //row 0 col 3 // cant .n
 	ldrb r5, [r14, r5, lsl #2]
 
 	orr.w r4, r8, r4, lsl #8 // col 2 upper part

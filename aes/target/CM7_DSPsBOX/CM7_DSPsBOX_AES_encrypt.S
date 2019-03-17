@@ -47,7 +47,7 @@ CM7_DSPsBOX_AES_encrypt:
 	lsr.w r8, r3, #24 //row 3 col 0
 	uxtb r9, r2, ror #16 //row 2 col 0
 
-	and r11, r0, #0x000000ff //row 0 col 0
+	and r11, r0, #0xff //row 0 col 0
 	uxtb r10, r1, ror #8 //row 1 col 0
 
 	//now we can load without stalls
@@ -59,7 +59,7 @@ CM7_DSPsBOX_AES_encrypt:
 	uxtb r5, r3, ror #16 //row 2 col 1
 
 	ldrb r10, [r14, r10]
-	and r6, r1, #0x000000ff//uxtb.w r6, r1 //row 0 col 1
+	and r6, r1, #0xff//uxtb.w r6, r1 //row 0 col 1
 
 	ldrb r11, [r14, r11]
 	uxtb r7, r2, ror #8 //row 1 col 1
@@ -92,7 +92,7 @@ CM7_DSPsBOX_AES_encrypt:
 	lsr.w r4, r1, #24 //row 3 col 2
 	eor r9, r11, r11, ror #8 // start mixing col 0
 
-	and.w r6, r2, 0x000000ff //row 0 col 2 // cant uxtb row1 as older nor younger opcode so do row0
+	and.w r6, r2, 0xff //row 0 col 2 // cant uxtb row1 as older nor younger opcode so do row0
 	orr.w r7, r7, r5, lsl #16 //col 1
 
 	//current alloctaion
@@ -142,7 +142,7 @@ CM7_DSPsBOX_AES_encrypt:
 	ldrb r5, [r14, r5]
 	orr.w r4, r8, r4, lsl #8 // col 2 upper part
 
-	and.w r3, r3, #0x000000ff //row 0 col 3 // do not load here since we have a lot of inline shift ops to fit somewhere
+	and.w r3, r3, #0xff //row 0 col 3 // do not load here since we have a lot of inline shift ops to fit somewhere
 	eor r0, r0, r11, ror #8 // col 0 mix // r5 not available yet // continue alternate mixing
 
 	ldrb r2, [r14, r2]
@@ -250,7 +250,7 @@ CM7_DSPsBOX_AES_encrypt:
 	lsr.w r7, r3, #24 //row 3 col 0 // cannot use .n opcode
 
 	uxtb r10, r1, ror #8 //row 1 col 0
-	and r11, r0, #0x000000ff //row 0 col 0
+	and r11, r0, #0xff //row 0 col 0
 
 	lsrs r4, r0, #24 //row 3 col 1
 	ldrb r8, [r14, r7]
@@ -289,7 +289,7 @@ CM7_DSPsBOX_AES_encrypt:
 	lsrs r4, r1, #24 //row 3 col 2
 
 	uxtb r5, r3, ror #8 //row 1 col 2
-	and.w r6, r2, 0x000000ff //row 0 col 2
+	and.w r6, r2, 0xff //row 0 col 2
 
 	//current allocation
 	// r0 - rk[0]
@@ -311,7 +311,7 @@ CM7_DSPsBOX_AES_encrypt:
 	lsr.w r2, r2, #24 //row 3 col 3 // cant .n
 	ldrb r6, [r14, r6]
 
-	and.w r3, r3, #0x000000ff //row 0 col 3 // cant .n
+	and.w r3, r3, #0xff //row 0 col 3 // cant .n
 	ldrb r5, [r14, r5]
 
 	orr.w r4, r8, r4, lsl #8 // col 2 upper part
