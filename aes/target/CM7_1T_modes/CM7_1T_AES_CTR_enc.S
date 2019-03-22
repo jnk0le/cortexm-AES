@@ -17,19 +17,21 @@
 .type   CM7_1T_AES_CTR_enc,%function
 CM7_1T_AES_CTR_enc:
 	ldr r12, [sp]
-	nop.w
+	str lr, [sp, #-4]! // use dead cycles for pushing
+
+	add r3, r0, r3, lsl #4 //rk_end-16 = rk + rounds * 16
+	str.w r11, [sp, #-4]!
 
 	add r12, r1, r12, lsl #4 // in_p + cnt*16
-	str r12, [sp]
+	str r12, [sp, #8]
 
-	mov r12, r0 // r12 can be anyway used in this cycle
-	add r3, r0, r3, lsl #4 //rk_end-16 = rk + rounds * 16
+	mov r12, r0
+	adds r0, #64 // p+4*4*4 //use this value to reload context pointer before next block encryption
 
-	//use this value to reload context pointer before next block encryption
-	adds r0, #64 // p+4*4*4
+	nop.w
 	adds r3, #16 // + nonce
 
-	push {r1-r11, lr} // push data_in, data_out, rk_end-16
+	push {r1-r10} // push data_in, data_out, rk_end-16
 
 	str r0, [sp, #-4]! //push ctx+64
 	movw r14, #:lower16:AES_Te2
@@ -46,17 +48,17 @@ ctr_partial_precompute:
 	eors r4, r0
 	eors r5, r1
 
-	uxtb.w r0, r4 // LE/LEFT
+	uxtb r0, r4 // LE/LEFT
 	eors r6, r2
 
-	uxtb.w r1, r5
+	uxtb r1, r5
 	eors r7, r3
 
 	//round 1
-	uxtb.w r2, r6
+	uxtb r2, r6
 	ldr r0, [r14, r0, lsl #2]
 
-	uxtb.w r3, r7
+	uxtb r3, r7
 	ldr r1, [r14, r1, lsl #2]
 
 	eor r8, r8, r0, ror #16
@@ -101,16 +103,16 @@ ctr_partial_precompute:
 	eor r1, r9
 	ldr r3, [r14, r3, lsl #2]
 
-	lsr.w r4, r4, #24
+	lsr.w r4, r4, #24 // cant .n
 	eor r2, r10
 
-	lsr.w r5, r5, #24
+	lsr.w r5, r5, #24 // cant .n
 	eor r3, r11
 
-	lsr.w r7, r6, #24
+	lsr.w r7, r6, #24 // cant .n
 	ldr r4, [r14, r4, lsl #2]
 
-	str.w r0, [sp, #16] // precomputed x0
+	str.w r0, [sp, #16] // precomputed x0 // cant .n
 	ldr r6, [r14, r5, lsl #2]
 
 	eor r1, r1, r4, ror #24
@@ -139,10 +141,10 @@ ctr_partial_precompute:
 	// r10 - C2 - uxtb -> eor16
 	// r11 - C2 - uxtb8 -> eor8
 
-	uxtb r6, r3, ror #24
+	uxtb r6, r3, ror #24 // cant .n
 	ldr r5, [r14, r5, lsl #2]
 
-	uxtb.w r7, r1
+	uxtb.w r7, r1 // cant .n
 	ldr r4, [r14, r4, lsl #2]
 
 	uxtb r8, r3, ror #16
@@ -157,16 +159,16 @@ ctr_partial_precompute:
 	uxtb r11, r3, ror #8
 	ldr r8, [r14, r8, lsl #2]
 
-	uxtb r0, r1, ror #24
+	uxtb r0, r1, ror #24 // cant .n
 	ldr r9, [r14, r9, lsl #2]
 
-	uxtb.w r3, r3
+	uxtb r3, r3
 	ldr r10, [r14, r10, lsl #2]
 
 	uxtb r1, r1, ror #16
 	ldr r11, [r14, r11, lsl #2]
 
-	uxtb.w r2, r2, ror #24
+	lsrs r2, r2, #24
 	ldr r0, [r14, r0, lsl #2]
 
 	// col0 - r4 rk[0] - r5
@@ -195,25 +197,25 @@ ctr_partial_precompute:
 	eor r11, r11, r0, ror #16 //ror 24 into rk
 	ldr r9, [r12], #4
 
-	eor.w r5, r4
+	eors r5, r4
 	eor.w r6, r8
 
 	eor.w r7, r7, r11, ror #8 // finish col2
-	str.w r5, [sp, #0]
+	str r5, [sp, #0]
 
-	eor.w r9, r1
-	str.w r6, [sp, #4]
+	eor.w r1, r9
+	str r6, [sp, #4]
 
 	//load key[3]
 	ldr r8, [r12, #-36]
-	nop.w
+	nop
 
 	//preload ctr[3]
 	ldr r10, [r12, #-52]
-	str.w r7, [sp, #8]
+	str r7, [sp, #8]
 
 	eor.w r8, r10
-	str.w r9, [sp, #12]
+	str r1, [sp, #12]
 
 ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack, p+4*4*4 in r12
 
@@ -221,19 +223,19 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	//expect key[3]^ctr[3] in r8
 
 	lsr.w r8, r8, #24
-	ldr.w r7, [sp, #16] //precomp_x0
+	ldr r7, [sp, #16] //precomp_x0
 
 	rev.w r9, r10
-	ldr.w r0, [sp, #0]
+	ldr r0, [sp, #0]
 
 	add.w r9, #1
 	ldr r8, [r14, r8, lsl #2]
 
 	rev.w r9, r9
-	ldr.w r1, [sp, #4]
+	ldr r1, [sp, #4]
 
 	eor r8, r7, r8, ror #24
-	ldr.w r2, [sp, #8]
+	ldr r2, [sp, #8]
 
 	//round 2
 	and.w r4, r8, #0xff
@@ -259,18 +261,18 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 
 1:	//start extending from the highest byte and load key/loop later
 	uxtb r8, r2, ror #16
-	lsr.w r4, r3, #24
+	lsrs r4, r3, #24
 
 	uxtb r9, r3, ror #16
-	lsr.w r5, r0, #24
+	lsrs r5, r0, #24
 
-	lsr.w r6, r1, #24
+	lsrs r6, r1, #24
 	ldr r4, [r14, r4, lsl #2]
 
 	uxtb r10, r0, ror #16
 	ldr r8, [r14, r8, lsl #2]
 
-	lsr.w r7, r2, #24
+	lsrs r7, r2, #24
 	ldr r5, [r14, r5, lsl #2]
 
 	uxtb r11, r1, ror #16
@@ -338,12 +340,12 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	ldr r3, [r12], #4
 
 	eor r6, r6, r8, ror #16
-	ldr.w r8, [sp, #32] // we need compare soon
+	ldr.w r8, [sp, #32] // we need compare soon // cant .n
 
 	eor r5, r5, r9, ror #8
 	ldr r10, [r14, r10, lsl #2]
 
-	cmp.w r8, r12 // cmp at least 3 cycles before branch
+	cmp.w r8, r12 // cmp at least 3 cycles before branch // cant .n
 	ldr r11, [r14, r11, lsl #2]
 
 	eor r7, r7, r10, ror #16
@@ -364,12 +366,12 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	//bfi way should be similar
 
 	uxtb r9, r2, ror #16 //row 2 col 0
-	lsrs r7, r3, #24 //row 3 col 0
+	lsrs r7, r3, #24 //row 3 col 0 /// .w????
 
 	uxtb r10, r1, ror #8 //row 1 col 0
 	and r11, r0, #0xff //row 0 col 0
 
-	lsrs r4, r0, #24 //row 3 col 1
+	lsrs r4, r0, #24 //row 3 col 1 /// .w ????
 	ldrb r8, [r14, r7, lsl #2]
 
 	uxtb r5, r3, ror #16
@@ -425,10 +427,10 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	uxtb r9, r1, ror #16 //row 2 col 3
 	ldrb r4, [r14, r4, lsl #2]
 
-	lsr.w r2, r2, #24 //row 3 col 3 // cant .n
+	lsrs r2, r2, #24 //row 3 col 3
 	ldrb r6, [r14, r6, lsl #2]
 
-	and.w r3, r3, #0xff //row 0 col 3 // cant .n
+	uxtb r3, r3
 	ldrb r5, [r14, r5, lsl #2]
 
 	orr.w r4, r8, r4, lsl #8 // col 2 upper part
@@ -463,28 +465,28 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	orr.w r10, r3, r10, lsl #8 // col 3 bottom part
 	ldr r3, [r12, #12] // rk[3]
 
-	eor.w r1, r7
+	eors r1, r7
 	ldr.w r11, [sp, #20+4] // in p
 
 	orr.w r6, r10, r6, lsl #16 // finish col 3
 	ldr.w r10, [sp, #20+52] // final in_p address at which we break encryption // argument passed through stack
 
-	eor.w r2, r4
+	eors r2, r4
 	ldr r4, [r11], #4
 
-	eor.w r3, r6
+	eors r3, r6
 	ldr r5, [r11], #4
 
-	eor r0, r4
+	eors r0, r4
 	ldr r6, [r11], #4
 
-	eor r1, r5
-	ldr.w r4, [sp, #20+8] // out p
+	eors r1, r5
+	ldr r4, [sp, #20+8] // out p
 
-	eor r2, r6
+	eors r2, r6
 	ldr r7, [r11], #4
 
-	cmp.w r10, r11
+	cmp r10, r11
 	str r0, [r4], #4
 
 	ldr r12, [sp, #20] // reload to p+4*4*4
@@ -497,19 +499,19 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	str r3, [r4], #4
 
 	//something is wrong here, cant add single nop anywhere before bne
-	beq.w ctr_exit //if in_p == final_p: exit
+	beq.w ctr_exit //if in_p == final_p: exit // cant .n
 
-	str.w r11, [sp, #20+4] // in p
+	str r11, [sp, #20+4] // in p
 	tst r10, #0xff000000 // sometimes few cycles lost due to branch proximity
 
 	ldr r8, [r12, #-36] // load key[3] //relax the round 1 latency from the beginning of the loop
-	str.w r4, [sp, #20+8] // out p
+	str r4, [sp, #20+8] // out p
 
 	eor.w r8, r10 // relax the round 1 latency from the beginning of the loop
 	bne.w ctr_encrypt_block //if ctr%256==0: partial_precompute
 
-	sub.w r12, #64 //reset to p, as required by partial_precompute
-	b.w ctr_partial_precompute
+	sub r12, #64 //reset to p, as required by partial_precompute
+	b.w ctr_partial_precompute // cant .n
 
 ctr_exit:
 
