@@ -186,7 +186,7 @@ CM7_1T_AES_decrypt:
 	// r11 - row 0 col 1
 
 	orr.w r4, r6, r4, lsl #16 // col 0
-ldrb r5, [r14, r5]
+	ldrb r5, [r14, r5]
 
 	//clear r1
 
@@ -213,14 +213,13 @@ ldrb r5, [r14, r5]
 	//clear r2
 
 	uxtb r11, r2, ror #8 // row 1 col 3
-ldrb r7, [r14, r7]
+	ldrb r7, [r14, r7]
 
 	orr.w r8, r10, r8, lsl #16 // col 1
-ldrb r9, [r14, r9]
+	ldrb r9, [r14, r9]
 
 	uxtb.w r10, r2 // row 0 col 2
-ldrb r6, [r14, r6]
-
+	ldrb r6, [r14, r6]
 
 	//current allocation
 	// r0 -
@@ -239,12 +238,10 @@ ldrb r6, [r14, r6]
 	// clear r3
 
 	uxtb.w r2, r3 //row 0 col 3
-ldrb r11, [r14, r11]
+	ldrb r11, [r14, r11]
 
 	lsr.w r1, r3, #24 // row 3 col 2
-ldrb r10, [r14, r10]
-
-
+	ldrb r10, [r14, r10]
 
 	orr.w r5, r9, r5, lsl #8 // col 3 upper part
 	ldrb r9, [r14, r2]
