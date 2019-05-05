@@ -138,11 +138,12 @@ CM7_1T_AES_decrypt:
 	movw r14, #:lower16:AES_inv_sbox
 	movt r14, #:upper16:AES_inv_sbox
 
-	uxtb r4, r2, ror #16 // row 2 col 0
-	lsr.w r5, r1, #24 // row 3 col 0
+	uxtb r4, r2, ror #16 // row 2 col 0 // cant uxtab
+	lsr.w r5, r1, #24 // row 3 col 0 // cant .n
 
 	//one extra cycle before ldr offsets are available
-	uxtb r6, r3, ror #8 // row 1 col 0
+
+	uxtb r6, r3, ror #8 // row 1 col 0 // cant uxtab
 	and.w r7, r0, #0xff // row 0 col 0
 
 	lsr.w r8, r2, #24 //row 3 col 1
@@ -154,7 +155,7 @@ CM7_1T_AES_decrypt:
 	uxtb r10, r0, ror #8 // row 1 col 1
 	ldrb r6, [r14, r6]
 
-	and.w r11, r1, #0xff  // row 0 col 1
+	uxtb r11, r1 // row 0 col 1
 	ldrb r7, [r14, r7]
 
 	orr.w r4, r4, r5, lsl #8  //column 0 upper part
@@ -168,7 +169,7 @@ CM7_1T_AES_decrypt:
 	orr.w r6, r7, r6, lsl #8 // column 0 bottom part
 	ldrb r10, [r14, r10]
 
-	uxtb r7, r0, ror #16 // row 2 col 2
+	uxtab r7, r14, r0, ror #16 // row 2 col 2
 	ldrb r11, [r14, r11]
 
 	//current allocation
@@ -190,7 +191,7 @@ CM7_1T_AES_decrypt:
 
 	//clear r1
 
-	uxtb r6, r1, ror #8 // row 1 col 2
+	uxtb r6, r1, ror #8 // row 1 col 2 // cannot uxtab
 	orr.w r8, r9, r8, lsl #8 // col 1 upper part
 
 	uxtb r9, r1, ror #16 // row 2 col 3
@@ -213,12 +214,12 @@ CM7_1T_AES_decrypt:
 	//clear r2
 
 	uxtb r11, r2, ror #8 // row 1 col 3
-	ldrb r7, [r14, r7]
+	ldrb r7, [r7]
 
 	orr.w r8, r10, r8, lsl #16 // col 1
 	ldrb r9, [r14, r9]
 
-	uxtb.w r10, r2 // row 0 col 2
+	uxtb r10, r2 // row 0 col 2
 	ldrb r6, [r14, r6]
 
 	//current allocation
@@ -237,10 +238,10 @@ CM7_1T_AES_decrypt:
 
 	// clear r3
 
-	uxtb.w r2, r3 //row 0 col 3
+	uxtb r2, r3 //row 0 col 3
 	ldrb r11, [r14, r11]
 
-	lsr.w r1, r3, #24 // row 3 col 2
+	lsrs r1, r3, #24 // row 3 col 2
 	ldrb r10, [r14, r10]
 
 	orr.w r5, r9, r5, lsl #8 // col 3 upper part
@@ -283,7 +284,7 @@ CM7_1T_AES_decrypt:
 	eor.w r5, r11, r5, lsl #16 // col 3
 	ldr r1, [r12, #4]
 
-	add.w sp, #4 // clear stack
+	add sp, #4 // clear stack
 	ldr r2, [r12, #8]
 
 	orr.w r7, r7, r6, lsl #8 // col 2 upper
