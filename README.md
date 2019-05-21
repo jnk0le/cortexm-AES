@@ -102,6 +102,10 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 `*` pipeline performance not fixed yet
 `**` Cortex-M7 results may differ by 6-12 cycles depending on the code around the caller (and it may not be just the bpu)
 
+### XXX_1T_CTR
+
+Implements counter mode caching. 
+
 ## Cipher modes performance (in cycles per byte) 
 
 | Cipher function            | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32H7 - CM7_1T |
@@ -122,9 +126,7 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 `*` pipeline performance not fixed yet
 
 ## todo
-- cm7 dsp
-- fix cm7 pre and post ldr dependency fuckup and other dependency bullshit
-- fix perf of cm7 unrolled functions
+- fix cm7 perf
 - add proper padding
 - doxygen
 - pre generation of lookups
