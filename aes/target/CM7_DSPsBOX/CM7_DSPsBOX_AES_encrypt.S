@@ -232,8 +232,6 @@ CM7_DSPsBOX_AES_encrypt:
 	eor r3, r3, r5, ror #8 // col 3 mix back
 	eor.w r8, r9, #0x1b1b1b1b // col 3 mix
 
-	//a total of 2 cycles is lost somewhere below here
-
 	eor.w r1, r1, r6 //finish col 1
 	sel r5, r8, r9 // mixed column 3
 
