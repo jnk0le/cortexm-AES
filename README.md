@@ -124,11 +124,3 @@ Implements counter mode caching.
 | CTR_unrolled<256>          | 44.78/63.04                 | 45.16/77.68                 | 23.89*            |
 
 `*` pipeline performance not fixed yet
-
-## todo
-- fix cm7 perf
-- add proper padding
-- doxygen
-- pre generation of lookups
-- gcm
-- add bitsliced/masked implementations
