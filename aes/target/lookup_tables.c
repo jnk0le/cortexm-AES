@@ -7,7 +7,7 @@
  * Alignment is required to avoid crossing 2 different memory blocks. (minimum AHB granurality for bus slave in cortex-m is 1kB)
  * You might want to create dedicated section in linker script for those,to make sure that the correct memory block is used.
  *
- * To avoid data dependent load time differences, those tables have to be placed in deterministic memory section. (usually non TCM/SRAM)
+ * To avoid data dependent load time differences, those tables have to be placed in deterministic memory section. (usually TCM/SRAM)
  *
  * `const` specifier cannot be used since it will move tables to flash memory that is not only non-deterministic, but it will also beat
  * the main performance purpose of using large lookup tables.
