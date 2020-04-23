@@ -49,7 +49,7 @@ The timmming issue can be visualized by following snippet:
 			""::: "r0","r1","r2","r3","r9");
 	tick = DWT->CYCCNT - tick - 1;
 
-	printf("4 even loads, cycles: %lu\n", tock);
+	printf("4 even loads, cycles: %lu\n", tick);
 
 	tick = DWT->CYCCNT;
 	asm volatile(""
@@ -67,7 +67,7 @@ The timmming issue can be visualized by following snippet:
 ```
 
 Only DTCM memory can be used for LUT tables, since everything else is cached through AXI bus.
-The effects of simultaneous access to DTCM memory by core and DMA/AHBS are yet unknown. (there was some changes in r1p0 revision "Improved handling of simultaneous AHBS and software activity relating to the same TCM")
+The timing effects of simultaneous access to DTCM memory by core and DMA/AHBS are yet unknown. (there was some changes in r1p0 revision: "Improved handling of simultaneous AHBS and software activity relating to the same TCM", details are of course Proprietary&Confidential)
 
 ### XXX_DSPsBOX
 
