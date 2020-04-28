@@ -9,8 +9,8 @@
  *
  * To avoid data dependent load time differences, those tables have to be placed in deterministic memory section. (usually TCM/SRAM)
  *
- * `const` specifier cannot be used since it will move tables to flash memory that is not only non-deterministic, but it will also beat
- * the main performance purpose of using large lookup tables.
+ * `const` specifier cannot be used since it will move tables to flash memory that is not only non-deterministic, but it also
+ *  beats the main purpose of using large lookup tables.
  *
  * \todo runtime gen at startup instead of storage
  *
@@ -21,7 +21,47 @@
 
 #include <stdint.h>
 
-uint8_t AES_sbox[256] __attribute__ ((aligned(256))) =
+/*
+	Use section attribute to put tables in a designated deterministic section (.data is used by default)
+	I recommend using ".section.XXX" naming to let the compiler do proper GC and reordering.
+
+	section(".AES_TABLES.sbox")
+	section(".AES_TABLES.inv_sbox")
+	section(".AES_TABLES.Te2")
+	section(".AES_TABLES.Td2")
+
+	If .data section is already in DTCM and you just want to make sure it is as explicit as possible
+
+	.data : ALIGN(4) {
+		PROVIDE(__data_start__ = .);
+
+		*(.AES_TABLES .AES_TABLES*)
+		*(.data .data* .gnu.linkonce.d*)
+		PROVIDE(__data_end__ = .);
+	} > DTCM AT > FLASH
+
+	If .data section is not placed in deterministic memory block then you have to create section section:
+
+	.AES_TABLES : ALIGN(4) {
+		PROVIDE(__aes_tables_start__ = .);
+		*(.AES_TABLES .AES_TABLES*)
+		PROVIDE(__aes_tables_end__ = .);
+	} > DTCM AT > FLASH
+
+	PROVIDE(__aes_tables_init_start__ = LOADADDR(.AES_TABLES));
+
+	and initialize it somewhere at startup:
+
+	extern size_t __aes_tables_init_start__;
+	extern size_t __aes_tables_start__;
+	extern size_t __aes_tables_end__;
+
+	for(int i = 0; i < (&__aes_tables_end__ - &__aes_tables_start__); i++) {
+		(&__aes_tables_start__)[i] = (&__aes_tables_init_start__)[i]; // copy by 4 bytes
+	}
+ */
+
+uint8_t AES_sbox[256] __attribute__((aligned(256), section(".data.AES_sbox"))) =
 {
 	0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
 	0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0,
@@ -41,7 +81,7 @@ uint8_t AES_sbox[256] __attribute__ ((aligned(256))) =
 	0x8C, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16
 };
 
-uint8_t AES_inv_sbox[256] __attribute__ ((aligned(256))) =
+uint8_t AES_inv_sbox[256] __attribute__((aligned(256), section(".data.AES_inv_sbox"))) =
 {
 	0x52, 0x09, 0x6A, 0xD5, 0x30, 0x36, 0xA5, 0x38, 0xBF, 0x40, 0xA3, 0x9E, 0x81, 0xF3, 0xD7, 0xFB,
 	0x7C, 0xE3, 0x39, 0x82, 0x9B, 0x2F, 0xFF, 0x87, 0x34, 0x8E, 0x43, 0x44, 0xC4, 0xDE, 0xE9, 0xCB,
@@ -61,7 +101,7 @@ uint8_t AES_inv_sbox[256] __attribute__ ((aligned(256))) =
 	0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D
 };
 
-uint32_t AES_Te2[256] __attribute__ ((aligned(1024))) =
+uint32_t AES_Te2[256] __attribute__((aligned(1024), section(".data.AES_Te2"))) =
 {
 	0x63c6a563, 0x7cf8847c, 0x77ee9977, 0x7bf68d7b,
 	0xf2ff0df2, 0x6bd6bd6b, 0x6fdeb16f, 0xc59154c5,
@@ -129,7 +169,7 @@ uint32_t AES_Te2[256] __attribute__ ((aligned(1024))) =
 	0xb07bcbb0, 0x54a8fc54, 0xbb6dd6bb, 0x162c3a16,
 };
 
-uint32_t AES_Td2[256] __attribute__ ((aligned(1024))) =
+uint32_t AES_Td2[256] __attribute__((aligned(1024), section(".data.AES_Td2"))) =
 {
 	0xf45150a7, 0x417e5365, 0x171ac3a4, 0x273a965e,
 	0xab3bcb6b, 0x9d1ff145, 0xfaacab58, 0xe34b9303,
