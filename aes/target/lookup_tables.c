@@ -34,13 +34,12 @@
 
 	.data : ALIGN(4) {
 		PROVIDE(__data_start__ = .);
-
 		*(.AES_TABLES .AES_TABLES*)
 		*(.data .data* .gnu.linkonce.d*)
 		PROVIDE(__data_end__ = .);
 	} > DTCM AT > FLASH
 
-	If .data section is not placed in deterministic memory block then you have to create section section:
+	If .data section is not placed in deterministic memory block, then you have to create another output section:
 
 	.AES_TABLES : ALIGN(4) {
 		PROVIDE(__aes_tables_start__ = .);
