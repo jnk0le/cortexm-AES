@@ -29,14 +29,12 @@
 	void CM7_1T_AES_keyschedule_dec_noTe(uint8_t* rk, size_t rounds); // __attribute__ ((section(".itcm.text")));
 
 	void CM7_1T_AES_encrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds); // __attribute__ ((section(".itcm.text")));
-	void CM7_1T_AES_encrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds); // __attribute__ ((section(".itcm.text")));
 
 	void CM7_1T_AES_128_encrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out); // __attribute__ ((section(".itcm.text")));
 	void CM7_1T_AES_192_encrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out); // __attribute__ ((section(".itcm.text")));
 	void CM7_1T_AES_256_encrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out); // __attribute__ ((section(".itcm.text")));
 
 	void CM7_1T_AES_decrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds); // __attribute__ ((section(".itcm.text")));
-	void CM7_1T_AES_decrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds); // __attribute__ ((section(".itcm.text")));
 
 	void CM7_1T_AES_128_decrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out); // __attribute__ ((section(".itcm.text")));
 	void CM7_1T_AES_192_decrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out); // __attribute__ ((section(".itcm.text")));
