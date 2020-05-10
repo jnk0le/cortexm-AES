@@ -100,7 +100,7 @@ Encryption is parallelized according to [this paper](http://www.wseas.us/e-libra
 Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 `setDecKey<>` counts cycles required to perform equivalent inverse cipher transformation on expanded encryption key.
 `*` pipeline performance not fixed yet
-`**` Cortex-M7 results may differ depending on the code around the caller (`encrypt<128>` should have 298 retired "uops", goes up by 9 cycles if e.g. unrolled code is also compiled in)
+`**` Cortex-M7 results may differ depending on the code around the caller (`encrypt<128>` should have 298 retired "uop pairs", goes up by 9 cycles if e.g. unrolled code is also compiled in)
 
 ### XXX_1T_CTR
 
