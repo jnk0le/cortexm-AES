@@ -84,23 +84,23 @@ Encryption is parallelized according to [this paper](http://www.wseas.us/e-libra
 | `encrypt<128>`      | 657/843   | 669      | 884 | 302 | 411 |
 | `encrypt<192>`      | 779/998   | 793      | 1056 | 358 | 491 |
 | `encrypt<256>`      | 901/1155  | 917      | 1228 | 414 | 571 |
-| `enc_unrolled<128>` | 604/834   | 604/1029 | - | 315* | - |
-| `enc_unrolled<192>` | 714/993   | 714/1221 | - | 373* | - |
-| `enc_unrolled<256>` | 824/1148  | 824/1413 | - | 431* | - |
+| `enc_unrolled<128>` | 604/834   | 604/1029 | - | 281 | - |
+| `enc_unrolled<192>` | 714/993   | 714/1221 | - | 333 | - |
+| `enc_unrolled<256>` | 824/1148  | 824/1413 | - | 385 | - |
 | `setDecKey<128>`    | 813/1102  | 816      | 0 | 412* | (1T) |
 | `setDecKey<192>`    | 989/1342  | 992      | 0 | 500* | (1T) |
 | `setDecKey<256>`    | 1165/1585 | 1168     | 0 | 588* | (1T) |
 | `decrypt<128>`      | 652/898   | 673      | 1272 | 304 | (1T) |
 | `decrypt<192>`      | 772/1071  | 797      | 1530 | 360 | (1T) |
 | `decrypt<256>`      | 892/1240  | 921      | 1788 | 416 | (1T) |
-| `dec_unrolled<128>` | 607/836   | 609/1032 | - | 319* | - |
-| `dec_unrolled<192>` | 717/995   | 719/1224 | - | 376* | - |
-| `dec_unrolled<256>` | 827/1150  | 829/1416 | - | 434* | - |
+| `dec_unrolled<128>` | 607/836   | 609/1032 | - | 282 | - |
+| `dec_unrolled<192>` | 717/995   | 719/1224 | - | 334 | - |
+| `dec_unrolled<256>` | 827/1150  | 829/1416 | - | 386 | - |
 
 Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 `setDecKey<>` counts cycles required to perform equivalent inverse cipher transformation on expanded encryption key.
 `*` pipeline performance not fixed yet
-`**` Cortex-M7 results may differ depending on the code around the caller (`encrypt<128>` should have 298 retired "uop pairs", goes up by 9 cycles if e.g. unrolled code is also compiled in)
+`**` Cortex-M7 results may differ depending on the code around the caller (`encrypt<128>` should have 298 retired "uop pairs", goes up by e.g. 9 cycles if unrolled code is also compiled in)
 
 ### XXX_1T_CTR
 
