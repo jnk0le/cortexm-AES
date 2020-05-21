@@ -12,12 +12,10 @@
 .global CM7_1T_AES_128_decrypt_unrolled
 .type   CM7_1T_AES_128_decrypt_unrolled,%function
 CM7_1T_AES_128_decrypt_unrolled:
-	pld [r1] // dead cycle anyway, preload in case data is still in external mem, cacheline is 32 bytes
+	pld [r1, #0] // dead cycle anyway, preload in case data is still in external mem, cacheline is 32 bytes
 	add r12, r0, #160 // 10 rounds * 16
 
 	push {r2, r4-r11, lr} //stack out
-
-	//2 4  5 6  7 8  9 10  11 lr
 
 	movw r14, #:lower16:AES_Td2
 	movt r14, #:upper16:AES_Td2

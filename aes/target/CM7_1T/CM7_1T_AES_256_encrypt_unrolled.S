@@ -10,7 +10,7 @@
 .global CM7_1T_AES_256_encrypt_unrolled
 .type   CM7_1T_AES_256_encrypt_unrolled,%function
 CM7_1T_AES_256_encrypt_unrolled:
-pld [r1, #0] // dead cycle anyway, preload in case data is still in external mem, cacheline is 32 bytes
+	pld [r1, #0] // dead cycle anyway, preload in case data is still in external mem, cacheline is 32 bytes
 	mov r12, r0
 
 	push {r2,r4-r11,lr} //stack out
