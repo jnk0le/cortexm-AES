@@ -1,5 +1,4 @@
 // uses backward expanded round key
-// LUT loads are splitted to avoid data dependent issuing capability from even/odd DTCM words
 
 .syntax unified
 .thumb
@@ -11,13 +10,13 @@
 .global CM7_1T_AES_decrypt
 .type   CM7_1T_AES_decrypt,%function
 CM7_1T_AES_decrypt:
+	pld [r1, #0] // dead cycle anyway, preload in case data is still in external mem, cacheline is 32 bytes
 	adds r0, #16 //to compare against before final round
-	str.w r14, [sp, -4]! // push lr
+
+	push {r2, r4-r11, lr} //stack out
 
 	add r12, r0, r3, lsl #4 //rk_end = rk+16 + rounds * 16
-	str.w r11, [sp, -4]! // push r11
-
-	push {r0, r2, r4-r10} //stack rk+16, out
+	str.w r0, [sp, #-4]! //stack rk+16
 
 	movw r14, #:lower16:AES_Td2
 	movt r14, #:upper16:AES_Td2
@@ -132,7 +131,7 @@ CM7_1T_AES_decrypt:
 	eor.w r2, r6
 	eor.w r3, r7
 
-	nop.w // cannot dual issue anything after branch // cannot use it block above to increment stack
+	nop.w
 	bne.w 1b
 
 	movw r14, #:lower16:AES_inv_sbox

@@ -1,5 +1,3 @@
-// LUT loads are splitted to avoid data dependent issuing capability from even/odd DTCM words
-
 .syntax unified
 .thumb
 .text
@@ -10,10 +8,16 @@
 .global CM7_1T_AES_encrypt
 .type   CM7_1T_AES_encrypt,%function
 CM7_1T_AES_encrypt:
-	add r3, r0, r3, lsl #4 //rk_end-16 = rk + rounds * 16
-	mov r12, r0
+	pld [r1, #0] // dead cycle anyway, preload in case data is still in external mem, cacheline is 32 bytes
+	str.w r14, [sp, #-4]! // push lr
 
-	push {r2,r3,r4-r11,lr} //stack out, rk_end-16
+	add r3, r0, r3, lsl #4 //rk_end-16 = rk + rounds * 16
+	str.w r11, [sp, #-4]! // push stalls if stack is not 8 byte aligned
+
+	push {r3,r4-r10} //stack out, rk_end-16
+
+	mov r12, r0
+	str.w r2, [sp, #-4]! // stack out
 
 	movw r14, #:lower16:AES_Te2
 	movt r14, #:upper16:AES_Te2
@@ -30,11 +34,8 @@ CM7_1T_AES_encrypt:
 	eors r2, r6
 	eors r3, r7
 
-	//and here uxtb can be younger and older // the yonger one saves one cycle in whole call
-	//cycle lost after changing lsr.w to lsrs.n, the rest is even worser
 1:
 	//start extending from the highest byte and load key/loop later
-
 	uxtb r8, r2, ror #16
 	lsr.w r4, r3, #24
 
