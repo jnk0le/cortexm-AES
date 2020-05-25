@@ -18,10 +18,13 @@
 .type   CM7_DSPsBOX_AES_encrypt,%function
 CM7_DSPsBOX_AES_encrypt:
 #if __ARM_ARCH_7EM__
+	pld [r1, #0] // dead cycle anyway, preload in case data is still in external mem, cacheline is 32 bytes
 	add r3, r0, r3, lsl #4 //rk_end-16 = rk + rounds * 16
-	mov r12, r0
 
-	push {r2,r3,r4-r11,lr} //stack out, rk_end-16
+	push {r3,r4-r11,lr} //stack rk_end-16
+
+	mov r12, r0
+	str.w r2, [sp, #-4]! // stack out
 
 	movw r14, #:lower16:AES_sbox
 	movt r14, #:upper16:AES_sbox
@@ -32,12 +35,11 @@ CM7_DSPsBOX_AES_encrypt:
 	ldmia r12!, {r0-r3}
 
 	//initial addroundkey
-	eors r0, r4
-	eors r1, r5
-	eors r2, r6
-	eors r3, r7
+	eor.w r0, r4
+	eor.w r1, r5
+	eor.w r2, r6
+	eor.w r3, r7
 
-	//any attempt to reduce size of this loop will yield in multi cycle stalls
 1:	//shiftrows and subbytes
 
 	//prepare column 0 asap
