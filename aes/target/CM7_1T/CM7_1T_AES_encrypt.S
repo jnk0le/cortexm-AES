@@ -14,7 +14,7 @@ CM7_1T_AES_encrypt:
 	add r3, r0, r3, lsl #4 //rk_end-16 = rk + rounds * 16
 	str.w r11, [sp, #-4]! // push stalls if stack is not 8 byte aligned
 
-	push {r3,r4-r10} //stack out, rk_end-16
+	push {r3,r4-r10} //stack rk_end-16
 
 	mov r12, r0
 	str.w r2, [sp, #-4]! // stack out
@@ -203,10 +203,10 @@ CM7_1T_AES_encrypt:
 	uxtb r9, r1, ror #16 //row 2 col 3
 	ldrb r4, [r14, r4, lsl #2]
 
-	lsr.w r2, r2, #24 //row 3 col 3 // cant .n
+	lsr.w r2, r2, #24 //row 3 col 3
 	ldrb r6, [r14, r6, lsl #2]
 
-	and.w r3, r3, #0xff //row 0 col 3 // cant .n
+	and.w r3, r3, #0xff //row 0 col 3
 	ldrb r5, [r14, r5, lsl #2]
 
 	orr.w r4, r8, r4, lsl #8 // col 2 upper part

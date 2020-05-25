@@ -137,12 +137,10 @@ CM7_1T_AES_decrypt:
 	movw r14, #:lower16:AES_inv_sbox
 	movt r14, #:upper16:AES_inv_sbox
 
-	uxtb r4, r2, ror #16 // row 2 col 0 // cant uxtab
-	lsr.w r5, r1, #24 // row 3 col 0 // cant .n
+	uxtb r4, r2, ror #16 // row 2 col 0
+	lsr.w r5, r1, #24 // row 3 col 0
 
-	//one extra cycle before ldr offsets are available
-
-	uxtb r6, r3, ror #8 // row 1 col 0 // cant uxtab
+	uxtb r6, r3, ror #8 // row 1 col 0
 	and.w r7, r0, #0xff // row 0 col 0
 
 	lsr.w r8, r2, #24 //row 3 col 1
@@ -190,7 +188,7 @@ CM7_1T_AES_decrypt:
 
 	//clear r1
 
-	uxtb r6, r1, ror #8 // row 1 col 2 // cannot uxtab
+	uxtb r6, r1, ror #8 // row 1 col 2
 	orr.w r8, r9, r8, lsl #8 // col 1 upper part
 
 	uxtb r9, r1, ror #16 // row 2 col 3
