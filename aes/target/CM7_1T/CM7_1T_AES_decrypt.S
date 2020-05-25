@@ -13,7 +13,7 @@ CM7_1T_AES_decrypt:
 	pld [r1, #0] // dead cycle anyway, preload in case data is still in external mem, cacheline is 32 bytes
 	adds r0, #16 //to compare against before final round
 
-	push {r2, r4-r11, lr} //stack out
+	push {r2,r4-r11,lr} //stack out
 
 	add r12, r0, r3, lsl #4 //rk_end = rk+16 + rounds * 16
 	str.w r0, [sp, #-4]! //stack rk+16

@@ -9,12 +9,9 @@
 .type   CM7_1T_AES_encrypt,%function
 CM7_1T_AES_encrypt:
 	pld [r1, #0] // dead cycle anyway, preload in case data is still in external mem, cacheline is 32 bytes
-	str.w r14, [sp, #-4]! // push lr
-
 	add r3, r0, r3, lsl #4 //rk_end-16 = rk + rounds * 16
-	str.w r11, [sp, #-4]! // push stalls if stack is not 8 byte aligned
 
-	push {r3,r4-r10} //stack rk_end-16
+	push {r3,r4-r11,lr} //stack rk_end-16
 
 	mov r12, r0
 	str.w r2, [sp, #-4]! // stack out
