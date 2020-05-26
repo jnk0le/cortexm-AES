@@ -22,21 +22,21 @@ CM7_1T_AES_CTR_enc:
 	add r3, r0, r3, lsl #4 //rk_end-16 = rk + rounds * 16
 	str.w r11, [sp, #-4]!
 
+	pld [r0, #0] // dead cycle anyway, preload anything, cacheline is 32 bytes
+	adds r3, #16 // + nonce
+
 	add r12, r1, r12, lsl #4 // in_p + cnt*16
 	str r12, [sp, #8]
 
 	mov r12, r0
 	adds r0, #64 // p+4*4*4 //use this value to reload context pointer before next block encryption
 
-	nop.w
-	adds r3, #16 // + nonce
-
 	push {r1-r10} // push data_in, data_out, rk_end-16
 
 	str r0, [sp, #-4]! //push ctx+64
 	movw r14, #:lower16:AES_Te2
 
-	sub sp, #20
+	sub sp, #20 // make space for partial precompute
 	movt r14, #:upper16:AES_Te2
 
 ctr_partial_precompute:
@@ -206,12 +206,10 @@ ctr_partial_precompute:
 	eor.w r1, r9
 	str r6, [sp, #4]
 
-	//load key[3]
-	ldr r8, [r12, #-36]
+	ldr r8, [r12, #-36] //load key[3]
 	nop
 
-	//preload ctr[3]
-	ldr r10, [r12, #-52]
+	ldr r10, [r12, #-52] //preload ctr[3]
 	str r7, [sp, #8]
 
 	eor.w r8, r10
@@ -514,6 +512,5 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	b.w ctr_partial_precompute // cant .n
 
 ctr_exit:
-
 	add sp, #20+16
 	pop {r4-r11,pc}
