@@ -2,15 +2,31 @@
 
 FIPS 197 compliant software AES implementation optimized for real world cortex-m microcontrollers.
 
+## build
+
+Repository root directory is expected to be the only include path.
+
+If repo is added as eclipse linked folder the root folder has to be added to ASM, C and CPP include paths (-I)
+(proj preporties -> C++ build -> settings)
+
+Includes also have to start from root (e.g. `#include <aes/cipher.hpp>`)
+
+current unit test code (and its placement) is bogus (may need to be excluded)
+
+No cmake yet.
+
 ## notes
 - Do not use ECB cipher mode for anything more than 16 bytes of plaintext data per key.
 - Do not blindly trust in timming constantness of LUT based ciphers since it depends on many factors that are 
 unknown or just implementation defined like section placement or pipeline suprises (you need to verify it, especially before use in production).
-- LUT tables have to be placed in deterministic memory section, usally TCMs and non-waitstated SRAMs (by default it lands in .data section) 
+- LUT tables have to be placed in deterministic memory section, usally TCMs and non-waitstated SRAMs (by default it lands in .data section)
 - None of the currently available implementations protects against power/EMI analysis attacks.
 - do not use cortex-m3 and cortex-m4 implementations on cortex-m7 since it is slower and will introduce timming leaks.
-- Unrolled ciphers might perform slower than looped versions due to cache pressure and flash waitstates. (like STM32F4 with 1K ART cache and up to 8WS) 
+- Unrolled ciphers might perform slower than looped versions due to (usually LRU) cache pressure and flash waitstates. (like STM32F4 with 1K ART cache and up to 8WS)
 - input/output buffers might have to be word aligned due to use of ldm,stm,ldrd and strd instructions.
+- for optimization gimmicks refer to [pipeline cycle test repo](https://github.com/jnk0le/random/tree/master/pipeline%20cycle%20test) (ignore comments insidie code here - they are likely outdated)
+- included unit tests don't cover timming leaks (performance difference on different runs may not be a data dependent ones)  
+- asm functions (and CM*.h headers) can be extracted and used as C only code, but that may require extra boilerplate code (structures etc.)
 
 ## implementations
 
@@ -19,7 +35,7 @@ unknown or just implementation defined like section placement or pipeline supris
 cortex m3 and cortex m4 optimized implementation.
 Uses a single T table per enc/dec cipher and additional inv_sbox for final round in decryption.
 
-Based on "Peter Schwabe and Ko Stoffelen" AES implementation available [here](https://github.com/Ko-/aes-armcortexm).
+Originally based on "Peter Schwabe and Ko Stoffelen" AES implementation available [here](https://github.com/Ko-/aes-armcortexm).
 
 32 bit LDR opcodes are aligned to 4 byte boundaries to prevent weird undocumented "feature" of cortex-m3/4 that prevents some pipelining of neighbouring loads.
 As well as other architecture specific optimizations.
@@ -32,10 +48,10 @@ FLASH memory simply cannot be used since vendors usually implements some kind of
 cortex m7 optimized implementation.
 Uses a single T table per enc/dec cipher and additional inv_sbox for final round in decryption.
 
-Based on "Peter Schwabe and Ko Stoffelen" AES implementation available [here](https://github.com/Ko-/aes-armcortexm), with carefully reordered instructions for cortex-m7 pipeline,
-to increase IPC and avoid data dependent stalls when accessing 2x32 bit DTCM (separate single ported SRAMs) on even/odd words. 
+Based on cortex m3/4 one, with carefully reordered instructions for cortex-m7 pipeline, to increase IPC and avoid data dependent 
+stalls when accessing 2x32 bit DTCM (separate single ported SRAMs) on even/odd words. 
 
-The timmming issue can be visualized by following snippet:
+The timmming issue can be visualized by following snippet (immediate vs register offset doesn't matter):
 
 ```
 	tick = DWT->CYCCNT;
@@ -71,7 +87,7 @@ The timing effects of simultaneous access to DTCM memory by core and DMA/AHBS ar
 
 ### XXX_DSPsBOX
 
-Utilizes dsp instructions to perform constant time, quad multiplications in mixcolumns stage.
+Utilizes dsp instructions to perform constant time, quad (gf)multiplications in mixcolumns stage.
 Encryption is parallelized according to [this paper](http://www.wseas.us/e-library/conferences/2009/moscow/AIC/AIC44.pdf), decryption is done through more straightforward representation.
 
 ## Base ciphers performance (in cycles per block)
@@ -104,9 +120,9 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 
 ### XXX_1T_CTR
 
-Implements counter mode caching. 
+Implements counter mode caching.
 
-## Cipher modes performance (in cycles per byte) 
+## Cipher modes performance (in cycles per byte)
 
 | Cipher function            | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32H7 - CM7_1T |
 |----------------------------|-----------------------------|-----------------------------|------------------|
