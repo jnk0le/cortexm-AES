@@ -56,26 +56,26 @@ The timmming issue can be visualized by following snippet (immediate vs register
 ```
 	tick = DWT->CYCCNT;
 	asm volatile(""
-			"movw r9, #:lower16:AES_Te0 \n"
-			"movt r9, #:upper16:AES_Te0 \n"
-			"ldr r0, [r9, #0] \n"
-			"ldr r1, [r9, #8] \n"
-			"ldr r2, [r9, #16] \n"
-			"ldr r3, [r9, #24] \n"
-			""::: "r0","r1","r2","r3","r9");
+			"movw r12, #:lower16:AES_Te0 \n"
+			"movt r12, #:upper16:AES_Te0 \n"
+			"ldr r0, [r12, #0] \n"
+			"ldr r1, [r12, #8] \n"
+			"ldr r2, [r12, #16] \n"
+			"ldr r3, [r12, #24] \n"
+			""::: "r0","r1","r2","r3","r12");
 	tick = DWT->CYCCNT - tick - 1;
 
 	printf("4 even loads, cycles: %lu\n", tick);
 
 	tick = DWT->CYCCNT;
 	asm volatile(""
-			"movw r9, #:lower16:AES_Te0 \n"
-			"movt r9, #:upper16:AES_Te0 \n"
-			"ldr r0, [r9, #0] \n"
-			"ldr r1, [r9, #4] \n"
-			"ldr r2, [r9, #8] \n"
-			"ldr r3, [r9, #12] \n"
-			""::: "r0","r1","r2","r3","r9");
+			"movw r12, #:lower16:AES_Te0 \n"
+			"movt r12, #:upper16:AES_Te0 \n"
+			"ldr r0, [r12, #0] \n"
+			"ldr r1, [r12, #4] \n"
+			"ldr r2, [r12, #8] \n"
+			"ldr r3, [r12, #12] \n"
+			""::: "r0","r1","r2","r3","r12");
 	tick = DWT->CYCCNT - tick - 1;
 
 	printf("4 linear loads, cycles: %lu\n", tick);
