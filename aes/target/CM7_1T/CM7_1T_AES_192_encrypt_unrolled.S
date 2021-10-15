@@ -10,6 +10,7 @@
 .global CM7_1T_AES_192_encrypt_unrolled
 .type   CM7_1T_AES_192_encrypt_unrolled,%function
 CM7_1T_AES_192_encrypt_unrolled:
+#if __ARM_ARCH_7M__
 	pld [r1, #0] // dead cycle anyway, preload in case data is still in external mem, cacheline is 32 bytes
 	mov r12, r0
 
@@ -161,3 +162,6 @@ CM7_1T_AES_192_encrypt_unrolled:
 	str r3, [r5, #12]
 
 	pop {r5-r11,pc}
+#else
+	b . //crash in case the function was called on thumb1 core
+#endif

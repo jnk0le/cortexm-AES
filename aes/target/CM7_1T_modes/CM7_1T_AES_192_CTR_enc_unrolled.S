@@ -18,6 +18,7 @@
 .global CM7_1T_AES_192_CTR_enc_unrolled
 .type   CM7_1T_AES_192_CTR_enc_unrolled,%function
 CM7_1T_AES_192_CTR_enc_unrolled:
+#if __ARM_ARCH_7M__
 	pld [r0, #0] // dead cycle anyway, preload anything, cacheline is 32 bytes
 	add r3, r1, r3, lsl #4 // in_p + cnt*16
 
@@ -456,3 +457,6 @@ ctr_exit:
 	add sp, #20+12
 	stmia r4!, {r0-r3} // store last block
 	pop {r4-r11,pc}
+#else
+	b . //crash in case the function was called on thumb1 core
+#endif

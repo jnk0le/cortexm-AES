@@ -10,6 +10,7 @@
 .global CM3_sBOX_AES_256_keyschedule_enc
 .type   CM4_sBOX_AES_256_keyschedule_enc,%function
 CM3_sBOX_AES_256_keyschedule_enc:
+#if __ARM_ARCH_7M__
 	push {r4-r11, lr}
 
 	//load key
@@ -74,3 +75,6 @@ CM3_sBOX_AES_256_keyschedule_enc:
 
 	add sp, #8 // faster than dummy pops
 	pop {r4-r11, pc}
+#else
+	b . //crash in case the function was called on thumb1 core
+#endif

@@ -16,6 +16,7 @@
 .global CM7_1T_AES_CTR_enc
 .type   CM7_1T_AES_CTR_enc,%function
 CM7_1T_AES_CTR_enc:
+#if __ARM_ARCH_7M__
 	ldr r12, [sp]
 	str lr, [sp, #-4]! // use dead cycles for pushing
 
@@ -514,3 +515,6 @@ ctr_encrypt_block: //expect {precomputed_y0..y3, precomputed_x0} on top of stack
 ctr_exit:
 	add sp, #20+16
 	pop {r4-r11,pc}
+#else
+	b . //crash in case the function was called on thumb1 core
+#endif

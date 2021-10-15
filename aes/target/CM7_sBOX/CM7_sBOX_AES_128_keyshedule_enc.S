@@ -13,7 +13,7 @@
 .global CM7_sBOX_AES_128_keyschedule_enc
 .type   CM7_sBOX_AES_128_keyschedule_enc,%function
 CM7_sBOX_AES_128_keyschedule_enc:
-#if __ARM_ARCH_7EM__
+#if __ARM_ARCH_7M__
 	push {r4-r8, lr}
 
 	movw r14, #:lower16:AES_sbox
@@ -66,6 +66,5 @@ CM7_sBOX_AES_128_keyschedule_enc:
 
 	pop {r4-r8, pc}
 #else
-	//crash in case the function was called on non dsp cortex m3
-	b .
+	b . //crash in case the function was called on thumb1 core
 #endif

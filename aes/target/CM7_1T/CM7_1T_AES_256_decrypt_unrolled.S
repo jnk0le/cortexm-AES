@@ -12,6 +12,7 @@
 .global CM7_1T_AES_256_decrypt_unrolled
 .type   CM7_1T_AES_256_decrypt_unrolled,%function
 CM7_1T_AES_256_decrypt_unrolled:
+#if __ARM_ARCH_7M__
 	pld [r1, #0] // dead cycle anyway, preload in case data is still in external mem, cacheline is 32 bytes
 	add r12, r0, #224 // 10 rounds * 16
 
@@ -231,3 +232,6 @@ CM7_1T_AES_256_decrypt_unrolled:
 	stmia r6!, {r0-r3}
 
 	pop {r5-r11, pc}
+#else
+	b . //crash in case the function was called on thumb1 core
+#endif

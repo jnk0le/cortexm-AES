@@ -316,6 +316,5 @@ CM4_DSPsBOX_AES_decrypt:
 
 	pop {r4-r11,pc}
 #else
-	//crash in case the function was called on non dsp cortex m3
-	b .
+	b . //crash in case the function was called on non dsp core
 #endif

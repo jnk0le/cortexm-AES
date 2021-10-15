@@ -11,6 +11,7 @@
 .global CM3_1T_AES_128_keyschedule_enc
 .type   CM3_1T_AES_128_keyschedule_enc,%function
 CM3_1T_AES_128_keyschedule_enc:
+#if __ARM_ARCH_7M__
 	push {r4-r8, lr}
 
 	movw r14, #:lower16:AES_Te2
@@ -55,3 +56,6 @@ CM3_1T_AES_128_keyschedule_enc:
 	bne 1b
 
 	pop {r4-r8, pc}
+#else
+	b . //crash in case the function was called on thumb1 core
+#endif

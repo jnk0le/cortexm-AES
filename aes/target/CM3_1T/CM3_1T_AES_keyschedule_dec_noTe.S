@@ -11,6 +11,7 @@
 .global CM3_1T_AES_keyschedule_dec_noTe
 .type   CM3_1T_AES_keyschedule_dec_noTe,%function
 CM3_1T_AES_keyschedule_dec_noTe:
+#if __ARM_ARCH_7M__
 	push {r4-r5, lr}
 
 	//first and last block are ommited
@@ -52,3 +53,6 @@ CM3_1T_AES_keyschedule_dec_noTe:
 	bne 1b
 
 	pop {r4-r5, pc}
+#else
+	b . //crash in case the function was called on thumb1 core
+#endif

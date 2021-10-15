@@ -9,6 +9,7 @@
 .global CM3_1T_AES_decrypt
 .type   CM3_1T_AES_decrypt,%function
 CM3_1T_AES_decrypt:
+#if __ARM_ARCH_7M__
 	adds r0, #16 //to compare against before final round
 	push {r0, r2, r4-r11, lr} //stack rk+16, out
 
@@ -189,3 +190,6 @@ CM3_1T_AES_decrypt:
 	str r3, [r4, #12]
 
 	pop {r4-r11, pc}
+#else
+	b . //crash in case the function was called on thumb1 core
+#endif

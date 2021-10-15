@@ -13,6 +13,7 @@
 .global CM7_sBOX_AES_256_keyschedule_enc
 .type   CM7_sBOX_AES_256_keyschedule_enc,%function
 CM7_sBOX_AES_256_keyschedule_enc:
+#if __ARM_ARCH_7M__
 	push {r4-r11, lr}
 
 	//load key
@@ -106,4 +107,6 @@ CM7_sBOX_AES_256_keyschedule_enc:
 
 	add sp, #8
 	pop {r4-r11, pc}
-
+#else
+	b . //crash in case the function was called on thumb1 core
+#endif

@@ -10,6 +10,7 @@
 .global CM3_1T_AES_256_CTR_enc_unrolled
 .type   CM3_1T_AES_256_CTR_enc_unrolled,%function
 CM3_1T_AES_256_CTR_enc_unrolled:
+#if __ARM_ARCH_7M__
 	add r3, r1, r3, lsl #4 // in_p + cnt*16
 
 	push {r1-r11,lr} // push data_in, data_out, blocks_cnt
@@ -1061,3 +1062,6 @@ ctr_exit:
 
 	add sp, #20+12
 	pop {r4-r11,pc}
+#else
+	b . //crash in case the function was called on thumb1 core
+#endif

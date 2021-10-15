@@ -10,6 +10,7 @@
 .global CM3_sBOX_AES_192_keyschedule_enc
 .type   CM3_sBOX_AES_192_keyschedule_enc,%function
 CM3_sBOX_AES_192_keyschedule_enc:
+#if __ARM_ARCH_7M__
 	push {r4-r10, lr}
 
 	movw r14, #:lower16:AES_sbox
@@ -51,3 +52,6 @@ CM3_sBOX_AES_192_keyschedule_enc:
 	bcc 1b
 
 	pop {r4-r10, pc}
+#else
+	b . //crash in case the function was called on thumb1 core
+#endif
