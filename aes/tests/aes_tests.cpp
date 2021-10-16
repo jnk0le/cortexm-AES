@@ -26,6 +26,8 @@ aes::CipherContext<128, aes::target::CM7_DSPsBOX> t128;
 aes::CipherContext<192, aes::target::CM7_DSPsBOX> t192;
 aes::CipherContext<256, aes::target::CM7_DSPsBOX> t256;
 
+#ifdef __ARM_ARCH_7M__
+
 //__attribute__ ((section(".itcm.text"), noinline))
 void aes_ecb_test(void)
 {
@@ -468,3 +470,4 @@ void aes_ctr_perf_test(void)
 	printf("ctr 256: %f cycles per byte\n", (double)tock/8192.0);
 
 }
+#endif
