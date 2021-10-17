@@ -11,7 +11,7 @@
 .global CM3_1T_AES_keyschedule_dec_noTe
 .type   CM3_1T_AES_keyschedule_dec_noTe,%function
 CM3_1T_AES_keyschedule_dec_noTe:
-#if __ARM_ARCH_7M__
+#if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
 	push {r4-r5, lr}
 
 	//first and last block are ommited

@@ -10,7 +10,7 @@
 .global CM3_1T_AES_CTR_enc
 .type   CM3_1T_AES_CTR_enc,%function
 CM3_1T_AES_CTR_enc:
-#if __ARM_ARCH_7M__
+#if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
 	mov r12, r0
 	//use this value to reload context pointer before next block encryption
 	adds r0, #64 // p+4*4*4

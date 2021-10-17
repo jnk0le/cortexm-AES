@@ -10,7 +10,7 @@
 .global CM3_sBOX_AES_128_keyschedule_enc
 .type   CM3_sBOX_AES_128_keyschedule_enc,%function
 CM3_sBOX_AES_128_keyschedule_enc:
-#if __ARM_ARCH_7M__
+#if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
 	push {r4-r8, lr}
 
 	movw r14, #:lower16:AES_sbox

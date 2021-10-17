@@ -9,7 +9,7 @@
 .global CM3_1T_AES_128_decrypt_unrolled
 .type   CM3_1T_AES_128_decrypt_unrolled,%function
 CM3_1T_AES_128_decrypt_unrolled:
-#if __ARM_ARCH_7M__
+#if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
 	push {r2, r4-r11, lr} //stack output pointer
 
 	add r12, r0, #160 // 10 rounds * 16

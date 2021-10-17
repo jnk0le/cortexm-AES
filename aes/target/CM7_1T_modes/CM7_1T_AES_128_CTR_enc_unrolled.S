@@ -18,7 +18,7 @@
 .global CM7_1T_AES_128_CTR_enc_unrolled
 .type   CM7_1T_AES_128_CTR_enc_unrolled,%function
 CM7_1T_AES_128_CTR_enc_unrolled:
-#if __ARM_ARCH_7M__
+#if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
 	pld [r0, #0] // dead cycle anyway, preload anything, cacheline is 32 bytes
 	add r3, r1, r3, lsl #4 // in_p + cnt*16
 

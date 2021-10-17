@@ -10,7 +10,7 @@
 .global CM7_1T_AES_decrypt
 .type   CM7_1T_AES_decrypt,%function
 CM7_1T_AES_decrypt:
-#if __ARM_ARCH_7M__
+#if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
 	pld [r1, #0] // dead cycle anyway, preload in case data is still in external mem, cacheline is 32 bytes
 	adds r0, #16 //to compare against before final round
 

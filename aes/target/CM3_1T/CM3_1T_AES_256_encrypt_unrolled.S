@@ -7,7 +7,7 @@
 .global CM3_1T_AES_256_encrypt_unrolled
 .type   CM3_1T_AES_256_encrypt_unrolled,%function
 CM3_1T_AES_256_encrypt_unrolled:
-#if __ARM_ARCH_7M__
+#if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
 	push {r2,r4-r11,lr} // stack output pointer
 
 	mov.w r12, r0  // align following code to 4 bytes

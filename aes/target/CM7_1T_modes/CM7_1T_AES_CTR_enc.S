@@ -16,7 +16,7 @@
 .global CM7_1T_AES_CTR_enc
 .type   CM7_1T_AES_CTR_enc,%function
 CM7_1T_AES_CTR_enc:
-#if __ARM_ARCH_7M__
+#if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
 	ldr r12, [sp]
 	str lr, [sp, #-4]! // use dead cycles for pushing
 

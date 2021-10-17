@@ -10,7 +10,7 @@
 .global CM3_sBOX_AES_256_keyschedule_enc
 .type   CM4_sBOX_AES_256_keyschedule_enc,%function
 CM3_sBOX_AES_256_keyschedule_enc:
-#if __ARM_ARCH_7M__
+#if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
 	push {r4-r11, lr}
 
 	//load key
