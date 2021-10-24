@@ -276,7 +276,7 @@ CM0_sBOX_AES_encrypt:
 	// r6 - s02`| s13`| s20`| s31`
 	// r7 - s03`| s10`| s21`| s32`
 
-	mov r4, r3 // fix later in mixcolums // 10-14 cycles due to this mov
+	//mov r4, r3 // position fixed later in mixcolums
 
 	// do mix columns as
 	// tmp = s0 ^ s1 ^ s2 ^ s3
@@ -285,36 +285,36 @@ CM0_sBOX_AES_encrypt:
 	// s2` ^= tmp ^ gmul2(s2^s3) // s0^s1^s3^gmul2(s2^s3)
 	// S3` ^= tmp ^ gmul2(s3^s0) // s0^s1^s2^gmul2(s3^s0)
 
-	//use approach with 1 more xor instead of rotation
+	// use approach with 1 more xor instead of rotation
 
 	mov r0, r10 // 0x80808080
 	mov r1, r11 // 0x1b1b1b1b
 
-	// 2 registers + 1 in/out are free
+	// 2 registers + 1 in/out are free // column 0 comes in r3 insteadof r4, need to correct it's position before mul
 
 	//col 0
-	lsrs r2, r4, #8
-	lsls r3, r4, #24
-	orrs r2, r3
+	lsrs r2, r3, #8
+	lsls r4, r3, #24
+	orrs r2, r4
 
-	eors r2, r4 // s0^s1 | s1^s2 | s2^s3 | s3^s0
+	eors r2, r3 // s0^s1 | s1^s2 | s2^s3 | s3^s0
 
-	rev16 r3, r2 //ror #16
-	rev r3, r3 //ror #16
+	rev16 r4, r2 //ror #16
+	rev r4, r4 //ror #16
 
-	eors r3, r2 // s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
+	eors r4, r2 // s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
 	eors r4, r3 // s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
 
 	//now mult r2 and eors it into r4 // r3 free
 
-	/* use quad multiplication according to:
+	/* do quad multiplication according to:
 
 	// mask = in & 0x80808080;
 	// out = ((in & 0x7f7f7f7f) << 1) ^ ((mask - (mask >> 7)) & 0x1b1b1b1b);
 
 	instead of xoring to each other, xor left part into output and free up register for mask subtraction (same perf)
 
-	(in & 0x7f7f7f7f) - can be gotten in 2 ways - bics from 0x7f7f7f7f or xor with `mask`
+	(in & 0x7f7f7f7f) - can be gotten in 2 ways - bics from 0x80808080 or xor with `mask`
 	*/
 
 	mov r3, r2
@@ -404,11 +404,11 @@ CM0_sBOX_AES_encrypt:
 	bics r2, r0 // can also eors r3
 	lsls r2, r2, #1
 
-	eors r7, r2 // unreduced
+	eors r7, r2 // unreduced, do predicated reduction separately
 
 	lsrs r2, r3, #7 // pressuring part
 	subs r3, r2
-	ands r3, r1 // do predicated reduction
+	ands r3, r1
 
 	eors r7, r3 // reduce the unreduced
 
@@ -426,7 +426,7 @@ CM0_sBOX_AES_encrypt:
 	beq 2f // if rk reached final condition
 	b 1b // out of range for conditional branch
 
-2:  //final round
+2:	//final round
 	mov r0, r9 // get sbox
 
 	//r1,r2,r3 are free //saved 2 cycles on rev 16// lost 2 cycles on sbox pressured out // maybe try it more straightforward
@@ -530,7 +530,7 @@ CM0_sBOX_AES_encrypt:
 	// r6 - s02 | s12 |  -  |  -
 	// r7 - s03`|     | s21`| s32`
 
-	//give up on rev16 // column 0 goes into r3 // correct later in mixcolumns??
+	//give up on rev16 // column 0 goes into r3
 
 	uxtb r3, r4
 	ldrb r3, [r0, r3]
@@ -603,7 +603,7 @@ CM0_sBOX_AES_encrypt:
 
 	orrs r5, r0
 
-	// r0 -     |     |     |
+	// r0 -
 	// r1 - sbox
 	// r2 - s13 |  -  |  -  |  -
 	// r3 - s00`| s11`| s22`| s33`
@@ -645,25 +645,25 @@ CM0_sBOX_AES_encrypt:
 	// r6 - s02`| s13`| s20`| s31`
 	// r7 - s03`| s10`| s21`| s32`
 
-	mov r4, r3 // fix later in epilogue // 10-14 cycles due to this mov
+	//mov r4, r3 // positioning fixed in epilogue
 
 	//final addroundkey
 	mov r0, r14 // get current rk
 
-	ldm r0, {r0-r3}
-	eors r4, r0
+	ldm r0, {r0-r2, r4}
+	eors r3, r0
 	eors r5, r1
 	eors r6, r2
-	eors r7, r3
+	eors r7, r4
 
-	pop {r0-r3} // pop to non data
+	pop {r0-r2, r4} // pop to non data
 	mov r8, r0
 	mov r9, r1
 	mov r10, r2
-	mov r11, r3
+	mov r11, r4
 
 	pop {r0} // unstack out pointer
-	stmia r0!, {r4-r7}
+	stmia r0!, {r3,r5-r7}
 
 	pop {r4-r7, pc}
 
