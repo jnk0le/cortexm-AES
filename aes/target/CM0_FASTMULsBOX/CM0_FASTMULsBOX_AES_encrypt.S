@@ -1,11 +1,11 @@
 /*!
- * \file CM0_sBOX_AES_encrypt.S
- * \brief
+ * \file CM0_FASTMULsBOX_AES_encrypt.S
+ * \brief faster than standard version, only when running on core with 1 cycle multiplier
  *
  *
  * \author jnk0le <jnk0le@hotmail.com>
  * \copyright MIT License
- * \date 24 oct 2021
+ * \date 25 oct 2021
  */
 
 .syntax unified
@@ -13,27 +13,26 @@
 .text
 
 .align 2
-// void CM0_sBOX_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
-.global CM0_sBOX_AES_encrypt
-.type   CM0_sBOX_AES_encrypt,%function
+// void CM0_FASTMULsBOX_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
+.global CM0_FASTMULsBOX_AES_encrypt
+.type   CM0_FASTMULsBOX_AES_encrypt,%function
 	nop // align loop entry
-CM0_sBOX_AES_encrypt:
+CM0_FASTMULsBOX_AES_encrypt:
 	push {r2, r4-r7, lr} // stack out ptr (faster than pressure on upper regs)
 	mov r4, r8
 	mov r5, r9
 	mov r6, r10
-	mov r7, r11
-	push {r4-r7}
+	push {r4-r6}
 
 	//rk incrementer
 	movs r4, #16
 	mov r8, r4
 
-	adr r2, aes_enc_constants
-	ldmia r2!, {r5,r6,r7}
+	ldr r5, =AES_sbox
 	mov r9, r5 // AES_sbox
+
+	ldr r6, =0x80808080
 	mov r10, r6 // 0x80808080
-	mov r11, r7 // 0x1b1b1b1b
 
 	//rk_end-16 = rk + rounds * 16
 	lsls r3, r3, #4
@@ -53,7 +52,7 @@ CM0_sBOX_AES_encrypt:
 	// r8 - increment constant
 	// r9 - sbox
 	// r10 - 0x80808080
-	// r11 - 0x1b1b1b1b
+	// r11 - x
 	// r12 - final ptr
 	// r14 - current ptr
 
@@ -288,7 +287,7 @@ CM0_sBOX_AES_encrypt:
 	// use approach with 1 more xor instead of rotation
 
 	mov r0, r10 // 0x80808080
-	mov r1, r11 // 0x1b1b1b1b
+	movs r1, #0x1b
 
 	// 2 registers + 1 in/out are free // column 0 comes in r3 insteadof r4, need to correct it's position before mul
 
@@ -308,12 +307,9 @@ CM0_sBOX_AES_encrypt:
 	//now mult r2 and eors it into r4 // r3 free
 
 	/* do quad multiplication according to:
-	// mask = in & 0x80808080;
-	// out = ((in & 0x7f7f7f7f) << 1) ^ ((mask - (mask >> 7)) & 0x1b1b1b1b);
+	// out = ((in & 0x7f7f7f7f) << 1) ^ (((in & 0x80808080) >> 7)) * 0x1b);
 
-	instead of xoring to each other, xor left part into output and free up register for mask subtraction (same perf)
-
-	(in & 0x7f7f7f7f) - can be gotten in 2 ways - bics from 0x80808080 or xor with `mask`
+	(in & 0x7f7f7f7f) - can be gotten in 2 ways - bics from 0x80808080 or xor with `mask` (in & 0x80808080)
 	*/
 
 	mov r3, r2
@@ -322,13 +318,11 @@ CM0_sBOX_AES_encrypt:
 	bics r2, r0 // can also eors r3
 	lsls r2, r2, #1
 
-	eors r4, r2 // unreduced
+	lsrs r3, r3, #7
+	muls r3, r1 // get predicated reduction
 
-	lsrs r2, r3, #7 // pressuring part
-	subs r3, r2
-	ands r3, r1 // get predicated reduction
-
-	eors r4, r3 // reduce the unreduced
+	eors r2, r3 // reduce
+	eors r4, r2 // final
 
 	//col 1
 	lsrs r2, r5, #8
@@ -349,13 +343,11 @@ CM0_sBOX_AES_encrypt:
 	bics r2, r0 // can also eors r3
 	lsls r2, r2, #1
 
-	eors r5, r2 // unreduced
+	lsrs r3, r3, #7
+	muls r3, r1 // get predicated reduction
 
-	lsrs r2, r3, #7 // pressuring part
-	subs r3, r2
-	ands r3, r1 // do predicated reduction
-
-	eors r5, r3 // reduce the unreduced
+	eors r2, r3 // reduce
+	eors r5, r2 // final
 
 	//col 2
 	lsrs r2, r6, #8
@@ -376,13 +368,11 @@ CM0_sBOX_AES_encrypt:
 	bics r2, r0 // can also eors r3
 	lsls r2, r2, #1
 
-	eors r6, r2 // unreduced
+	lsrs r3, r3, #7
+	muls r3, r1 // get predicated reduction
 
-	lsrs r2, r3, #7 // pressuring part
-	subs r3, r2
-	ands r3, r1 // do predicated reduction
-
-	eors r6, r3 // reduce the unreduced
+	eors r2, r3 // reduce
+	eors r6, r2 // final
 
 	//col 3
 	lsrs r2, r7, #8
@@ -403,13 +393,11 @@ CM0_sBOX_AES_encrypt:
 	bics r2, r0 // can also eors r3
 	lsls r2, r2, #1
 
-	eors r7, r2 // unreduced, do predicated reduction separately
+	lsrs r3, r3, #7
+	muls r3, r1 // get predicated reduction
 
-	lsrs r2, r3, #7 // pressuring part
-	subs r3, r2
-	ands r3, r1
-
-	eors r7, r3 // reduce the unreduced
+	eors r2, r3 // reduce
+	eors r7, r2 // final
 
 	//addroundkey
 	mov r0, r14 // get current rk
@@ -655,19 +643,12 @@ CM0_sBOX_AES_encrypt:
 	eors r6, r2
 	eors r7, r4
 
-	pop {r0-r2, r4} // pop to non data
+	pop {r0-r2} // pop to non data
 	mov r8, r0
 	mov r9, r1
 	mov r10, r2
-	mov r11, r4
 
 	pop {r0} // unstack out pointer
 	stmia r0!, {r3,r5-r7}
 
 	pop {r4-r7, pc}
-
-.align 2
-aes_enc_constants:
-	.long AES_sbox
-	.long 0x80808080
-	.long 0x1b1b1b1b
