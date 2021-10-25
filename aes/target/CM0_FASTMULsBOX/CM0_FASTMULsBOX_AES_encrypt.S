@@ -16,7 +16,6 @@
 // void CM0_FASTMULsBOX_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
 .global CM0_FASTMULsBOX_AES_encrypt
 .type   CM0_FASTMULsBOX_AES_encrypt,%function
-	nop // align loop entry
 CM0_FASTMULsBOX_AES_encrypt:
 	push {r2, r4-r7, lr} // stack out ptr (faster than pressure on upper regs)
 	mov r4, r8
@@ -56,8 +55,9 @@ CM0_FASTMULsBOX_AES_encrypt:
 	// r12 - final ptr
 	// r14 - current ptr
 
+	mov r0, r9 // get sbox here to align loop entry, next getter is at the end of loop
+
 1:	//shiftrows and subbytes
-	mov r0, r9 // get sbox
 
 	//r1,r2,r3 are free //saved 2 cycles on rev 16// lost 2 cycles on sbox pressured out + 1 unoptimized mov // maybe try it more straightforward
 	//columns are kept as little endian so right/left in shifts is in reverse wrt transposed canonical state representation
@@ -409,12 +409,13 @@ CM0_FASTMULsBOX_AES_encrypt:
 	eors r6, r2
 	eors r7, r3
 
+	mov r0, r9 // get sbox for next round or final round
+
 	cmp r14, r12
 	beq 2f // if rk reached final condition
 	b 1b // out of range for conditional branch
 
 2:	//final round
-	mov r0, r9 // get sbox
 
 	//r1,r2,r3 are free //saved 2 cycles on rev 16// lost 2 cycles on sbox pressured out // maybe try it more straightforward
 	//columns are kept as little endian so right/left in shifts is in reverse wrt transposed canonical state representation
