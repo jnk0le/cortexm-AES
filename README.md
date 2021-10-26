@@ -16,19 +16,37 @@ current unit test code (and its placement) is bogus (may need to be excluded)
 No cmake yet.
 
 ## notes
-- Do not use ECB cipher mode for anything more than 16 bytes of plaintext data per key.
+- Do not use ECB cipher mode for any serious encryption.
 - Do not blindly trust in timming constantness of LUT based ciphers since it depends on many factors that are 
-unknown or just implementation defined like section placement or pipeline suprises (you need to verify it, especially before use in production).
+unknown or just implementation defined like section placement or pipeline suprises (you need to verify it, especially where is `.data` 
+section).
 - LUT tables have to be placed in deterministic memory section, usally TCMs and non-waitstated SRAMs (by default it lands in .data section)
+- FLASH memory is unsafe even on simplest cortex m0(+) as there might be a prefetcher with a few entry cache (like stm32l1)
 - None of the currently available implementations protects against power/EMI analysis attacks.
 - do not use cortex-m3 and cortex-m4 implementations on cortex-m7 since it is slower and will introduce timming leaks.
 - Unrolled ciphers might perform slower than looped versions due to (usually LRU) cache pressure and flash waitstates. (like STM32F4 with 1K ART cache and up to 8WS)
 - input/output buffers might have to be word aligned due to use of ldm,stm,ldrd and strd instructions.
-- for optimization gimmicks refer to [pipeline cycle test repo](https://github.com/jnk0le/random/tree/master/pipeline%20cycle%20test) (ignore comments insidie code here - they are likely outdated)
+- for optimization gimmicks refer to [pipeline cycle test repo](https://github.com/jnk0le/random/tree/master/pipeline%20cycle%20test) (ignore old comments inside code here - they are likely outdated)
 - included unit tests don't cover timming leaks (performance difference on different runs may not be a data dependent ones)  
 - asm functions (and CM*.h headers) can be extracted and used as C only code, but that may require extra boilerplate code (structures etc.)
 
 ## implementations
+
+### CM0_sBOX
+
+192,256 bit keyschedules and decryption are not ready yet
+
+1668 cycles per block encryption on 0ws cortex-m0
+
+
+### CM0_FASTMULsBOX
+
+Faster than CM0sBOX only when running on core with single cycle multiplier (used for predicated reduction in mixcolumns multiplication)
+
+192,256 bit keyschedules and decryption are not ready yet
+
+1626 cycles per block encryption on 0ws cortex-m0
+
 
 ### CM3_1T
 
