@@ -21,7 +21,7 @@ No cmake yet.
 unknown or just implementation defined like section placement or pipeline suprises (you need to verify it, especially where is `.data` 
 section).
 - LUT tables have to be placed in deterministic memory section, usally TCMs and non-waitstated SRAMs (by default it lands in .data section)
-- FLASH memory is unsafe even on simplest cortex m0(+) as there might be a prefetcher with a few entry cache (like stm32l1)
+- FLASH memory is unsafe even on simplest cortex m0(+) as there might be a prefetcher with a few entry cache (like stm32l0)
 - None of the currently available implementations protects against power/EMI analysis attacks.
 - do not use cortex-m3 and cortex-m4 implementations on cortex-m7 since it is slower and will introduce timming leaks.
 - Unrolled ciphers might perform slower than looped versions due to (usually LRU) cache pressure and flash waitstates. (like STM32F4 with 1K ART cache and up to 8WS)
