@@ -59,8 +59,8 @@ CM0_sBOX_AES_128_keyschedule_enc:
 	stmia r0!, {r4-r7} // write roundkey
 
 	lsls r1, #1 // next rcon
-	cmp r1, #0xff
-	blo 2f // or bls on 0x80
+	cmp r1, #0x80
+	bls 2f
 	movs r1, #0x1b
 2:	cmp r1, #0x6c // final condition
 	bne 1b

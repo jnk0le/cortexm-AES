@@ -56,7 +56,7 @@ namespace target
 
 		protected:
 			static constexpr size_t key_rounds = (key_length == 128) ? 10 : ((key_length == 192) ? 12 : 14);
-			static_assert(key_length == 128, "only 128 bit encryption at the moment");
+			static_assert(key_length == 128 || key_length == 192 , "only 128/192 bit encryption at the moment");
 		};
 
 	template<size_t key_length>
@@ -93,7 +93,7 @@ namespace target
 
 		protected:
 			static constexpr size_t key_rounds = (key_length == 128) ? 10 : ((key_length == 192) ? 12 : 14);
-			static_assert(key_length == 128, "only 128 bit encryption at the moment");
+			static_assert(key_length == 128 || key_length == 192, "only 128/192 bit encryption at the moment");
 		};
 
 	template<size_t key_length>

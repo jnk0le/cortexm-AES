@@ -203,7 +203,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 	// r6 - s02 | s12 |  -  |  -
 	// r7 - s03`| s10`| s21`| s32`
 
-	lsrs r0, r5, #24 // to high pressure
+	lsrs r0, r5, #24 // too high pressure
 
 	uxtb r5, r5
 	add r5, r9 // add sbox base
@@ -561,7 +561,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 	// r6 - s02 | s12 |  -  |  -
 	// r7 - s03`| s10`| s21`| s32`
 
-	lsrs r0, r5, #24 // to high pressure
+	lsrs r0, r5, #24 // too high pressure
 
 	uxtb r5, r5
 	add r5, r9 // add sbox base

@@ -34,18 +34,18 @@ section).
 
 ### CM0_sBOX
 
-192,256 bit keyschedules and decryption are not ready yet
+256 bit keyschedule and decryption are not ready yet
 
-1668 cycles per block encryption on 0ws cortex-m0
+1668 cycles per block encryption (128bit) on 0ws cortex-m0
 
 
 ### CM0_FASTMULsBOX
 
 Faster than CM0sBOX only when running on core with single cycle multiplier (used for predicated reduction in mixcolumns multiplication)
 
-192,256 bit keyschedules and decryption are not ready yet
+256 bit keyschedule and decryption are not ready yet
 
-1626 cycles per block encryption on 0ws cortex-m0
+1626 cycles per block encryption (128bit) on 0ws cortex-m0
 
 
 ### CM3_1T
