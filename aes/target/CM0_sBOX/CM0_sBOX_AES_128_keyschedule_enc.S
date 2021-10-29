@@ -52,6 +52,7 @@ CM0_sBOX_AES_128_keyschedule_enc:
 	eors r4, r3
 
 	eors r4, r1 // apply rcon
+
 	eors r5, r4
 	eors r6, r5
 	eors r7, r6
