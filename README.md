@@ -36,7 +36,7 @@ section).
 
 256 bit keyschedule and decryption are not ready yet
 
-1668 cycles per block encryption (128bit) on 0ws cortex-m0
+1666 cycles per block encryption (128bit) on 0ws cortex-m0
 
 
 ### CM0_FASTMULsBOX
@@ -45,7 +45,7 @@ Faster than CM0sBOX only when running on core with single cycle multiplier (used
 
 256 bit keyschedule and decryption are not ready yet
 
-1626 cycles per block encryption (128bit) on 0ws cortex-m0
+1624 cycles per block encryption (128bit) on 0ws cortex-m0
 
 
 ### CM3_1T
