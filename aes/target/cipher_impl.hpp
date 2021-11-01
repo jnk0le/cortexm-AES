@@ -50,8 +50,7 @@ namespace target
 			}
 
 			void decrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
-				while(1); // will be added later
-				//CM0_sBOX_AES_decrypt(rk, data_in, data_out, this->key_rounds);
+				CM0_sBOX_AES_decrypt(rk, data_in, data_out, this->key_rounds);
 			}
 
 		protected:
@@ -86,8 +85,7 @@ namespace target
 			}
 
 			void decrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
-				while(1); // will be added later
-				//CM0_FASTMULsBOX_AES_decrypt(rk, data_in, data_out, this->key_rounds);
+				CM0_sBOX_AES_decrypt(rk, data_in, data_out, this->key_rounds); // FASTMUL will be added later
 			}
 
 		protected:

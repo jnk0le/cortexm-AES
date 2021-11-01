@@ -59,7 +59,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 1:	//shiftrows and subbytes
 
-	//r1,r2,r3 are free //saved 2 cycles on rev 16// lost 2 cycles on sbox pressured out + 1 unoptimized mov // maybe try it more straightforward
+	//r1,r2,r3 are free //saved 2 cycles on rev 16// lost 2 cycles on sbox pressured out // maybe try it more straightforward
 	//columns are kept as little endian so right/left in shifts is in reverse wrt transposed canonical state representation
 
 	// r4 - s00 | s10 | s20 | s30
