@@ -34,7 +34,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 	mov r10, r6 // 0x80808080
 
 	//rk_end-16 = rk + rounds * 16
-	lsls r3, r3, #4
+	lsls r3, #4
 	adds r3, r0
 	mov r12, r3 // final ptr
 
@@ -75,7 +75,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 	lsrs r1, r7, #24
 	ldrb r1, [r0, r1]
-	lsls r1, r1, #24
+	lsls r1, #24
 
 	rev16 r3, r5
 
@@ -91,7 +91,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 	uxtb r2, r3
 	ldrb r2, [r0, r2]
-	lsls r2, r2, #8
+	lsls r2, #8
 
 	orrs r1, r2
 
@@ -109,7 +109,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 	// r6 - s02 | s12 | s22 | s32
 	// r7 - s03`|     |     |
 
-	lsrs r3, r3, #24
+	lsrs r3, #24
 	ldrb r3, [r0, r3]
 	lsls r3, #16
 
@@ -127,7 +127,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 	lsrs r3, r6, #24
 	ldrb r3, [r0, r3]
-	lsls r3, r3, #24
+	lsls r3, #24
 
 	orrs r7, r3
 
@@ -146,7 +146,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 	lsrs r3, r6, #16
 	uxtb r3, r3
 	ldrb r3, [r0, r3]
-	lsls r3, r3, #16
+	lsls r3, #16
 
 	orrs r1, r3
 
@@ -170,7 +170,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 	lsrs r1, r4, #8
 	uxtb r1, r1
 	ldrb r1, [r0, r1]
-	lsls r1, r1, #8
+	lsls r1, #8
 
 	orrs r7, r1
 
@@ -186,12 +186,12 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 	lsrs r1, r4, #24
 	ldrb r1, [r0, r1]
-	lsls r1, r1, #24
+	lsls r1, #24
 
-	lsrs r4, r4, #16
+	lsrs r4, #16
 	uxtb r4, r4
 	ldrb r4, [r0, r4]
-	lsls r4, r4, #16
+	lsls r4, #16
 
 	// r0 - sbox
 	// r1 -     |     |     | s30`
@@ -213,7 +213,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 	mov r1, r9 // get sbox back
 	ldrb r0, [r1, r0]
-	lsls r0, r0, #24
+	lsls r0, #24
 
 	// r0 -     |     |     | s31`
 	// r1 - sbox
@@ -229,7 +229,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 	lsrs r0, r2, #24
 	ldrb r0, [r1, r0]
-	lsls r0, r0, #16
+	lsls r0, #16
 
 	orrs r5, r0
 
@@ -245,12 +245,12 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 	uxtb r2, r2
 	ldrb r2, [r1, r2]
-	lsls r2, r2, #8
+	lsls r2, #8
 
 	lsrs r0, r6, #8
 	uxtb r0, r0
 	ldrb r0, [r1, r0]
-	lsls r0, r0, #8
+	lsls r0, #8
 
 	orrs r5, r0
 
@@ -316,9 +316,9 @@ CM0_FASTMULsBOX_AES_encrypt:
 	ands r3, r0 // mask
 
 	bics r2, r0 // can also eors r3
-	lsls r2, r2, #1
+	lsls r2, #1
 
-	lsrs r3, r3, #7
+	lsrs r3, #7
 	muls r3, r1 // get predicated reduction
 
 	eors r2, r3 // reduce
@@ -341,9 +341,9 @@ CM0_FASTMULsBOX_AES_encrypt:
 	ands r3, r0 //mask
 
 	bics r2, r0 // can also eors r3
-	lsls r2, r2, #1
+	lsls r2, #1
 
-	lsrs r3, r3, #7
+	lsrs r3, #7
 	muls r3, r1 // get predicated reduction
 
 	eors r2, r3 // reduce
@@ -366,9 +366,9 @@ CM0_FASTMULsBOX_AES_encrypt:
 	ands r3, r0 //mask
 
 	bics r2, r0 // can also eors r3
-	lsls r2, r2, #1
+	lsls r2, #1
 
-	lsrs r3, r3, #7
+	lsrs r3, #7
 	muls r3, r1 // get predicated reduction
 
 	eors r2, r3 // reduce
@@ -391,9 +391,9 @@ CM0_FASTMULsBOX_AES_encrypt:
 	ands r3, r0 //mask
 
 	bics r2, r0 // can also eors r3
-	lsls r2, r2, #1
+	lsls r2, #1
 
-	lsrs r3, r3, #7
+	lsrs r3, #7
 	muls r3, r1 // get predicated reduction
 
 	eors r2, r3 // reduce
@@ -433,7 +433,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 	lsrs r1, r7, #24
 	ldrb r1, [r0, r1]
-	lsls r1, r1, #24
+	lsls r1, #24
 
 	rev16 r3, r5
 
@@ -449,7 +449,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 	uxtb r2, r3
 	ldrb r2, [r0, r2]
-	lsls r2, r2, #8
+	lsls r2, #8
 
 	orrs r1, r2
 
@@ -467,7 +467,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 	// r6 - s02 | s12 | s22 | s32
 	// r7 - s03`|     |     |
 
-	lsrs r3, r3, #24
+	lsrs r3, #24
 	ldrb r3, [r0, r3]
 	lsls r3, #16
 
@@ -485,7 +485,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 	lsrs r3, r6, #24
 	ldrb r3, [r0, r3]
-	lsls r3, r3, #24
+	lsls r3, #24
 
 	orrs r7, r3
 
@@ -504,7 +504,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 	lsrs r3, r6, #16
 	uxtb r3, r3
 	ldrb r3, [r0, r3]
-	lsls r3, r3, #16
+	lsls r3, #16
 
 	orrs r1, r3
 
@@ -528,7 +528,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 	lsrs r1, r4, #8
 	uxtb r1, r1
 	ldrb r1, [r0, r1]
-	lsls r1, r1, #8
+	lsls r1, #8
 
 	orrs r7, r1
 
@@ -544,12 +544,12 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 	lsrs r1, r4, #24
 	ldrb r1, [r0, r1]
-	lsls r1, r1, #24
+	lsls r1, #24
 
-	lsrs r4, r4, #16
+	lsrs r4, #16
 	uxtb r4, r4
 	ldrb r4, [r0, r4]
-	lsls r4, r4, #16
+	lsls r4, #16
 
 	// r0 - sbox
 	// r1 -     |     |     | s30`
@@ -571,7 +571,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 	mov r1, r9 // get sbox back
 	ldrb r0, [r1, r0]
-	lsls r0, r0, #24
+	lsls r0, #24
 
 	// r0 -     |     |     | s31`
 	// r1 - sbox
@@ -587,7 +587,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 	lsrs r0, r2, #24
 	ldrb r0, [r1, r0]
-	lsls r0, r0, #16
+	lsls r0, #16
 
 	orrs r5, r0
 
@@ -603,12 +603,12 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 	uxtb r2, r2
 	ldrb r2, [r1, r2]
-	lsls r2, r2, #8
+	lsls r2, #8
 
 	lsrs r0, r6, #8
 	uxtb r0, r0
 	ldrb r0, [r1, r0]
-	lsls r0, r0, #8
+	lsls r0, #8
 
 	orrs r5, r0
 

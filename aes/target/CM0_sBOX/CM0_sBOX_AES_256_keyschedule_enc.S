@@ -28,7 +28,7 @@ CM0_sBOX_AES_256_keyschedule_enc:
 	stmia r0!, {r2-r5} // just copy a key
 
 	//swap out middle part due to pressure
-	//r2 r3 r4 r5 // part1
+	//r2 r8 r9 r5 // part1
 	//r3 r4 r6 r7 // part2
 
 	mov r8, r3

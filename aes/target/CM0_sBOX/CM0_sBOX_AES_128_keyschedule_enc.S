@@ -61,11 +61,10 @@ CM0_sBOX_AES_128_keyschedule_enc:
 
 	lsls r1, #1 // next rcon
 	cmp r1, #0x80
-	bls 2f
+	bls 2f // rcon is not secret
 	movs r1, #0x1b
 2:	cmp r1, #0x6c // final condition
 	bne 1b
 
 	pop {r4-r7}
 	bx lr
-
