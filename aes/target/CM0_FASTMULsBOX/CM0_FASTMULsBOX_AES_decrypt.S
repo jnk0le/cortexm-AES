@@ -1,11 +1,11 @@
 /*!
- * \file CM0_sBOX_AES_decrypt.S
+ * \file CM0_FASTMULsBOX_AES_decrypt.S
  * \brief
  *
  *
  * \author jnk0le <jnk0le@hotmail.com>
  * \copyright MIT License
- * \date 2 nov 2021
+ * \date 10 nov 2021
  */
 
 //key goes backward
@@ -15,22 +15,21 @@
 .text
 
 .align 2
-// void CM0_sBOX_AES_decrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
-.global CM0_sBOX_AES_decrypt
-.type   CM0_sBOX_AES_decrypt,%function
-CM0_sBOX_AES_decrypt:
+// void CM0_FASTMULsBOX_AES_decrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
+.global CM0_FASTMULsBOX_AES_decrypt
+.type   CM0_FASTMULsBOX_AES_decrypt,%function
+CM0_FASTMULsBOX_AES_decrypt:
 	push {r2, r4-r7, lr} // stack out ptr (faster than pressure on upper regs)
 	mov r4, r8
 	mov r5, r9
 	mov r6, r10
-	mov r7, r11
-	push {r4-r7}
+	push {r4-r6}
 
-	adr r2, aes_enc_constants
-	ldmia r2!, {r5,r6,r7}
-	mov r9, r5 // AES_inv_sbox
+	ldr r5, =AES_inv_sbox
+	mov r9, r5 // AES_sbox
+
+	ldr r6, =0x80808080
 	mov r10, r6 // 0x80808080
-	mov r11, r7 // 0x1b1b1b1b
 
 	movs r2, #16
 
@@ -58,7 +57,6 @@ CM0_sBOX_AES_decrypt:
 	// r8 - decrement constant
 	// r9 - inv_sbox
 	// r10 - 0x80808080
-	// r11 - 0x1b1b1b1b
 	// r12 - final ptr // rk+16
 	// r14 - current ptr
 
@@ -283,7 +281,7 @@ CM0_sBOX_AES_decrypt:
 
 	//col 0
 	mov r0, r10 // 0x80808080
-	mov r1, r11 // 0x1b1b1b1b
+	movs r1, 0x1b
 
 	//expand S{1} to S{2}, S{4}, S{8}
 
@@ -295,49 +293,44 @@ CM0_sBOX_AES_decrypt:
 	mov r2, r4
 	ands r2, r0 // mask
 
-	lsrs r3, r2, #7
-	subs r2, r3
-	ands r2, r1 // get predicated reduction
-
 	mov r3, r4 // need to preserve S{1}
 
-	bics r3, r0
+	bics r3, r0 // can also eors r2
 	lsls r3, #1
+
+	lsrs r2, #7
+	muls r2, r1  // get predicated reduction
 
 	eors r2, r3 // S{2}
 
-	mov r3, r2
-	ands r3, r0 // mask
+	ands r0, r2 // mask
 
-	lsrs r1, r3, #7
-	subs r3, r1
-	mov r1, r11 // get 0x1b1b1b1b back
-	ands r3, r1 // get predicated reduction
+	mov r3, r2 // need to preserve S{2}
 
-	mov r1, r2 // need to preserve S{2}
-	bics r1, r0
-	lsls r1, #1
+	eors r3, r0
+	lsls r3, #1
 
-	eors r3, r1 // S{4}
+	lsrs r0, #7
+	muls r0, r1 // get predicated reduction
 
-	ands r0, r3 // mask
-
-	lsrs r1, r0, #7
-	subs r0, r1
-	mov r1, r11 // get 0x1b1b1b1b back
-	ands r1, r0 // get predicated reduction
+	eors r3, r0 // S{4}
 
 	mov r0, r10 // get 0x80808080 back
-	mvns r0, r0 // can't use mask, can't bics into the input data
-	ands r0, r3
-	lsls r0, #1
+	ands r0, r3 // mask
+
+	lsrs r0, #7
+	muls r0, r1
+
+	mov r1, r10 // get 0x80808080 back
+	mvns r1, r1 // can't use mask, can't bics into the input data
+	ands r1, r3
+	lsls r1, #1
 	eors r1, r0 // S{8}
 
 	// r0 -
 	// r1 -	S{8}
 	// r2 - S{2}
 	// r3 - S{4}
-
 	// r4 - S{1}
 
 	eors r4, r1 // S{9}
@@ -368,47 +361,43 @@ CM0_sBOX_AES_decrypt:
 
 	//col 1
 	mov r0, r10 // 0x80808080
-	mov r1, r11 // 0x1b1b1b1b
+	movs r1, 0x1b
 
 	mov r2, r5
 	ands r2, r0 // mask
 
-	lsrs r3, r2, #7
-	subs r2, r3
-	ands r2, r1 // get predicated reduction
-
 	mov r3, r5 // need to preserve S{1}
 
-	bics r3, r0
+	bics r3, r0 // can also eors r2
 	lsls r3, #1
+
+	lsrs r2, #7
+	muls r2, r1  // get predicated reduction
 
 	eors r2, r3 // S{2}
 
-	mov r3, r2
-	ands r3, r0 // mask
+	ands r0, r2 // mask
 
-	lsrs r1, r3, #7
-	subs r3, r1
-	mov r1, r11 // get 0x1b1b1b1b back
-	ands r3, r1 // get predicated reduction
+	mov r3, r2 // need to preserve S{2}
 
-	mov r1, r2 // need to preserve S{2}
-	bics r1, r0
-	lsls r1, #1
+	eors r3, r0
+	lsls r3, #1
 
-	eors r3, r1 // S{4}
+	lsrs r0, #7
+	muls r0, r1 // get predicated reduction
 
-	ands r0, r3 // mask
-
-	lsrs r1, r0, #7
-	subs r0, r1
-	mov r1, r11 // get 0x1b1b1b1b back
-	ands r1, r0 // get predicated reduction
+	eors r3, r0 // S{4}
 
 	mov r0, r10 // get 0x80808080 back
-	mvns r0, r0 // can't use mask, can't bics into the input data
-	ands r0, r3
-	lsls r0, #1
+	ands r0, r3 // mask
+
+	lsrs r0, #7
+	muls r0, r1
+
+	mov r1, r10 // get 0x80808080 back
+	mvns r1, r1 // can't use mask, can't bics into the input data
+	ands r1, r3
+	lsls r1, #1
 	eors r1, r0 // S{8}
 
 	eors r5, r1 // S{9}
@@ -434,47 +423,43 @@ CM0_sBOX_AES_decrypt:
 
 	//col 2
 	mov r0, r10 // 0x80808080
-	mov r1, r11 // 0x1b1b1b1b
+	movs r1, 0x1b
 
 	mov r2, r6
 	ands r2, r0 // mask
 
-	lsrs r3, r2, #7
-	subs r2, r3
-	ands r2, r1 // get predicated reduction
-
 	mov r3, r6 // need to preserve S{1}
 
-	bics r3, r0
+	bics r3, r0 // can also eors r2
 	lsls r3, #1
+
+	lsrs r2, #7
+	muls r2, r1  // get predicated reduction
 
 	eors r2, r3 // S{2}
 
-	mov r3, r2
-	ands r3, r0 // mask
+	ands r0, r2 // mask
 
-	lsrs r1, r3, #7
-	subs r3, r1
-	mov r1, r11 // get 0x1b1b1b1b back
-	ands r3, r1 // get predicated reduction
+	mov r3, r2 // need to preserve S{2}
 
-	mov r1, r2 // need to preserve S{2}
-	bics r1, r0
-	lsls r1, #1
+	eors r3, r0
+	lsls r3, #1
 
-	eors r3, r1 // S{4}
+	lsrs r0, #7
+	muls r0, r1 // get predicated reduction
 
-	ands r0, r3 // mask
-
-	lsrs r1, r0, #7
-	subs r0, r1
-	mov r1, r11 // get 0x1b1b1b1b back
-	ands r1, r0 // get predicated reduction
+	eors r3, r0 // S{4}
 
 	mov r0, r10 // get 0x80808080 back
-	mvns r0, r0 // can't use mask, can't bics into the input data
-	ands r0, r3
-	lsls r0, #1
+	ands r0, r3 // mask
+
+	lsrs r0, #7
+	muls r0, r1
+
+	mov r1, r10 // get 0x80808080 back
+	mvns r1, r1 // can't use mask, can't bics into the input data
+	ands r1, r3
+	lsls r1, #1
 	eors r1, r0 // S{8}
 
 	eors r6, r1 // S{9}
@@ -500,47 +485,44 @@ CM0_sBOX_AES_decrypt:
 
 	//col 3
 	mov r0, r10 // 0x80808080
-	mov r1, r11 // 0x1b1b1b1b
+	mov r0, r10 // 0x80808080
+	movs r1, 0x1b
 
 	mov r2, r7
 	ands r2, r0 // mask
 
-	lsrs r3, r2, #7
-	subs r2, r3
-	ands r2, r1 // get predicated reduction
-
 	mov r3, r7 // need to preserve S{1}
 
-	bics r3, r0
+	bics r3, r0 // can also eors r2
 	lsls r3, #1
+
+	lsrs r2, #7
+	muls r2, r1  // get predicated reduction
 
 	eors r2, r3 // S{2}
 
-	mov r3, r2
-	ands r3, r0 // mask
+	ands r0, r2 // mask
 
-	lsrs r1, r3, #7
-	subs r3, r1
-	mov r1, r11 // get 0x1b1b1b1b back
-	ands r3, r1 // get predicated reduction
+	mov r3, r2 // need to preserve S{2}
 
-	mov r1, r2 // need to preserve S{2}
-	bics r1, r0
-	lsls r1, #1
+	eors r3, r0
+	lsls r3, #1
 
-	eors r3, r1 // S{4}
+	lsrs r0, #7
+	muls r0, r1 // get predicated reduction
 
-	ands r0, r3 // mask
-
-	lsrs r1, r0, #7
-	subs r0, r1
-	mov r1, r11 // get 0x1b1b1b1b back
-	ands r1, r0 // get predicated reduction
+	eors r3, r0 // S{4}
 
 	mov r0, r10 // get 0x80808080 back
-	mvns r0, r0 // can't use mask, can't bics into the input data
-	ands r0, r3
-	lsls r0, #1
+	ands r0, r3 // mask
+
+	lsrs r0, #7
+	muls r0, r1
+
+	mov r1, r10 // get 0x80808080 back
+	mvns r1, r1 // can't use mask, can't bics into the input data
+	ands r1, r3
+	lsls r1, #1
 	eors r1, r0 // S{8}
 
 	eors r7, r1 // S{9}
@@ -785,19 +767,12 @@ CM0_sBOX_AES_decrypt:
 	eors r6, r2
 	eors r7, r3
 
-	pop {r0-r3} // pop to non data
+	pop {r0-r2} // pop to non data
 	mov r8, r0
 	mov r9, r1
 	mov r10, r2
-	mov r11, r3
 
 	pop {r0} // unstack out pointer
 	stmia r0!, {r4-r7}
 
 	pop {r4-r7, pc}
-
-.align 2
-aes_enc_constants:
-	.long AES_inv_sbox
-	.long 0x80808080
-	.long 0x1b1b1b1b
