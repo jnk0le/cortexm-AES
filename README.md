@@ -43,9 +43,9 @@ section).
 
 Faster than CM0sBOX only when running on core with single cycle multiplier (used for predicated reduction in mixcolumns multiplication)
 
-1624 cycles per block encryption (128bit) on 0ws cortex-m0
+1623 cycles per block encryption (128bit) on 0ws cortex-m0
 
-2498 cycles per block decryption (128bit) on 0ws cortex-m0
+2497 cycles per block decryption (128bit) on 0ws cortex-m0
 
 
 ### CM3_1T

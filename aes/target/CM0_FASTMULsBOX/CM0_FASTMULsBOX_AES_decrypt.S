@@ -767,12 +767,11 @@ CM0_FASTMULsBOX_AES_decrypt:
 	eors r6, r2
 	eors r7, r3
 
-	pop {r0-r2} // pop to non data
+	pop {r0-r2, r3} // pop to non data // unstack also out pointer
 	mov r8, r0
 	mov r9, r1
 	mov r10, r2
 
-	pop {r0} // unstack out pointer
-	stmia r0!, {r4-r7}
+	stmia r3!, {r4-r7}
 
 	pop {r4-r7, pc}
