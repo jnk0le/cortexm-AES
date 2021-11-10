@@ -346,10 +346,10 @@ CM0_sBOX_AES_decrypt:
 	eors r2, r4 // S{b}
 	eors r3, r4 // S{d}
 
-	// S{9} - ror #24    -
+	// S{9} - ror #24
 	// S{b} - ror #8
 	// S{d} - ror #16
-	// S{e} - ror #0     -
+	// S{e} - ror #0
 
 	movs r0, #24
 	rors r4, r0
