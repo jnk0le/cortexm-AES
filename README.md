@@ -106,7 +106,7 @@ The timing effects of simultaneous access to DTCM memory by core and DMA/AHBS ar
 ### XXX_DSPsBOX
 
 Utilizes dsp instructions to perform constant time, quad (gf)multiplications in mixcolumns stage.
-MixCloums stage is parallelized according to [this paper](http://www.wseas.us/e-library/conferences/2009/moscow/AIC/AIC44.pdf), InvMixColums is done through more straightforward representation.
+MixCloums stage is parallelized according to [this](http://www.wseas.us/e-library/conferences/2009/moscow/AIC/AIC44.pdf) or [this](https://www.researchgate.net/publication/221002183_Efficient_AES_implementations_for_ARM_based_platforms) paper, InvMixColums is done through more straightforward representation.
 
 ## Base ciphers performance (in cycles per block)
 
