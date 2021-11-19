@@ -138,7 +138,7 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 
 ### XXX_1T_CTR
 
-Implements counter mode caching.
+Implements counter mode caching. Do not use if IV/counter is secret as it will lead to a timming leak of a single byte, every 256 aligned counter steps.
 
 ## Cipher modes performance (in cycles per byte)
 
