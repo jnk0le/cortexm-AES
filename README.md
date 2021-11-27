@@ -43,39 +43,40 @@ section).
 Faster than CM0sBOX only when running on core with single cycle multiplier (used for predicated reduction in mixcolumns multiplication)
 
 
-##### performance
-
-STM32F0 is cortex-m0 (prefetch enabled for 1ws)
-STM32L0 is cortex-m0+ (prefetch enabled for 1ws)
+#### performance
 
 | Cipher function  | STM32F0 (0ws/1ws) - CM0_sBOX | STM32F0 (0ws/1ws) - CM0_FASTMULsBOX | STM32L0 (0ws/1ws) - CM0_sBOX | STM32L0 (0ws/1ws) - CM0_FASTMULsBOX |
 |----------------------|---|---|---|---|
-| `setEncKey<128>` | 417 |  | 417 |  |
-| `setEncKey<192>` | 386 |  | 386 |  |
-| `setEncKey<256>` | 598 |  | 598 |  |
-| `encrypt<128>`    | 1666/ | 1623/ |  |  |
-| `encrypt<192>`    | 2000/ | 1949/ |  |  |
-| `encrypt<256>`    | 2334/ | 2275/ |  |  |
+| `setEncKey<128>` | 417/431 | 417/431 |  |  |
+| `setEncKey<192>` | 386/398 | 386/398 |  |  |
+| `setEncKey<256>` | 598/610 | 598/610 |  |  |
+| `encrypt<128>`    | 1666/1680 | 1623/1636 |  |  |
+| `encrypt<192>`    | 2000/2016 | 1949/1964 |  |  |
+| `encrypt<256>`    | 2334/2352 | 2275/2292 |  |  |
 | `setDecKey<128>` | 0 | 0 | 0 | 0 |
 | `setDecKey<192>` | 0 | 0 | 0 | 0 |
 | `setDecKey<256>` | 0 | 0 | 0 | 0 |
-| `decrypt<128>`    | 2675/ | 2497/ |  |  |
-| `decrypt<192>`    | 3231/ | 3015/ |  |  |
-| `decrypt<256>`    | 3787/ | 3533/ |  |  |
+| `decrypt<128>`    | 2675/2688 | 2497/2509 |  |  |
+| `decrypt<192>`    | 3231/3246 | 3015/3029 |  |  |
+| `decrypt<256>`    | 3787/3804 | 3533/3549 |  |  |
 
-##### specific function sizes
+STM32F0 is cortex-m0 (prefetch enabled for 1ws)
+
+STM32L0 is cortex-m0+ (prefetch enabled for 1ws)
+
+#### specific function sizes
+
+| Function | size in bytes | stack usage in bytes | notes |
+|----------|---------------|----------------------|-------| 
+| `CM0_sBOX_AES_128_keyschedule_enc` | 74 | | uses sbox table |
+| `CM0_sBOX_AES_192_keyschedule_enc` | 86 | | uses sbox table |
+| `CM0_sBOX_AES_256_keyschedule_enc` | 172 | | uses sbox table |
+| `CM0_sBOX_AES_encrypt` | 508 | | uses sbox table |
+| `CM0_sBOX_AES_decrypt` | 736 | | uses inv_sbox table |
+| `CM0_FASTMULsBOX_AES_encrypt` | 488 | | uses sbox table |
+| `CM0_FASTMULsBOX_AES_decrypt` | 688 | | uses inv_sbox table |
 
 sizes include pc-rel constants
-
-| Function | size in bytes | notes |
-|----------|---------------|-------| 
-| `CM0_sBOX_AES_128_keyschedule_enc` | 74 | uses sbox table |
-| `CM0_sBOX_AES_192_keyschedule_enc` | 86 | uses sbox table |
-| `CM0_sBOX_AES_256_keyschedule_enc` | 172 | uses sbox table |
-| `CM0_sBOX_AES_encrypt` | 508 | uses sbox table |
-| `CM0_sBOX_AES_decrypt` | 736 | uses inv_sbox table |
-| `CM0_FASTMULsBOX_AES_encrypt` | 488 | uses sbox table |
-| `CM0_FASTMULsBOX_AES_decrypt` | 688 | uses inv_sbox table |
 
 ### cortex-m3/m4
 
