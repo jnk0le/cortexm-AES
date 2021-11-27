@@ -66,17 +66,19 @@ STM32L0 is cortex-m0+ (prefetch enabled for 1ws)
 
 #### specific function sizes
 
-| Function | size in bytes | stack usage in bytes | notes |
-|----------|---------------|----------------------|-------| 
-| `CM0_sBOX_AES_128_keyschedule_enc` | 74 | | uses sbox table |
-| `CM0_sBOX_AES_192_keyschedule_enc` | 86 | | uses sbox table |
-| `CM0_sBOX_AES_256_keyschedule_enc` | 172 | | uses sbox table |
-| `CM0_sBOX_AES_encrypt` | 508 | | uses sbox table |
-| `CM0_sBOX_AES_decrypt` | 736 | | uses inv_sbox table |
-| `CM0_FASTMULsBOX_AES_encrypt` | 488 | | uses sbox table |
-| `CM0_FASTMULsBOX_AES_decrypt` | 688 | | uses inv_sbox table |
+| Function | code size in bytes | stack usage in bytes | notes |
+|----------|--------------------|----------------------|-------| 
+| `CM0_sBOX_AES_128_keyschedule_enc` | 74 | 16 | uses sbox table |
+| `CM0_sBOX_AES_192_keyschedule_enc` | 86 | 20(24) | uses sbox table |
+| `CM0_sBOX_AES_256_keyschedule_enc` | 172 | 28(32) | uses sbox table |
+| `CM0_sBOX_AES_encrypt` | 508 | 40 | uses sbox table |
+| `CM0_sBOX_AES_decrypt` | 736 | 40 | uses inv_sbox table |
+| `CM0_FASTMULsBOX_AES_encrypt` | 488 | 36(40) | uses sbox table |
+| `CM0_FASTMULsBOX_AES_decrypt` | 688 | 36(40) | uses inv_sbox table |
 
-sizes include pc-rel constants
+code sizes include pc-rel constants
+
+extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
 
 ### cortex-m3/m4
 
