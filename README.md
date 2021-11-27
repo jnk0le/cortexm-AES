@@ -21,7 +21,7 @@ No cmake yet.
 unknown or just implementation defined like section placement or pipeline suprises (you need to verify it, especially where is `.data` 
 section).
 - LUT tables have to be placed in deterministic memory section, usally TCMs and non-waitstated SRAMs (by default it lands in .data section)
-- FLASH memory is unsafe even on simplest cortex m0(+) as there might be a prefetcher with a few entry cache (like stm32l0)
+- FLASH memory is unsafe even on simplest cortex m0(+) as there might be a prefetcher with a few entry cache (like stm32f0/l0)
 - None of the currently available implementations protects against power/EMI analysis attacks.
 - do not use cortex-m3 and cortex-m4 implementations on cortex-m7 since it is slower and will introduce timming leaks.
 - Unrolled ciphers might perform slower than looped versions due to (usually LRU) cache pressure and flash waitstates. (like STM32F4 with 1K ART cache and up to 8WS)
@@ -30,22 +30,63 @@ section).
 - included unit tests don't cover timming leaks (performance difference on different runs may not be a data dependent ones)  
 - asm functions (and CM*.h headers) can be extracted and used as C only code, but that may require extra boilerplate code (structures etc.)
 
-## implementations
-
-### CM0_sBOX
-
-1666 cycles per block encryption (128bit) on 0ws cortex-m0
-
-2675 cycles per block decryption (128bit) on 0ws cortex-m0
+## base implementations
 
 
-### CM0_FASTMULsBOX
+### cortex-m0/m0+
+
+#### CM0_sBOX
+
+
+#### CM0_FASTMULsBOX
 
 Faster than CM0sBOX only when running on core with single cycle multiplier (used for predicated reduction in mixcolumns multiplication)
 
-1623 cycles per block encryption (128bit) on 0ws cortex-m0
 
-2497 cycles per block decryption (128bit) on 0ws cortex-m0
+##### performance
+
+STM32F0 is cortex-m0 (prefetch enabled for 1ws)
+STM32L0 is cortex-m0+ (prefetch enabled for 1ws)
+
+| Cipher function  | STM32F0 (0ws/1ws) - CM0_sBOX | STM32F0 (0ws/1ws) - CM0_FASTMULsBOX | STM32L0 (0ws/1ws) - CM0_sBOX | STM32L0 (0ws/1ws) - CM0_FASTMULsBOX |
+|----------------------|---|---|---|---|
+| `setEncKey<128>` | 417 |  | 417 |  |
+| `setEncKey<192>` | 386 |  | 386 |  |
+| `setEncKey<256>` | 598 |  | 598 |  |
+| `encrypt<128>`    | 1666/ | 1623/ |  |  |
+| `encrypt<192>`    | 2000/ | 1949/ |  |  |
+| `encrypt<256>`    | 2334/ | 2275/ |  |  |
+| `setDecKey<128>` | 0 | 0 | 0 | 0 |
+| `setDecKey<192>` | 0 | 0 | 0 | 0 |
+| `setDecKey<256>` | 0 | 0 | 0 | 0 |
+| `decrypt<128>`    | 2675/ | 2497/ |  |  |
+| `decrypt<192>`    | 3231/ | 3015/ |  |  |
+| `decrypt<256>`    | 3787/ | 3533/ |  |  |
+
+##### specific function sizes
+
+sizes include pc-rel constants
+
+| Function | size in bytes | notes |
+|----------|---------------|-------| 
+| `CM0_sBOX_AES_128_keyschedule_enc` | 74 | uses sbox table |
+| `CM0_sBOX_AES_192_keyschedule_enc` | 86 | uses sbox table |
+| `CM0_sBOX_AES_256_keyschedule_enc` | 172 | uses sbox table |
+| `CM0_sBOX_AES_encrypt` | 508 | uses sbox table |
+| `CM0_sBOX_AES_decrypt` | 736 | uses inv_sbox table |
+| `CM0_FASTMULsBOX_AES_encrypt` | 488 | uses sbox table |
+| `CM0_FASTMULsBOX_AES_decrypt` | 688 | uses inv_sbox table |
+
+### cortex-m3/m4
+
+TBD
+
+### cortex-m7
+
+TBD
+
+
+## (legacy) implementations
 
 
 ### CM3_1T
