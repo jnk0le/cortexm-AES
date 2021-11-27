@@ -89,7 +89,7 @@ TBD
 TBD
 
 
-## (legacy) implementations
+## implementations (legacy part - will be replaced later)
 
 
 ### CM3_1T
