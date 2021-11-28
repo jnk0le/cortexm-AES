@@ -155,8 +155,6 @@ CM0_sBOX_AES_decrypt:
 	// r6 - s02 |  -  | s22 | s32
 	// r7 - s03`| s12`| s21`| s30`
 
-	//ror16 from r4 ?
-
 	mov r1, r6 // free up s02
 
 	uxtb r6, r6
@@ -242,7 +240,7 @@ CM0_sBOX_AES_decrypt:
 	orrs r4, r3
 
 	// r0 - inv_sbox
-	// r1 - s10 |     |     | s20
+	// r1 - s10 |  -  |  -  | s20
 	// r2 -     |     | s23`| s32`
 	// r3 -
 
@@ -661,9 +659,6 @@ CM0_sBOX_AES_decrypt:
 	// r6 - s02 |  -  | s22 | s32
 	// r7 - s03`| s12`| s21`| s30`
 
-	// A :ror16 from r4 ?
-	// B :mov from r6 ?
-
 	mov r1, r6 // free up s02
 
 	uxtb r6, r6
@@ -749,7 +744,7 @@ CM0_sBOX_AES_decrypt:
 	orrs r4, r3
 
 	// r0 - inv_sbox
-	// r1 - s10 |     |     | s20
+	// r1 - s10 |  -  |  -  | s20
 	// r2 -     |     | s23`| s32`
 	// r3 -
 
