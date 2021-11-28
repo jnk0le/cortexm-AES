@@ -60,7 +60,7 @@ Faster than CM0sBOX only when running on core with single cycle multiplier (used
 | `decrypt<192>`    | 3231/3246 | 3015/3029 |  |  |
 | `decrypt<256>`    | 3787/3804 | 3533/3549 |  |  |
 
-STM32F0 is cortex-m0 (prefetch enabled for 1ws)
+STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% performance degradation)
 
 STM32L0 is cortex-m0+ (prefetch enabled for 1ws)
 
