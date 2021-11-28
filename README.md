@@ -42,37 +42,37 @@ Uses simple sbox with parallel mixcolumns
 Forward mixcolumns is done as (and according to [this](http://www.wseas.us/e-library/conferences/2009/moscow/AIC/AIC44.pdf) or [this](https://www.researchgate.net/publication/221002183_Efficient_AES_implementations_for_ARM_based_platforms) paper, can be done with 3 xor + 3 rotations or 4 xor + 2 rotations used here):
 
 ```
-	tmp = s0 ^ s1 ^ s2 ^ s3
-	s0` ^= tmp ^ gmul2(s0^s1) // s1^s2^s3^gmul2(s0^s1)
-	s1` ^= tmp ^ gmul2(s1^s2) // s0^s2^s3^gmul2(s1^s2)
-	s2` ^= tmp ^ gmul2(s2^s3) // s0^s1^s3^gmul2(s2^s3)
-	S3` ^= tmp ^ gmul2(s3^s0) // s0^s1^s2^gmul2(s3^s0)
+tmp = s0 ^ s1 ^ s2 ^ s3
+s0` ^= tmp ^ gmul2(s0^s1) // s1^s2^s3^gmul2(s0^s1)
+s1` ^= tmp ^ gmul2(s1^s2) // s0^s2^s3^gmul2(s1^s2)
+s2` ^= tmp ^ gmul2(s2^s3) // s0^s1^s3^gmul2(s2^s3)
+S3` ^= tmp ^ gmul2(s3^s0) // s0^s1^s2^gmul2(s3^s0)
 ```
 
 Inverse mixcolums is implemented as:
 
 ```
-	S{2} = gmul2(S{1})
-	S{4} = gmul2(S{2})
-	S{8} = gmul2(S{4})
+S{2} = gmul2(S{1})
+S{4} = gmul2(S{2})
+S{8} = gmul2(S{4})
 	
-	S{9} = S{8} ^ S{1}
-	S{b} = S{9} ^ S{2}
-	S{d} = S{9} ^ S{4}
-	S{e} = S{8} ^ S{4} ^ S{2}
+S{9} = S{8} ^ S{1}
+S{b} = S{9} ^ S{2}
+S{d} = S{9} ^ S{4}
+S{e} = S{8} ^ S{4} ^ S{2}
 	
-	out = S{e} ^ ror8(S{b}) ^ ror16(S{d}) ^ ror24(S{9})
+out = S{e} ^ ror8(S{b}) ^ ror16(S{d}) ^ ror24(S{9})
 	
-	out = s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
+out == s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
 ```
 
 `gmul2()` is implementend as:
 
 ```
-	mask = in & 0x80808080;
-	out = ((in & 0x7f7f7f7f) << 1) ^ ((mask - (mask >> 7)) & 0x1b1b1b1b);
+mask = in & 0x80808080;
+out = ((in & 0x7f7f7f7f) << 1) ^ ((mask - (mask >> 7)) & 0x1b1b1b1b);
 	
-	//(in & 0x7f7f7f7f) - is also equivalent to xor with `mask`
+//(in & 0x7f7f7f7f) - is also equivalent to xor with `mask`
 ```
 
 #### CM0_FASTMULsBOX
@@ -82,9 +82,9 @@ Faster than CM0sBOX only when running on core with single cycle multiplier (used
 Implemented similarly to CM0sBOX but with `gmul2()` implementend as:
 
 ```
-	out = ((in & 0x7f7f7f7f) << 1) ^ (((in & 0x80808080) >> 7)) * 0x1b);
+out = ((in & 0x7f7f7f7f) << 1) ^ (((in & 0x80808080) >> 7)) * 0x1b);
 	
-	//(in & 0x7f7f7f7f) - is also equivalent to xor with (in & 0x80808080)
+//(in & 0x7f7f7f7f) - is also equivalent to xor with (in & 0x80808080)
 ```
 
 #### performance
