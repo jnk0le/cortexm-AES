@@ -63,7 +63,7 @@ S{e} = S{8} ^ S{4} ^ S{2}
 	
 out = S{e} ^ ror8(S{b}) ^ ror16(S{d}) ^ ror24(S{9})
 	
-out == s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
+s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
 ```
 
 `gmul2()` is implementend as:
