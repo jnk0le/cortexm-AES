@@ -39,7 +39,7 @@ section).
 
 Uses simple sbox with parallel mixcolumns
 
-Forward mixcolumns is done as (and according to [this](http://www.wseas.us/e-library/conferences/2009/moscow/AIC/AIC44.pdf) or [this](https://www.researchgate.net/publication/221002183_Efficient_AES_implementations_for_ARM_based_platforms) paper, can be done with 3 xor + 3 rotations or 4 xor + 2 rotations used here):
+Forward mixcolumns is done as (and according to [this](http://www.wseas.us/e-library/conferences/2009/moscow/AIC/AIC44.pdf) or [this](https://www.researchgate.net/publication/221002183_Efficient_AES_implementations_for_ARM_based_platforms) paper, can be done with 3 xor + 3 rotations or 4 xor + 2 rotations as used here):
 
 ```
 tmp = s0 ^ s1 ^ s2 ^ s3
