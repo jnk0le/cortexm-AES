@@ -11,8 +11,6 @@ If repo is added as eclipse linked folder the root folder has to be added to ASM
 
 Includes also have to start from root (e.g. `#include <aes/cipher.hpp>`)
 
-current unit test code (and its placement) is bogus (may need to be excluded)
-
 No cmake yet.
 
 ## notes
