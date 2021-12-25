@@ -30,8 +30,8 @@ CM0_FASTMULsBOX_AES_encrypt:
 	ldr r5, =AES_sbox
 	mov r9, r5 // AES_sbox
 
-	ldr r6, =0x80808080
-	mov r10, r6 // 0x80808080
+	ldr r6, =0x01010101
+	mov r10, r6 // 0x01010101
 
 	//rk_end-16 = rk + rounds * 16
 	lsls r3, #4
@@ -50,7 +50,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 	// r8 - increment constant
 	// r9 - sbox
-	// r10 - 0x80808080
+	// r10 - 0x01010101
 	// r11 - x
 	// r12 - final ptr
 	// r14 - current ptr
@@ -286,7 +286,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 	// use approach with 1 more xor instead of rotation
 
-	mov r0, r10 // 0x80808080
+	mov r0, r10 // 0x01010101
 	movs r1, #0x1b
 
 	// 2 registers + 1 in/out are free // column 0 comes in r3 insteadof r4, need to correct it's position before mul
@@ -304,22 +304,21 @@ CM0_FASTMULsBOX_AES_encrypt:
 	eors r4, r2 // s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
 	eors r4, r3 // s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
 
-	//now mult r2 and eors it into r4 // r3 free
+	/*now mult r2 and eors it into r4 // r3 free
 
-	/* do quad multiplication according to:
+	do quad multiplication according to:
 	// out = ((in & 0x7f7f7f7f) << 1) ^ (((in & 0x80808080) >> 7)) * 0x1b);
 
-	(in & 0x7f7f7f7f) - can be gotten in 2 ways - bics from 0x80808080 or xor with `mask` (in & 0x80808080)
+	modified to perform shifts first to avoid one extra mov
+	// out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 	*/
 
-	mov r3, r2
+	lsrs r3, r2, #7
 	ands r3, r0 // mask
-
-	bics r2, r0 // can also eors r3
-	lsls r2, #1
-
-	lsrs r3, #7
 	muls r3, r1 // get predicated reduction
+
+	lsls r2, #1
+	bics r2, r0 // & 0xfe // can also eors with r3
 
 	eors r2, r3 // reduce
 	eors r4, r2 // final
@@ -337,14 +336,12 @@ CM0_FASTMULsBOX_AES_encrypt:
 	eors r3, r2 // s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
 	eors r5, r3 // s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
 
-	mov r3, r2
-	ands r3, r0 //mask
-
-	bics r2, r0 // can also eors r3
-	lsls r2, #1
-
-	lsrs r3, #7
+	lsrs r3, r2, #7
+	ands r3, r0 // mask
 	muls r3, r1 // get predicated reduction
+
+	lsls r2, #1
+	bics r2, r0 // & 0xfe // can also eors with r3
 
 	eors r2, r3 // reduce
 	eors r5, r2 // final
@@ -362,14 +359,12 @@ CM0_FASTMULsBOX_AES_encrypt:
 	eors r3, r2 // s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
 	eors r6, r3 // s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
 
-	mov r3, r2
-	ands r3, r0 //mask
-
-	bics r2, r0 // can also eors r3
-	lsls r2, #1
-
-	lsrs r3, #7
+	lsrs r3, r2, #7
+	ands r3, r0 // mask
 	muls r3, r1 // get predicated reduction
+
+	lsls r2, #1
+	bics r2, r0 // & 0xfe // can also eors with r3
 
 	eors r2, r3 // reduce
 	eors r6, r2 // final
@@ -387,14 +382,12 @@ CM0_FASTMULsBOX_AES_encrypt:
 	eors r3, r2 // s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
 	eors r7, r3 // s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
 
-	mov r3, r2
-	ands r3, r0 //mask
-
-	bics r2, r0 // can also eors r3
-	lsls r2, #1
-
-	lsrs r3, #7
+	lsrs r3, r2, #7
+	ands r3, r0 // mask
 	muls r3, r1 // get predicated reduction
+
+	lsls r2, #1
+	bics r2, r0 // & 0xfe // can also eors with r3
 
 	eors r2, r3 // reduce
 	eors r7, r2 // final
