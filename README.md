@@ -114,7 +114,7 @@ STM32L0 is cortex-m0+ (prefetch enabled for 1ws)
 | `CM0_FASTMULsBOX_AES_encrypt` | 480 | 36(40) | uses sbox table, requires single cycle multiplier |
 | `CM0_FASTMULsBOX_AES_decrypt` | 688 | 36(40) | uses inv_sbox table, requires single cycle multiplier |
 
-code sizes include pc-rel constants
+code sizes include pc-rel constants and their padding
 
 extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
 
