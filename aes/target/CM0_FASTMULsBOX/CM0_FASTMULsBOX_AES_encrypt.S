@@ -318,7 +318,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 	muls r3, r1 // get predicated reduction
 
 	lsls r2, #1
-	bics r2, r0 // & 0xfe // can also eors with r3
+	bics r2, r0 // & 0xfe
 
 	eors r2, r3 // reduce
 	eors r4, r2 // final

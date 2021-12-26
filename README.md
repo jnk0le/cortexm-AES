@@ -53,12 +53,12 @@ Inverse mixcolums is implemented as:
 S{2} = gmul2(S{1})
 S{4} = gmul2(S{2})
 S{8} = gmul2(S{4})
-	
+
 S{9} = S{8} ^ S{1}
 S{b} = S{9} ^ S{2}
 S{d} = S{9} ^ S{4}
 S{e} = S{8} ^ S{4} ^ S{2}
-	
+
 out = S{e} ^ ror8(S{b}) ^ ror16(S{d}) ^ ror24(S{9})
 	
 s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
@@ -79,6 +79,9 @@ Implemented similarly to CM0sBOX but with `gmul2()` implementend as:
 
 ```
 out = ((in & 0x7f7f7f7f) << 1) ^ (((in & 0x80808080) >> 7)) * 0x1b);
+
+// or modified sequence to perform shifts first in order to to avoid extra moves
+out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 ```
 
 #### performance
@@ -94,9 +97,9 @@ out = ((in & 0x7f7f7f7f) << 1) ^ (((in & 0x80808080) >> 7)) * 0x1b);
 | `setDecKey<128>` | 0 | 0 | 0 | 0 |
 | `setDecKey<192>` | 0 | 0 | 0 | 0 |
 | `setDecKey<256>` | 0 | 0 | 0 | 0 |
-| `decrypt<128>`    | 2675/2688 | 2497/2509 |  |  |
-| `decrypt<192>`    | 3231/3246 | 3015/3029 |  |  |
-| `decrypt<256>`    | 3787/3804 | 3533/3549 |  |  |
+| `decrypt<128>`    | 2675/2688 | 2387/2400 |  |  | 
+| `decrypt<192>`    | 3231/3246 | 2879/2894 |  |  | 
+| `decrypt<256>`    | 3787/3804 | 3371/3388 |  |  | 
 
 STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% performance degradation)
 
@@ -112,7 +115,7 @@ STM32L0 is cortex-m0+ (prefetch enabled for 1ws)
 | `CM0_sBOX_AES_encrypt` | 508 | 40 | uses sbox table |
 | `CM0_sBOX_AES_decrypt` | 736 | 40 | uses inv_sbox table |
 | `CM0_FASTMULsBOX_AES_encrypt` | 480 | 36(40) | uses sbox table, requires single cycle multiplier |
-| `CM0_FASTMULsBOX_AES_decrypt` | 688 | 36(40) | uses inv_sbox table, requires single cycle multiplier |
+| `CM0_FASTMULsBOX_AES_decrypt` | 672 | 40 | uses inv_sbox table, requires single cycle multiplier |
 
 code sizes include pc-rel constants and their padding
 

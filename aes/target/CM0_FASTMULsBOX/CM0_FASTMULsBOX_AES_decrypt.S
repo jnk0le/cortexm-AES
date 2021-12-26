@@ -23,13 +23,20 @@ CM0_FASTMULsBOX_AES_decrypt:
 	mov r4, r8
 	mov r5, r9
 	mov r6, r10
-	push {r4-r6}
+	mov r7, r11
+	push {r4-r7}
 
-	ldr r5, =AES_inv_sbox
+	/*ldr r5, =AES_inv_sbox
 	mov r9, r5 // AES_sbox
 
-	ldr r6, =0x80808080
-	mov r10, r6 // 0x80808080
+	ldr r6, =0x01010101
+	mov r10, r6 // 0x01010101*/
+
+	adr r2, aes_dec_constants
+	ldmia r2!, {r5,r6,r7}
+	mov r9, r5 // AES_inv_sbox
+	mov r10, r6 // 0x01010101
+	mov r11, r7 // 0x80808080
 
 	movs r2, #16
 
@@ -56,7 +63,8 @@ CM0_FASTMULsBOX_AES_decrypt:
 
 	// r8 - decrement constant
 	// r9 - inv_sbox
-	// r10 - 0x80808080
+	// r10 - 0x01010101
+	// r11 - x
 	// r12 - final ptr // rk+16
 	// r14 - current ptr
 
@@ -275,54 +283,54 @@ CM0_FASTMULsBOX_AES_decrypt:
 	eors r7, r3
 
 	//invmixcolums
-	//constants have to be vented on each column
+	//constants have to be vented on during column
 
 	//col 0
-	mov r0, r10 // 0x80808080
+	mov r0, r10 // 0x01010101
 	movs r1, 0x1b
 
 	//expand S{1} to S{2}, S{4}, S{8}
+	//all of them have to be preserved
 
 	/* do quad multiplication according to:
-	// mask = in & 0x80808080;
-	// out = ((in & 0x7f7f7f7f) << 1) ^ ((mask - (mask >> 7)) & 0x1b1b1b1b);
+	// out = ((in & 0x7f7f7f7f) << 1) ^ (((in & 0x80808080) >> 7)) * 0x1b);
+
+	some calculations are modified to perform shifts first to avoid extra moves
+	// out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 	*/
 
-	mov r2, r4
-	ands r2, r0 // mask
+	lsrs r3, r4, #7
+	ands r3, r0 // mask
+	muls r3, r1 // get predicated reduction
 
-	mov r3, r4 // need to preserve S{1}
-
-	bics r3, r0 // can also eors r2
-	lsls r3, #1
-
-	lsrs r2, #7
-	muls r2, r1  // get predicated reduction
+	lsls r2, r4, #1
+	bics r2, r0 // & 0xfe
 
 	eors r2, r3 // S{2}
 
+	lsls r3, r2, #1
+	bics r3, r0
+
+	mov r0, r11 // lsls r0, #7 // need 0x80808080 anyway
+
 	ands r0, r2 // mask
-
-	mov r3, r2 // need to preserve S{2}
-
-	eors r3, r0
-	lsls r3, #1
-
 	lsrs r0, #7
 	muls r0, r1 // get predicated reduction
 
 	eors r3, r0 // S{4}
 
-	mov r0, r10 // get 0x80808080 back
+	// need 0x80808080 due to register presure
+	mov r0, r11 // get 0x80808080
+
 	ands r0, r3 // mask
 
 	lsrs r0, #7
-	muls r0, r1
+	muls r1, r0 // get predicated reduction
 
-	mov r1, r10 // get 0x80808080 back
-	mvns r1, r1 // can't use mask, can't bics into the input data
-	ands r1, r3
-	lsls r1, #1
+	lsls r0, #7 // get mask bits into high pos
+
+	eors r0, r3 // equivalent to &0x7f
+	lsls r0, #1
 	eors r1, r0 // S{8}
 
 	// r0 -
@@ -358,44 +366,41 @@ CM0_FASTMULsBOX_AES_decrypt:
 	eors r4, r3// s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
 
 	//col 1
-	mov r0, r10 // 0x80808080
+	mov r0, r10 // 0x01010101
 	movs r1, 0x1b
 
-	mov r2, r5
-	ands r2, r0 // mask
+	lsrs r3, r5, #7
+	ands r3, r0 // mask
+	muls r3, r1 // get predicated reduction
 
-	mov r3, r5 // need to preserve S{1}
-
-	bics r3, r0 // can also eors r2
-	lsls r3, #1
-
-	lsrs r2, #7
-	muls r2, r1  // get predicated reduction
+	lsls r2, r5, #1
+	bics r2, r0 // & 0xfe
 
 	eors r2, r3 // S{2}
 
+	lsls r3, r2, #1
+	bics r3, r0
+
+	mov r0, r11 // lsls r0, #7 // need 0x80808080 anyway
+
 	ands r0, r2 // mask
-
-	mov r3, r2 // need to preserve S{2}
-
-	eors r3, r0
-	lsls r3, #1
-
 	lsrs r0, #7
 	muls r0, r1 // get predicated reduction
 
 	eors r3, r0 // S{4}
 
-	mov r0, r10 // get 0x80808080 back
+	// need 0x80808080 due to register presure
+	mov r0, r11 // get 0x80808080
+
 	ands r0, r3 // mask
 
 	lsrs r0, #7
-	muls r0, r1
+	muls r1, r0 // get predicated reduction
 
-	mov r1, r10 // get 0x80808080 back
-	mvns r1, r1 // can't use mask, can't bics into the input data
-	ands r1, r3
-	lsls r1, #1
+	lsls r0, #7 // get mask bits into high pos
+
+	eors r0, r3 // equivalent to &0x7f
+	lsls r0, #1
 	eors r1, r0 // S{8}
 
 	eors r5, r1 // S{9}
@@ -420,44 +425,41 @@ CM0_FASTMULsBOX_AES_decrypt:
 	eors r5, r3// s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
 
 	//col 2
-	mov r0, r10 // 0x80808080
+	mov r0, r10 // 0x01010101
 	movs r1, 0x1b
 
-	mov r2, r6
-	ands r2, r0 // mask
+	lsrs r3, r6, #7
+	ands r3, r0 // mask
+	muls r3, r1 // get predicated reduction
 
-	mov r3, r6 // need to preserve S{1}
-
-	bics r3, r0 // can also eors r2
-	lsls r3, #1
-
-	lsrs r2, #7
-	muls r2, r1  // get predicated reduction
+	lsls r2, r6, #1
+	bics r2, r0 // & 0xfe
 
 	eors r2, r3 // S{2}
 
+	lsls r3, r2, #1
+	bics r3, r0
+
+	mov r0, r11 // lsls r0, #7 // need 0x80808080 anyway
+
 	ands r0, r2 // mask
-
-	mov r3, r2 // need to preserve S{2}
-
-	eors r3, r0
-	lsls r3, #1
-
 	lsrs r0, #7
 	muls r0, r1 // get predicated reduction
 
 	eors r3, r0 // S{4}
 
-	mov r0, r10 // get 0x80808080 back
+	// need 0x80808080 due to register presure
+	mov r0, r11 // get 0x80808080
+
 	ands r0, r3 // mask
 
 	lsrs r0, #7
-	muls r0, r1
+	muls r1, r0 // get predicated reduction
 
-	mov r1, r10 // get 0x80808080 back
-	mvns r1, r1 // can't use mask, can't bics into the input data
-	ands r1, r3
-	lsls r1, #1
+	lsls r0, #7 // get mask bits into high pos
+
+	eors r0, r3 // equivalent to &0x7f
+	lsls r0, #1
 	eors r1, r0 // S{8}
 
 	eors r6, r1 // S{9}
@@ -482,45 +484,41 @@ CM0_FASTMULsBOX_AES_decrypt:
 	eors r6, r3// s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
 
 	//col 3
-	mov r0, r10 // 0x80808080
-	mov r0, r10 // 0x80808080
+	mov r0, r10 // 0x01010101
 	movs r1, 0x1b
 
-	mov r2, r7
-	ands r2, r0 // mask
+	lsrs r3, r7, #7
+	ands r3, r0 // mask
+	muls r3, r1 // get predicated reduction
 
-	mov r3, r7 // need to preserve S{1}
-
-	bics r3, r0 // can also eors r2
-	lsls r3, #1
-
-	lsrs r2, #7
-	muls r2, r1  // get predicated reduction
+	lsls r2, r7, #1
+	bics r2, r0 // & 0xfe
 
 	eors r2, r3 // S{2}
 
+	lsls r3, r2, #1
+	bics r3, r0
+
+	mov r0, r11 // lsls r0, #7 // need 0x80808080 anyway
+
 	ands r0, r2 // mask
-
-	mov r3, r2 // need to preserve S{2}
-
-	eors r3, r0
-	lsls r3, #1
-
 	lsrs r0, #7
 	muls r0, r1 // get predicated reduction
 
 	eors r3, r0 // S{4}
 
-	mov r0, r10 // get 0x80808080 back
+	// need 0x80808080 due to register presure
+	mov r0, r11 // get 0x80808080
+
 	ands r0, r3 // mask
 
 	lsrs r0, #7
-	muls r0, r1
+	muls r1, r0 // get predicated reduction
 
-	mov r1, r10 // get 0x80808080 back
-	mvns r1, r1 // can't use mask, can't bics into the input data
-	ands r1, r3
-	lsls r1, #1
+	lsls r0, #7 // get mask bits into high pos
+
+	eors r0, r3 // equivalent to &0x7f
+	lsls r0, #1
 	eors r1, r0 // S{8}
 
 	eors r7, r1 // S{9}
@@ -762,11 +760,21 @@ CM0_FASTMULsBOX_AES_decrypt:
 	eors r6, r2
 	eors r7, r3
 
-	pop {r0-r2, r3} // pop to non data // unstack also out pointer
+	//can't pop all at once
+	pop {r0-r1}
 	mov r8, r0
 	mov r9, r1
-	mov r10, r2
+
+	pop {r0-r1, r3} // pop to non data // unstack also out pointer
+	mov r10, r0
+	mov r11, r1
 
 	stmia r3!, {r4-r7}
 
 	pop {r4-r7, pc}
+
+.align 2
+aes_dec_constants:
+	.long AES_inv_sbox
+	.long 0x01010101
+	.long 0x80808080

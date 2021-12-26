@@ -26,7 +26,7 @@ CM0_sBOX_AES_decrypt:
 	mov r7, r11
 	push {r4-r7}
 
-	adr r2, aes_enc_constants
+	adr r2, aes_dec_constants
 	ldmia r2!, {r5,r6,r7}
 	mov r9, r5 // AES_inv_sbox
 	mov r10, r6 // 0x80808080
@@ -277,13 +277,14 @@ CM0_sBOX_AES_decrypt:
 	eors r7, r3
 
 	//invmixcolums
-	//constants have to be vented on each column
+	//constants have to be vented during each column
 
 	//col 0
 	mov r0, r10 // 0x80808080
 	mov r1, r11 // 0x1b1b1b1b
 
 	//expand S{1} to S{2}, S{4}, S{8}
+	//all of them have to be preserved
 
 	/* do quad multiplication according to:
 	// mask = in & 0x80808080;
@@ -792,7 +793,7 @@ CM0_sBOX_AES_decrypt:
 	pop {r4-r7, pc}
 
 .align 2
-aes_enc_constants:
+aes_dec_constants:
 	.long AES_inv_sbox
 	.long 0x80808080
 	.long 0x1b1b1b1b
