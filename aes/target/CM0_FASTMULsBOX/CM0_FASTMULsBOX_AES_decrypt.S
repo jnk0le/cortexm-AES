@@ -26,12 +26,6 @@ CM0_FASTMULsBOX_AES_decrypt:
 	mov r7, r11
 	push {r4-r7}
 
-	/*ldr r5, =AES_inv_sbox
-	mov r9, r5 // AES_sbox
-
-	ldr r6, =0x01010101
-	mov r10, r6 // 0x01010101*/
-
 	adr r2, aes_dec_constants
 	ldmia r2!, {r5,r6,r7}
 	mov r9, r5 // AES_inv_sbox
