@@ -289,47 +289,46 @@ CM0_sBOX_AES_decrypt:
 	/* do quad multiplication according to:
 	// mask = in & 0x80808080;
 	// out = ((in & 0x7f7f7f7f) << 1) ^ ((mask - (mask >> 7)) & 0x1b1b1b1b);
+
+	(in & 0x7f7f7f7f) - can be gotten in 2 ways - bics from 0x80808080 or xor with `mask`
 	*/
 
-	mov r2, r4
-	ands r2, r0 // mask
+	ands r0, r4 // mask
 
-	lsrs r3, r2, #7
-	subs r2, r3
+	lsrs r2, r0, #7
+	subs r2, r0, r2
 	ands r2, r1 // get predicated reduction
 
-	mov r3, r4 // need to preserve S{1}
+	eors r0, r4  // equivalent to & 0x7f
+	lsls r3, r0, #1
 
-	bics r3, r0
-	lsls r3, #1
-
+	mov r0, r10 // get 0x80808080 back
 	eors r2, r3 // S{2}
 
-	mov r3, r2
-	ands r3, r0 // mask
+	ands r0, r2 // mask
 
-	lsrs r1, r3, #7
-	subs r3, r1
-	mov r1, r11 // get 0x1b1b1b1b back
+	lsrs r3, r0, #7
+	subs r3, r0, r3 // keep mask
 	ands r3, r1 // get predicated reduction
 
-	mov r1, r2 // need to preserve S{2}
-	bics r1, r0
-	lsls r1, #1
+	eors r0, r2 // equivalent to & 0x7f
+	lsls r0, #1
 
-	eors r3, r1 // S{4}
+	eors r3, r0 // S{4}
+
+	mov r0, r10 // get 0x80808080 back
 
 	ands r0, r3 // mask
-
 	lsrs r1, r0, #7
 	subs r0, r1
 	mov r1, r11 // get 0x1b1b1b1b back
-	ands r1, r0 // get predicated reduction
+	ands r0, r1 // get predicated reduction
 
-	mov r0, r10 // get 0x80808080 back
-	mvns r0, r0 // can't use mask, can't bics into the input data
-	ands r0, r3
-	lsls r0, #1
+	mov r1, r10 // get 0x80808080 back
+	mvns r1, r1 // can't use mask, can't bics into the input data
+	ands r1, r3
+	lsls r1, #1
+
 	eors r1, r0 // S{8}
 
 	// r0 -
@@ -369,45 +368,42 @@ CM0_sBOX_AES_decrypt:
 	mov r0, r10 // 0x80808080
 	mov r1, r11 // 0x1b1b1b1b
 
-	mov r2, r5
-	ands r2, r0 // mask
+	ands r0, r5 // mask
 
-	lsrs r3, r2, #7
-	subs r2, r3
+	lsrs r2, r0, #7
+	subs r2, r0, r2
 	ands r2, r1 // get predicated reduction
 
-	mov r3, r5 // need to preserve S{1}
+	eors r0, r5  // equivalent to & 0x7f
+	lsls r3, r0, #1
 
-	bics r3, r0
-	lsls r3, #1
-
+	mov r0, r10 // get 0x80808080 back
 	eors r2, r3 // S{2}
 
-	mov r3, r2
-	ands r3, r0 // mask
+	ands r0, r2 // mask
 
-	lsrs r1, r3, #7
-	subs r3, r1
-	mov r1, r11 // get 0x1b1b1b1b back
+	lsrs r3, r0, #7
+	subs r3, r0, r3 // keep mask
 	ands r3, r1 // get predicated reduction
 
-	mov r1, r2 // need to preserve S{2}
-	bics r1, r0
-	lsls r1, #1
+	eors r0, r2 // equivalent to & 0x7f
+	lsls r0, #1
 
-	eors r3, r1 // S{4}
+	eors r3, r0 // S{4}
+
+	mov r0, r10 // get 0x80808080 back
 
 	ands r0, r3 // mask
-
 	lsrs r1, r0, #7
 	subs r0, r1
 	mov r1, r11 // get 0x1b1b1b1b back
-	ands r1, r0 // get predicated reduction
+	ands r0, r1 // get predicated reduction
 
-	mov r0, r10 // get 0x80808080 back
-	mvns r0, r0 // can't use mask, can't bics into the input data
-	ands r0, r3
-	lsls r0, #1
+	mov r1, r10 // get 0x80808080 back
+	mvns r1, r1 // can't use mask, can't bics into the input data
+	ands r1, r3
+	lsls r1, #1
+
 	eors r1, r0 // S{8}
 
 	eors r5, r1 // S{9}
@@ -435,45 +431,42 @@ CM0_sBOX_AES_decrypt:
 	mov r0, r10 // 0x80808080
 	mov r1, r11 // 0x1b1b1b1b
 
-	mov r2, r6
-	ands r2, r0 // mask
+	ands r0, r6 // mask
 
-	lsrs r3, r2, #7
-	subs r2, r3
+	lsrs r2, r0, #7
+	subs r2, r0, r2
 	ands r2, r1 // get predicated reduction
 
-	mov r3, r6 // need to preserve S{1}
+	eors r0, r6  // equivalent to & 0x7f
+	lsls r3, r0, #1
 
-	bics r3, r0
-	lsls r3, #1
-
+	mov r0, r10 // get 0x80808080 back
 	eors r2, r3 // S{2}
 
-	mov r3, r2
-	ands r3, r0 // mask
+	ands r0, r2 // mask
 
-	lsrs r1, r3, #7
-	subs r3, r1
-	mov r1, r11 // get 0x1b1b1b1b back
+	lsrs r3, r0, #7
+	subs r3, r0, r3 // keep mask
 	ands r3, r1 // get predicated reduction
 
-	mov r1, r2 // need to preserve S{2}
-	bics r1, r0
-	lsls r1, #1
+	eors r0, r2 // equivalent to & 0x7f
+	lsls r0, #1
 
-	eors r3, r1 // S{4}
+	eors r3, r0 // S{4}
+
+	mov r0, r10 // get 0x80808080 back
 
 	ands r0, r3 // mask
-
 	lsrs r1, r0, #7
 	subs r0, r1
 	mov r1, r11 // get 0x1b1b1b1b back
-	ands r1, r0 // get predicated reduction
+	ands r0, r1 // get predicated reduction
 
-	mov r0, r10 // get 0x80808080 back
-	mvns r0, r0 // can't use mask, can't bics into the input data
-	ands r0, r3
-	lsls r0, #1
+	mov r1, r10 // get 0x80808080 back
+	mvns r1, r1 // can't use mask, can't bics into the input data
+	ands r1, r3
+	lsls r1, #1
+
 	eors r1, r0 // S{8}
 
 	eors r6, r1 // S{9}
@@ -501,45 +494,42 @@ CM0_sBOX_AES_decrypt:
 	mov r0, r10 // 0x80808080
 	mov r1, r11 // 0x1b1b1b1b
 
-	mov r2, r7
-	ands r2, r0 // mask
+	ands r0, r7 // mask
 
-	lsrs r3, r2, #7
-	subs r2, r3
+	lsrs r2, r0, #7
+	subs r2, r0, r2
 	ands r2, r1 // get predicated reduction
 
-	mov r3, r7 // need to preserve S{1}
+	eors r0, r7  // equivalent to & 0x7f
+	lsls r3, r0, #1
 
-	bics r3, r0
-	lsls r3, #1
-
+	mov r0, r10 // get 0x80808080 back
 	eors r2, r3 // S{2}
 
-	mov r3, r2
-	ands r3, r0 // mask
+	ands r0, r2 // mask
 
-	lsrs r1, r3, #7
-	subs r3, r1
-	mov r1, r11 // get 0x1b1b1b1b back
+	lsrs r3, r0, #7
+	subs r3, r0, r3 // keep mask
 	ands r3, r1 // get predicated reduction
 
-	mov r1, r2 // need to preserve S{2}
-	bics r1, r0
-	lsls r1, #1
+	eors r0, r2 // equivalent to & 0x7f
+	lsls r0, #1
 
-	eors r3, r1 // S{4}
+	eors r3, r0 // S{4}
+
+	mov r0, r10 // get 0x80808080 back
 
 	ands r0, r3 // mask
-
 	lsrs r1, r0, #7
 	subs r0, r1
 	mov r1, r11 // get 0x1b1b1b1b back
-	ands r1, r0 // get predicated reduction
+	ands r0, r1 // get predicated reduction
 
-	mov r0, r10 // get 0x80808080 back
-	mvns r0, r0 // can't use mask, can't bics into the input data
-	ands r0, r3
-	lsls r0, #1
+	mov r1, r10 // get 0x80808080 back
+	mvns r1, r1 // can't use mask, can't bics into the input data
+	ands r1, r3
+	lsls r1, #1
+
 	eors r1, r0 // S{8}
 
 	eors r7, r1 // S{9}

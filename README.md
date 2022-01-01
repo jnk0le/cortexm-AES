@@ -97,9 +97,9 @@ out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 | `setDecKey<128>` | 0 | 0 | 0 | 0 |
 | `setDecKey<192>` | 0 | 0 | 0 | 0 |
 | `setDecKey<256>` | 0 | 0 | 0 | 0 |
-| `decrypt<128>`    | 2675/2688 | 2387/2400 |  |  | 
-| `decrypt<192>`    | 3231/3246 | 2879/2894 |  |  | 
-| `decrypt<256>`    | 3787/3804 | 3371/3388 |  |  | 
+| `decrypt<128>`    | 2567/2580 | 2387/2400 |  |  | 
+| `decrypt<192>`    | 3099/3114 | 2879/2894 |  |  | 
+| `decrypt<256>`    | 3631/3648 | 3371/3388 |  |  | 
 
 STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% performance degradation)
 
@@ -113,7 +113,7 @@ STM32L0 is cortex-m0+ (prefetch enabled for 1ws)
 | `CM0_sBOX_AES_192_keyschedule_enc` | 86 | 20(24) | uses sbox table |
 | `CM0_sBOX_AES_256_keyschedule_enc` | 172 | 28(32) | uses sbox table |
 | `CM0_sBOX_AES_encrypt` | 508 | 40 | uses sbox table |
-| `CM0_sBOX_AES_decrypt` | 736 | 40 | uses inv_sbox table |
+| `CM0_sBOX_AES_decrypt` | 712 | 40 | uses inv_sbox table |
 | `CM0_FASTMULsBOX_AES_encrypt` | 480 | 36(40) | uses sbox table, requires single cycle multiplier |
 | `CM0_FASTMULsBOX_AES_decrypt` | 672 | 40 | uses inv_sbox table, requires single cycle multiplier |
 
