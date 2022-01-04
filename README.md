@@ -80,7 +80,7 @@ Implemented similarly to CM0sBOX but with `gmul2()` implementend as:
 ```
 out = ((in & 0x7f7f7f7f) << 1) ^ (((in & 0x80808080) >> 7)) * 0x1b);
 
-// or modified sequence to perform shifts first in order to to avoid extra moves
+// or equivalent sequence to perform shifts first in order to to avoid extra moves
 out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 ```
 
@@ -129,6 +129,15 @@ TBD
 
 TBD
 
+### cortex-m55
+
+no hardware yet, TBD
+
+### RI5CY
+
+RI5CY as in GAP8, not the later CV32E40P that is more constrained.
+
+TBD
 
 ## implementations (this part will be replaced later)
 
