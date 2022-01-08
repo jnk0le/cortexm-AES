@@ -131,7 +131,7 @@ TBD
 
 ### cortex-m55
 
-no hardware yet, TBD
+no hardware available yet, TBD
 
 ### RI5CY
 
