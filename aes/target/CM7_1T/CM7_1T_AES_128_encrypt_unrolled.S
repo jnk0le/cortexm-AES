@@ -10,7 +10,7 @@
 .global CM7_1T_AES_128_encrypt_unrolled
 .type   CM7_1T_AES_128_encrypt_unrolled,%function
 CM7_1T_AES_128_encrypt_unrolled:
-#if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
+#if __ARM_ARCH_7EM__
 	pld [r1, #0] // dead cycle anyway, preload in case data is still in external mem, cacheline is 32 bytes
 	mov r12, r0
 

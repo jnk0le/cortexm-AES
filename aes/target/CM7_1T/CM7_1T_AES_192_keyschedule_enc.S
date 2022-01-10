@@ -14,7 +14,7 @@
 .global CM7_1T_AES_192_keyschedule_enc
 .type   CM7_1T_AES_192_keyschedule_enc,%function
 CM7_1T_AES_192_keyschedule_enc:
-#if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
+#if __ARM_ARCH_7EM__
 	push {r4-r10, lr}
 
 	movw r14, #:lower16:AES_Te2
