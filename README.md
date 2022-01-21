@@ -80,7 +80,7 @@ Implemented similarly to CM0sBOX but with `gmul2()` implementend as:
 ```
 out = ((in & 0x7f7f7f7f) << 1) ^ (((in & 0x80808080) >> 7)) * 0x1b);
 
-// or equivalent sequence to perform shifts first in order to to avoid extra moves
+// or equivalent sequence to perform shifts first in order to avoid extra moves
 out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 ```
 
@@ -97,9 +97,9 @@ out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 | `setDecKey<128>` | 0 | 0 | 0 | 0 |
 | `setDecKey<192>` | 0 | 0 | 0 | 0 |
 | `setDecKey<256>` | 0 | 0 | 0 | 0 |
-| `decrypt<128>`    | 2567/2580 | 2387/2400 |  |  | 
-| `decrypt<192>`    | 3099/3114 | 2879/2894 |  |  | 
-| `decrypt<256>`    | 3631/3648 | 3371/3388 |  |  | 
+| `decrypt<128>`    | 2567/2580 | 2387/2400 |  |  |
+| `decrypt<192>`    | 3099/3114 | 2879/2894 |  |  |
+| `decrypt<256>`    | 3631/3648 | 3371/3388 |  |  |
 
 STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% performance degradation)
 
@@ -123,7 +123,61 @@ extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
 
 ### cortex-m3/m4
 
-TBD
+#### CM3_1T
+
+
+can be used on cortex-m3 and cortex m4
+
+
+
+
+
+#### CM3_1T_unrolled
+
+Same as CM3_1T but uses unrollend enc/dec functions
+
+#### CM3_1T_deconly
+
+Same as CM3_1T. Uses sbox table in key expansions instead of Te2 to reduce pressure on SRAM for decryption only use cases
+
+#### CM3_1T_unrolled_deconly
+
+Same as CM3_1T_deconly but uses unrollend enc/dec functions
+
+#### CM4_DSPsBOX
+
+
+
+
+#### performance
+
+| Cipher function  | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32F4 (0ws/7ws) - CM4_DSPsBOX |
+|----------------------|---|---|---|
+|                      |   |   |   |
+
+
+#### specific function sizes
+
+| Function | code size in bytes | stack usage in bytes | notes |
+|----------|--------------------|----------------------|-------|
+| `CM3_1T_AES_128_keyschedule_enc` | 0 | 0 | uses Te2 table |
+| `CM3_sBOX_AES_128_keyschedule_enc` | 0 | 0 | uses sbox table |
+| `CM3_1T_AES_192_keyschedule_enc` | 0 | 0 | uses Te2 table |
+| `CM3_sBOX_AES_192_keyschedule_enc` | 0 | 0 | uses sbox table |
+| `CM3_1T_AES_256_keyschedule_enc` | 0 | 0 | uses Te2 table |
+| `CM3_sBOX_AES_256_keyschedule_enc` | 0 | 0 | uses sbox table |
+| `CM3_1T_AES_keyschedule_dec` | 0 | 0 | uses Te2 and Td2 table |
+| `CM3_1T_AES_keyschedule_dec_noTe` | 0 | 0 | uses sbox and Td2 table |
+| `CM3_1T_AES_encrypt` | 0 | 0 | uses Te2 table |
+| `CM3_1T_AES_decrypt` | 0 | 0 | uses Td2 and inv_sbox table |
+| `CM3_1T_AES_128_encrypt_unrolled` | 0 | 0 | uses Te2 table |
+| `CM3_1T_AES_128_decrypt_unrolled` | 0 | 0 | uses Td2 and inv_sbox table |
+| `CM3_1T_AES_192_encrypt_unrolled` | 0 | 0 | uses Te2 table |
+| `CM3_1T_AES_192_decrypt_unrolled` | 0 | 0 | uses Td2 and inv_sbox table |
+| `CM3_1T_AES_256_encrypt_unrolled` | 0 | 0 | uses Te2 table |
+| `CM3_1T_AES_256_decrypt_unrolled` | 0 | 0 | uses Td2 and inv_sbox table |
+| `CM4_DSPsBOX_AES_encrypt` | 0 | 0 | uses sbox table |
+| `CM4_DSPsBOX_AES_decrypt` | 0 | 0 | uses inv_sbox table |
 
 ### cortex-m7
 
