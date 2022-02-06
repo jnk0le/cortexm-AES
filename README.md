@@ -88,9 +88,9 @@ out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 
 | Cipher function  | STM32F0 (0ws/1ws) - CM0_sBOX | STM32F0 (0ws/1ws) - CM0_FASTMULsBOX | STM32L0 (0ws/1ws) - CM0_sBOX | STM32L0 (0ws/1ws) - CM0_FASTMULsBOX |
 |----------------------|---|---|---|---|
-| `setEncKey<128>` | 417/431 | 417/431 |  |  |
-| `setEncKey<192>` | 386/398 | 386/398 |  |  |
-| `setEncKey<256>` | 598/610 | 598/610 |  |  |
+| `setEncKey<128>` | 417/431 | (sBOX) |  |  |
+| `setEncKey<192>` | 386/398 | (sBOX) |  |  |
+| `setEncKey<256>` | 598/610 | (sBOX) |  |  |
 | `encrypt<128>`    | 1666/1680 | 1587/1600 |  |  |
 | `encrypt<192>`    | 2000/2016 | 1905/1920 |  |  |
 | `encrypt<256>`    | 2334/2352 | 2223/2240 |  |  |
@@ -144,6 +144,10 @@ Same as CM3_1T. Uses sbox table in key expansions instead of Te2 to reduce press
 
 Same as CM3_1T_deconly but uses unrollend enc/dec functions
 
+#### CM3_sBOX
+
+TBD
+
 #### CM4_DSPsBOX
 
 
@@ -151,25 +155,41 @@ Same as CM3_1T_deconly but uses unrollend enc/dec functions
 
 #### performance
 
-| Cipher function  | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32F4 (0ws/7ws) - CM4_DSPsBOX |
-|----------------------|---|---|---|
-|                      |   |   |   |
-
+| Cipher function  | STM32F1 (0ws/2ws) - CM3_1T | STM32F1 (0ws/2ws) - CM3_sBOX | STM32F4 (0ws/7ws) - CM3_1T | STM32F4 (0ws/7ws) - CM4_DSPsBOX |
+|--------------------------------|------|-------|-------|-------|
+| `setEncKey<128>`          | 302/358 |   |   |   |
+| `setEncKey<192>`          | 276/311 |   |   |   |
+| `setEncKey<256>`          | 378/485 |   |   |   |
+| `encrypt<128>`             | 657/843 |   |   |   |
+| `encrypt<192>`             | 779/996 |   |   |   |
+| `encrypt<256>`             | 901/1152 |   |   |   |
+| `encrypt_unrolled<128>` |   |   |   |   |
+| `encrypt_unrolled<192>` |   |   |   |   |
+| `encrypt_unrolled<256>` |   |   |   |   |
+| `setDecKey<128>`          | 813/1103 | 0 |   |   |
+| `setDecKey<192>`          | 989/1343  | 0 |   |   |
+| `setDecKey<256>`          | 1165/1583  | 0 |   |   |
+| `decrypt<128>`             | 651/901 |   |   |   |
+| `decrypt<192>`             | 771/1071 |   |   |   |
+| `decrypt<256>`             | 891/1241 |   |   |   |
+| `decrypt_unrolled<128>` |   |   |   |   |
+| `decrypt_unrolled<192>` |   |   |   |   |
+| `decrypt_unrolled<256>` |   |   |   |   |
 
 #### specific function sizes
 
 | Function | code size in bytes | stack usage in bytes | notes |
 |----------|--------------------|----------------------|-------|
-| `CM3_1T_AES_128_keyschedule_enc` | 0 | 0 | uses Te2 table |
+| `CM3_1T_AES_128_keyschedule_enc` | 100 | 24 | uses Te2 table |
 | `CM3_sBOX_AES_128_keyschedule_enc` | 0 | 0 | uses sbox table |
-| `CM3_1T_AES_192_keyschedule_enc` | 0 | 0 | uses Te2 table |
+| `CM3_1T_AES_192_keyschedule_enc` | 100 | 32 | uses Te2 table |
 | `CM3_sBOX_AES_192_keyschedule_enc` | 0 | 0 | uses sbox table |
-| `CM3_1T_AES_256_keyschedule_enc` | 0 | 0 | uses Te2 table |
+| `CM3_1T_AES_256_keyschedule_enc` | 178 | 44(48) | uses Te2 table |
 | `CM3_sBOX_AES_256_keyschedule_enc` | 0 | 0 | uses sbox table |
-| `CM3_1T_AES_keyschedule_dec` | 0 | 0 | uses Te2 and Td2 table |
+| `CM3_1T_AES_keyschedule_dec` | 92 | 16 | uses Te2 and Td2 table |
 | `CM3_1T_AES_keyschedule_dec_noTe` | 0 | 0 | uses sbox and Td2 table |
-| `CM3_1T_AES_encrypt` | 0 | 0 | uses Te2 table |
-| `CM3_1T_AES_decrypt` | 0 | 0 | uses Td2 and inv_sbox table |
+| `CM3_1T_AES_encrypt` | 436(cm3) | 44(48) | uses Te2 table |
+| `CM3_1T_AES_decrypt` | 450 | 44(48) | uses Td2 and inv_sbox table |
 | `CM3_1T_AES_128_encrypt_unrolled` | 0 | 0 | uses Te2 table |
 | `CM3_1T_AES_128_decrypt_unrolled` | 0 | 0 | uses Td2 and inv_sbox table |
 | `CM3_1T_AES_192_encrypt_unrolled` | 0 | 0 | uses Te2 table |
@@ -256,7 +276,7 @@ The timing effects of simultaneous access to DTCM memory by core and DMA/AHBS ar
 Utilizes dsp instructions to perform constant time, quad (gf)multiplications in mixcolumns stage.
 MixCloums stage is parallelized according to [this](http://www.wseas.us/e-library/conferences/2009/moscow/AIC/AIC44.pdf) or [this](https://www.researchgate.net/publication/221002183_Efficient_AES_implementations_for_ARM_based_platforms) paper, InvMixColums is done through more straightforward representation.
 
-## Base ciphers performance (in cycles per block)
+## Base ciphers performance (in cycles per block, some numbers are outdated)
 
 | Cipher function     | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32F4 (0ws/7ws) - CM4_DSPsBOX | STM32H7 - CM7_1T | STM32H7 - CM7_DSPsBOX |
 |---------------------|----------------------------|----------------------------|---------------------------------|------------------|-----------------------|
