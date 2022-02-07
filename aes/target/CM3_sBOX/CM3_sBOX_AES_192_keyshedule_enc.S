@@ -16,8 +16,7 @@ CM3_sBOX_AES_192_keyschedule_enc:
 	movw r14, #:lower16:AES_sbox
 	movt r14, #:upper16:AES_sbox
 
-	//load key
-	ldmia.w r1, {r2-r7} // align loop entry to 8 bytes
+	ldmia.w r1, {r2-r7} // load key // align loop entry to 8 bytes
 	mov.w r1, #0x01000000 // calculate rcon in highest byte to use a carry flag
 
 	//just copy a key
@@ -41,17 +40,18 @@ CM3_sBOX_AES_192_keyschedule_enc:
 	eors r3, r2
 	eors r4, r3
 	eors r5, r4
+
+	lsls r1, #1 // next rcon
+	bcs 2f // last round when carry is set
+
 	eors r6, r5
 	eors r7, r6
 
-	lsls r1, #1
+	stmia r0!, {r2-r7} // write full roundkey
+	b 1b
 
-	itet cc // we need one round with 0x80 so use carry flag
-	stmiacc r0!, {r2-r7} //write full roundkey
-	stmiacs r0!, {r2-r5} //write only 4 words at the last round
-	bcc 1b
-
+2:	stmia r0!, {r2-r5} // write only 4 words at the last round
 	pop {r4-r10, pc}
 #else
-	b . //crash in case the function was called on thumb1 core
+	b . // crash in case the function was called on thumb1 core
 #endif

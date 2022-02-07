@@ -1,4 +1,3 @@
-// can be reimplemented to use only 256 byte sbox in case the Te2 is not used anyway
 // precesses 256 bits of key per iteration
 // 7 rounds of rcon can be computed as left shift only
 
