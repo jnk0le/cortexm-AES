@@ -187,7 +187,7 @@ TBD
 | `CM3_1T_AES_256_keyschedule_enc` | 178 | 44(48) | uses Te2 table |
 | `CM3_sBOX_AES_256_keyschedule_enc` | 0 | 0 | uses sbox table |
 | `CM3_1T_AES_keyschedule_dec` | 92 | 12(16) | uses Te2 and Td2 table |
-| `CM3_1T_AES_keyschedule_dec_noTe` | 0 | 0 | uses sbox and Td2 table |
+| `CM3_1T_AES_keyschedule_dec_noTe` | 86 | 12(16) | uses sbox and Td2 table |
 | `CM3_1T_AES_encrypt` | 448 | 44(48) | uses Te2 table |
 | `CM3_1T_AES_decrypt` | 450 | 44(48) | uses Td2 and inv_sbox table |
 | `CM3_1T_AES_128_encrypt_unrolled` | 0 | 0 | uses Te2 table |

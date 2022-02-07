@@ -1,5 +1,4 @@
 // performs perform equivalent inverse cipher transformation on expanded encryption key
-// decryprion will be done backwards to avoid extra stacking or redundant code
 
 .syntax unified
 .thumb
@@ -24,11 +23,10 @@ CM3_1T_AES_keyschedule_dec_noTe:
 	movw r12, #:lower16:AES_Td2
 	movt r12, #:upper16:AES_Td2
 
-1:	ldr r2, [r1, #-4]!
+1:	ldr r2, [r1, #-4]! // can also go forward but requires negative offset on store
 
-	uxtb r3, r2
 	uxtb r4, r2, ror #8
-	//uxtb r5, r2, ror #24
+	uxtb r3, r2
 	lsrs r5, r2, #24
 	uxtb r2, r2, ror #16
 
