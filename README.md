@@ -160,17 +160,17 @@ TBD
 | `setEncKey<128>`          | 302/358 |   |   |   |
 | `setEncKey<192>`          | 276/311 |   |   |   |
 | `setEncKey<256>`          | 378/485 |   |   |   |
-| `encrypt<128>`             | 657/843 |   |   |   |
-| `encrypt<192>`             | 779/996 |   |   |   |
-| `encrypt<256>`             | 901/1152 |   |   |   |
+| `encrypt<128>`             | 648/889 |   |   |   |
+| `encrypt<192>`             | 768/1054 |   |   |   |
+| `encrypt<256>`             | 888/1222 |   |   |   |
 | `encrypt_unrolled<128>` |   |   |   |   |
 | `encrypt_unrolled<192>` |   |   |   |   |
 | `encrypt_unrolled<256>` |   |   |   |   |
-| `setDecKey<128>`          | 813/1103 | 0 |   |   |
-| `setDecKey<192>`          | 989/1343  | 0 |   |   |
-| `setDecKey<256>`          | 1165/1583  | 0 |   |   |
+| `setDecKey<128>`          | 813/1101 | 0 |   |   |
+| `setDecKey<192>`          | 987/1341 | 0 |   |   |
+| `setDecKey<256>`          | 1163/1580 | 0 |   |   |
 | `decrypt<128>`             | 651/901 |   |   |   |
-| `decrypt<192>`             | 771/1071 |   |   |   |
+| `decrypt<192>`             | 771/1072 |   |   |   |
 | `decrypt<256>`             | 891/1241 |   |   |   |
 | `decrypt_unrolled<128>` |   |   |   |   |
 | `decrypt_unrolled<192>` |   |   |   |   |
@@ -186,9 +186,9 @@ TBD
 | `CM3_sBOX_AES_192_keyschedule_enc` | 0 | 0 | uses sbox table |
 | `CM3_1T_AES_256_keyschedule_enc` | 178 | 44(48) | uses Te2 table |
 | `CM3_sBOX_AES_256_keyschedule_enc` | 0 | 0 | uses sbox table |
-| `CM3_1T_AES_keyschedule_dec` | 92 | 16 | uses Te2 and Td2 table |
+| `CM3_1T_AES_keyschedule_dec` | 92 | 12(16) | uses Te2 and Td2 table |
 | `CM3_1T_AES_keyschedule_dec_noTe` | 0 | 0 | uses sbox and Td2 table |
-| `CM3_1T_AES_encrypt` | 436(cm3) | 44(48) | uses Te2 table |
+| `CM3_1T_AES_encrypt` | 448 | 44(48) | uses Te2 table |
 | `CM3_1T_AES_decrypt` | 450 | 44(48) | uses Td2 and inv_sbox table |
 | `CM3_1T_AES_128_encrypt_unrolled` | 0 | 0 | uses Te2 table |
 | `CM3_1T_AES_128_decrypt_unrolled` | 0 | 0 | uses Td2 and inv_sbox table |
@@ -198,6 +198,8 @@ TBD
 | `CM3_1T_AES_256_decrypt_unrolled` | 0 | 0 | uses Td2 and inv_sbox table |
 | `CM4_DSPsBOX_AES_encrypt` | 0 | 0 | uses sbox table |
 | `CM4_DSPsBOX_AES_decrypt` | 0 | 0 | uses inv_sbox table |
+
+extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
 
 ### cortex-m7
 

@@ -311,7 +311,8 @@ CM0_sBOX_AES_encrypt:
 	// mask = in & 0x80808080;
 	// out = ((in & 0x7f7f7f7f) << 1) ^ ((mask - (mask >> 7)) & 0x1b1b1b1b);
 
-	instead of xoring to each other, xor left part into output and free up register for mask subtraction (same perf)
+	instead of xoring to each other, xor left part into output and free up register for mask subtraction
+	other approach (shift first OR ands into mask + eor) had same perf
 
 	(in & 0x7f7f7f7f) - can be gotten in 2 ways - bics from 0x80808080 or xor with `mask`
 	*/

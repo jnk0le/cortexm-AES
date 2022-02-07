@@ -32,20 +32,14 @@ CM3_1T_AES_encrypt:
 	uxtb r2, r6
 	uxtb r3, r7
 
+	ldr r8, [r12], #16
 	ldr r0, [r14, r0, lsl #2]
 	ldr r1, [r14, r1, lsl #2]
 	ldr r2, [r14, r2, lsl #2]
 	ldr r3, [r14, r3, lsl #2]
-
-#if __ARM_ARCH_7EM__
-	//doesn't pipeline well on cm3
-	ldr r8, [r12], #4
-	ldr r9, [r12], #4
-	ldr r10, [r12], #4
-	ldr r11, [r12], #4
-#else
-	ldmia r12!, {r8-r11}
-#endif
+	ldr r9, [r12, #-12]
+	ldr r10, [r12, #-8]
+	ldr r11, [r12, #-4]
 
 	eor r8, r8, r0, ror #16
 	eor r9, r9, r1, ror #16
@@ -70,10 +64,6 @@ CM3_1T_AES_encrypt:
 	uxtb r2, r4, ror #16
 	uxtb r3, r5, ror #16
 
-	//uxtb r7, r7, ror #24
-	//uxtb r4, r4, ror #24
-	//uxtb r5, r5, ror #24
-	//uxtb r6, r6, ror #24
 	lsrs r7, #24
 	lsrs r4, #24
 	lsrs r5, #24

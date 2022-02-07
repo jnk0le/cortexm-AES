@@ -31,9 +31,7 @@ CM3_1T_AES_decrypt:
 	eors r6, r2
 	eors r7, r3
 
-1:	//ldmdb r12!, {r8-r11}
-
-	uxtb r0, r4
+1:	uxtb r0, r4
 	uxtb r1, r5
 	uxtb r2, r6
 	uxtb r3, r7
@@ -111,8 +109,6 @@ CM3_1T_AES_decrypt:
 	//final round
 	movw r14, #:lower16:AES_inv_sbox
 	movt r14, #:upper16:AES_inv_sbox
-
-	//ldmdb r12, {r8-r11}
 
 	uxtb r0, r4
 	uxtb r1, r5
