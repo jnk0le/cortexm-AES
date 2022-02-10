@@ -163,9 +163,9 @@ TBD
 | `encrypt<128>`             | 648/889 |   |   |   |
 | `encrypt<192>`             | 768/1054 |   |   |   |
 | `encrypt<256>`             | 888/1222 |   |   |   |
-| `encrypt_unrolled<128>` |   |   |   |   |
-| `encrypt_unrolled<192>` |   |   |   |   |
-| `encrypt_unrolled<256>` |   |   |   |   |
+| `encrypt_unrolled<128>` | 604/841 |   |   |   |
+| `encrypt_unrolled<192>` | 714/997 |   |   |   |
+| `encrypt_unrolled<256>` | 824/1153 |   |   |   |
 | `setDecKey<128>`          | 813/1101 | 0 |   |   |
 | `setDecKey<192>`          | 987/1341 | 0 |   |   |
 | `setDecKey<256>`          | 1163/1580 | 0 |   |   |
@@ -181,21 +181,21 @@ TBD
 | Function | code size in bytes | stack usage in bytes | notes |
 |----------|--------------------|----------------------|-------|
 | `CM3_1T_AES_128_keyschedule_enc` | 100 | 24 | uses Te2 table |
-| `CM3_sBOX_AES_128_keyschedule_enc` | 0 | 0 | uses sbox table |
 | `CM3_1T_AES_192_keyschedule_enc` | 100 | 32 | uses Te2 table |
-| `CM3_sBOX_AES_192_keyschedule_enc` | 0 | 0 | uses sbox table |
 | `CM3_1T_AES_256_keyschedule_enc` | 178 | 44(48) | uses Te2 table |
-| `CM3_sBOX_AES_256_keyschedule_enc` | 0 | 0 | uses sbox table |
 | `CM3_1T_AES_keyschedule_dec` | 92 | 12(16) | uses Te2 and Td2 table |
 | `CM3_1T_AES_keyschedule_dec_noTe` | 86 | 12(16) | uses sbox and Td2 table |
 | `CM3_1T_AES_encrypt` | 448 | 44(48) | uses Te2 table |
 | `CM3_1T_AES_decrypt` | 450 | 44(48) | uses Td2 and inv_sbox table |
-| `CM3_1T_AES_128_encrypt_unrolled` | 0 | 0 | uses Te2 table |
+| `CM3_1T_AES_128_encrypt_unrolled` | 1992 | 40 | uses Te2 table |
 | `CM3_1T_AES_128_decrypt_unrolled` | 0 | 0 | uses Td2 and inv_sbox table |
-| `CM3_1T_AES_192_encrypt_unrolled` | 0 | 0 | uses Te2 table |
+| `CM3_1T_AES_192_encrypt_unrolled` | 2376 | 40 | uses Te2 table |
 | `CM3_1T_AES_192_decrypt_unrolled` | 0 | 0 | uses Td2 and inv_sbox table |
-| `CM3_1T_AES_256_encrypt_unrolled` | 0 | 0 | uses Te2 table |
+| `CM3_1T_AES_256_encrypt_unrolled` | 2760 | 40 | uses Te2 table |
 | `CM3_1T_AES_256_decrypt_unrolled` | 0 | 0 | uses Td2 and inv_sbox table |
+| `CM3_sBOX_AES_128_keyschedule_enc` | 100 | 24 | uses sbox table |
+| `CM3_sBOX_AES_192_keyschedule_enc` | 100 | 32 | uses sbox table |
+| `CM3_sBOX_AES_256_keyschedule_enc` | 178 | 44(48) | uses sbox table |
 | `CM4_DSPsBOX_AES_encrypt` | 0 | 0 | uses sbox table |
 | `CM4_DSPsBOX_AES_decrypt` | 0 | 0 | uses inv_sbox table |
 

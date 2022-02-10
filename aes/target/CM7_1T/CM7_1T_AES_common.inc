@@ -4,7 +4,7 @@
 .thumb
 
 //columns expected in r0-r3
-//tbox expected in r14
+//Te2 expected in r14
 //pointer to expanded key expected in r12
 
 //output columns in r0-r3
