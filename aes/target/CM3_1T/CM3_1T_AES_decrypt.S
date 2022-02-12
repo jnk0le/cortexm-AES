@@ -1,5 +1,3 @@
-// uses backward expanded round key
-
 .syntax unified
 .thumb
 .text
@@ -68,10 +66,6 @@ CM3_1T_AES_decrypt:
 	uxtb r2, r4, ror #16
 	uxtb r3, r5, ror #16
 
-	//uxtb r5, r5, ror #24
-	//uxtb r6, r6, ror #24
-	//uxtb r7, r7, ror #24
-	//uxtb r4, r4, ror #24
 	lsrs r5, #24
 	lsrs r6, #24
 	lsrs r7, #24
@@ -106,7 +100,7 @@ CM3_1T_AES_decrypt:
 
 	bne.w 1b //align following code to 4 bytes
 
-	//final round
+	// final round
 	movw r14, #:lower16:AES_inv_sbox
 	movt r14, #:upper16:AES_inv_sbox
 
@@ -145,16 +139,13 @@ CM3_1T_AES_decrypt:
 	uxtb r2, r4, ror #16
 	uxtb r3, r5, ror #16
 
-	//uxtb r5, r5, ror #24
-	//uxtb r6, r6, ror #24
-	//uxtb r7, r7, ror #24
 	lsrs r5, #24
 	lsrs r6, #24
 	lsrs r7, #24
 
 	uxtb r12, r4, ror #24
 
-	ldr r4, [sp, #4] //load output pointer
+	ldr r4, [sp, #4] // load output pointer
 
 	ldrb r0, [r14, r0]
 	ldrb r1, [r14, r1]
@@ -165,8 +156,6 @@ CM3_1T_AES_decrypt:
 	ldrb r6, [r14, r6]
 	ldrb r7, [r14, r7]
 	ldrb r12, [r14, r12]
-
-	//ldr r4, [sp, #4] //load output pointer
 
 	eor r8, r8, r0, lsl #16
 	eor r9, r9, r1, lsl #16
@@ -187,5 +176,5 @@ CM3_1T_AES_decrypt:
 
 	pop {r4-r11, pc}
 #else
-	b . //crash in case the function was called on thumb1 core
+	b . // crash in case the function was called on thumb1 core
 #endif

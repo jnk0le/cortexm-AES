@@ -3,11 +3,11 @@
 .syntax unified
 .thumb
 
-//columns expected in r0-r3
-//Te2 expected in r14
-//pointer to expanded key expected in r12
+// columns expected in r0-r3
+// Te2 expected in r14
+// pointer to expanded key expected in r12
 
-//output columns in r0-r3
+// output columns in r0-r3
 
 // should this replace normal round??
 // 16 offset needed if r12 points to ctr+key
