@@ -109,15 +109,15 @@ CM3_1T_AES_encrypt:
 	uxtb r2, r4, ror #16
 	uxtb r3, r5, ror #16
 
-	ldr r8, [r14, r8, lsl #2]
-	ldr r9, [r14, r9, lsl #2]
-	ldr r10, [r14, r10, lsl #2]
-	ldr r11, [r14, r11, lsl #2]
+	ldrb r8, [r14, r8, lsl #2]
+	ldrb r9, [r14, r9, lsl #2]
+	ldrb r10, [r14, r10, lsl #2]
+	ldrb r11, [r14, r11, lsl #2]
 
-	ldr r0, [r14, r0, lsl #2]
-	ldr r1, [r14, r1, lsl #2]
-	ldr r2, [r14, r2, lsl #2]
-	ldr r3, [r14, r3, lsl #2]
+	ldrb r0, [r14, r0, lsl #2]
+	ldrb r1, [r14, r1, lsl #2]
+	ldrb r2, [r14, r2, lsl #2]
+	ldrb r3, [r14, r3, lsl #2]
 
 	bfi r8, r0, #24, #8
 	bfi r9, r1, #24, #8
@@ -128,10 +128,10 @@ CM3_1T_AES_encrypt:
 	uxtb r1, r5
 	uxtb r2, r6
 	uxtb r3, r7
-	ldr r0, [r14, r0, lsl #2]
-	ldr r1, [r14, r1, lsl #2]
-	ldr r2, [r14, r2, lsl #2]
-	ldr r3, [r14, r3, lsl #2]
+	ldrb r0, [r14, r0, lsl #2]
+	ldrb r1, [r14, r1, lsl #2]
+	ldrb r2, [r14, r2, lsl #2]
+	ldrb r3, [r14, r3, lsl #2]
 	bfi r8, r0, #8, #8
 	bfi r9, r1, #8, #8
 	bfi r10, r2, #8, #8
@@ -141,11 +141,12 @@ CM3_1T_AES_encrypt:
 	uxtb r1, r6, ror #8
 	uxtb r2, r7, ror #8
 	uxtb r3, r4, ror #8
-	ldr r0, [r14, r0, lsl #2]
-	ldr r1, [r14, r1, lsl #2]
-	ldr r2, [r14, r2, lsl #2]
-	ldr r3, [r14, r3, lsl #2]
+
 	ldr r4, [sp], #8 // load output pointer and clear stack
+	ldrb r0, [r14, r0, lsl #2]
+	ldrb r1, [r14, r1, lsl #2]
+	ldrb r2, [r14, r2, lsl #2]
+	ldrb r3, [r14, r3, lsl #2]
 	ldr r14, [r12]
 	ldr r5, [r12, #4]
 	ldr r6, [r12, #8]

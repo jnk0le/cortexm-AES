@@ -160,18 +160,18 @@ TBD
 | `setEncKey<128>`          | 302/358 |   |   |   |
 | `setEncKey<192>`          | 276/311 |   |   |   |
 | `setEncKey<256>`          | 378/485 |   |   |   |
-| `encrypt<128>`             | 648/889 |   |   |   |
-| `encrypt<192>`             | 768/1054 |   |   |   |
-| `encrypt<256>`             | 888/1222 |   |   |   |
-| `encrypt_unrolled<128>` | 604/841 |   |   |   |
-| `encrypt_unrolled<192>` | 714/997 |   |   |   |
-| `encrypt_unrolled<256>` | 824/1153 |   |   |   |
+| `encrypt<128>`             | 647/890 |   |   |   |
+| `encrypt<192>`             | 767/1054 |   |   |   |
+| `encrypt<256>`             | 887/1222 |   |   |   |
+| `encrypt_unrolled<128>` | 603/841 |   |   |   |
+| `encrypt_unrolled<192>` | 713/997 |   |   |   |
+| `encrypt_unrolled<256>` | 823/1153 |   |   |   |
 | `setDecKey<128>`          | 813/1101 | 0 |   |   |
 | `setDecKey<192>`          | 987/1341 | 0 |   |   |
 | `setDecKey<256>`          | 1163/1580 | 0 |   |   |
 | `decrypt<128>`             | 651/901 |   |   |   |
 | `decrypt<192>`             | 771/1072 |   |   |   |
-| `decrypt<256>`             | 891/1241 |   |   |   |
+| `decrypt<256>`             | 891/1242 |   |   |   |
 | `decrypt_unrolled<128>` | 606/847 |   |   |   |
 | `decrypt_unrolled<192>` | 716/1003 |   |   |   |
 | `decrypt_unrolled<256>` | 826/1159 |   |   |   |
