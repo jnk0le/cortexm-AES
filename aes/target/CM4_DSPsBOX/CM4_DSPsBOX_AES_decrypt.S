@@ -46,13 +46,9 @@ CM4_DSPsBOX_AES_decrypt:
 	uxtb r11, r1, ror #16
 
 	//row 3 - ST3x
-	//uxtb r4, r1, ror #24
-	//uxtb r5, r2, ror #24
-	//uxtb r6, r3, ror #24
 	lsrs r4, r1, #24
 	lsrs r5, r2, #24
 	lsrs r6, r3, #24
-
 	uxtb r12, r0, ror #24
 
 	//halfway sboxing
@@ -107,7 +103,7 @@ CM4_DSPsBOX_AES_decrypt:
 
 	//addroundkey
 	ldr r4, [r14, #-16]!
-	ldr r12, [sp] // load also final address to compare later // also split pre indexed load with its dependencies
+	ldr r12, [sp] // load also final address to compare later
 	ldr r5, [r14, #4]
 	ldr r6, [r14, #8]
 	ldr r8, [r14, #12]

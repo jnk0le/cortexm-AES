@@ -155,26 +155,26 @@ TBD
 
 #### performance
 
-| Cipher function  | STM32F1 (0ws/2ws) - CM3_1T | STM32F1 (0ws/2ws) - CM3_sBOX | STM32F4 (0ws/5ws) - CM3_1T | STM32F4 (0ws/7ws) - CM4_DSPsBOX |
+| Cipher function  | STM32F1 (0ws/2ws) - CM3_1T | STM32F1 (0ws/2ws) - CM3_sBOX | STM32F4 (0ws/5ws) - CM3_1T | STM32F4 - CM4_DSPsBOX |
 |--------------------------------|---------|-------|-------|-------|
-| `setEncKey<128>`          | 302/358  |  | 302 |   |
-| `setEncKey<192>`          | 276/311  |  | 276 |   |
-| `setEncKey<256>`          | 378/485  |  | 379 |   |
-| `encrypt<128>`             | 646/884  |  | 645 |   |
-| `encrypt<192>`             | 766/1049 |  | 765 |   |
-| `encrypt<256>`             | 886/1217 |  | 887 |   |
-| `encrypt_unrolled<128>` | 603/836  |   | 602/779 |   |
-| `encrypt_unrolled<192>` | 713/990  |   | 712/922 |   |
-| `encrypt_unrolled<256>` | 823/1148 |   | 822/1067 |   |
-| `setDecKey<128>`          | 813/1101 | 0 | 811 |   |
-| `setDecKey<192>`          | 987/1341 | 0 | 987 |   |
-| `setDecKey<256>`          | 1163/1580 | 0 | 1164 |   |
-| `decrypt<128>`             | 651/901  |   | 650 |   |
-| `decrypt<192>`             | 771/1072 |   | 770 |   |
-| `decrypt<256>`             | 891/1242 |   | 892 |   |
-| `decrypt_unrolled<128>` | 606/847  |   | 604/785 |   |
-| `decrypt_unrolled<192>` | 716/1003 |   | 714/928 |   |
-| `decrypt_unrolled<256>` | 826/1159 |   | 824/1073 |   |
+| `setEncKey<128>`          | 302/358  |  | 302 | 302 |
+| `setEncKey<192>`          | 276/311  |  | 276 | 277 |
+| `setEncKey<256>`          | 378/485  |  | 379 | 381 |
+| `encrypt<128>`             | 646/884  |  | 645 | 852 |
+| `encrypt<192>`             | 766/1049 |  | 765 | 1020 |
+| `encrypt<256>`             | 886/1217 |  | 887 | 1188 |
+| `encrypt_unrolled<128>` | 603/836  |   | 602/779 | - |
+| `encrypt_unrolled<192>` | 713/990  |   | 712/922 | - |
+| `encrypt_unrolled<256>` | 823/1148 |   | 822/1067 | - |
+| `setDecKey<128>`          | 813/1101 | 0 | 811 | 0 |
+| `setDecKey<192>`          | 987/1341 | 0 | 987 | 0 |
+| `setDecKey<256>`          | 1163/1580 | 0 | 1164 | 0 |
+| `decrypt<128>`             | 651/901  |   | 650 | 1250 |
+| `decrypt<192>`             | 771/1072 |   | 770 | 1506 |
+| `decrypt<256>`             | 891/1242 |   | 892 | 1760 |
+| `decrypt_unrolled<128>` | 606/847  |   | 604/785 | - |
+| `decrypt_unrolled<192>` | 716/1003 |   | 714/928 | - |
+| `decrypt_unrolled<256>` | 826/1159 |   | 824/1073 | - |
 
 results assume that input, expanded round key and stack lie in the same memory block (e.g. SRAM1 vs SRAM2 and CCM on f407)
 
@@ -198,7 +198,7 @@ results assume that input, expanded round key and stack lie in the same memory b
 | `CM3_sBOX_AES_128_keyschedule_enc` | 100 | 24 | uses sbox table |
 | `CM3_sBOX_AES_192_keyschedule_enc` | 100 | 32 | uses sbox table |
 | `CM3_sBOX_AES_256_keyschedule_enc` | 178 | 44(48) | uses sbox table |
-| `CM4_DSPsBOX_AES_encrypt` | 0 | 0 | uses sbox table |
+| `CM4_DSPsBOX_AES_encrypt` | 498 | 44(48) | uses sbox table |
 | `CM4_DSPsBOX_AES_decrypt` | 0 | 0 | uses inv_sbox table |
 
 extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
@@ -297,21 +297,21 @@ MixCloums stage is parallelized according to [this](http://www.wseas.us/e-librar
 
 | Cipher function     | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32F4 (0ws/7ws) - CM4_DSPsBOX | STM32H7 - CM7_1T | STM32H7 - CM7_DSPsBOX |
 |---------------------|----------------------------|----------------------------|---------------------------------|------------------|-----------------------|
-| `setEncKey<128>`    |    |   | 305 | 157* | 157* |
-| `setEncKey<192>`    |    |    | 281 | 140* | 140* |
-| `setEncKey<256>`    |    |   | 434 | 227* | 227* |
-| `encrypt<128>`      |    | | 884 | 302 | 411 |
-| `encrypt<192>`      |    | | 1056 | 358 | 491 |
-| `encrypt<256>`      |   |  | 1228 | 414 | 571 |
+| `setEncKey<128>`    |    |   |  | 157* | 157* |
+| `setEncKey<192>`    |    |    |  | 140* | 140* |
+| `setEncKey<256>`    |    |   |  | 227* | 227* |
+| `encrypt<128>`      |    | |  | 302 | 411 |
+| `encrypt<192>`      |    | |  | 358 | 491 |
+| `encrypt<256>`      |   |  |  | 414 | 571 |
 | `enc_unrolled<128>` |    | | - | 281 | - |
 | `enc_unrolled<192>` |    | | - | 333 | - |
 | `enc_unrolled<256>` |  | | - | 385 | - |
-| `setDecKey<128>`    |   | | 0 | 412* | (1T) |
-| `setDecKey<192>`    |   | | 0 | 500* | (1T) |
-| `setDecKey<256>`    |  | | 0 | 588* | (1T) |
-| `decrypt<128>`      |    | | 1272 | 304 | (1T) |
-| `decrypt<192>`      |   | | 1530 | 360 | (1T) |
-| `decrypt<256>`      |  | | 1788 | 416 | (1T) |
+| `setDecKey<128>`    |   | |  | 412* | (1T) |
+| `setDecKey<192>`    |   | |  | 500* | (1T) |
+| `setDecKey<256>`    |  | |  | 588* | (1T) |
+| `decrypt<128>`      |    | |  | 304 | (1T) |
+| `decrypt<192>`      |   | |  | 360 | (1T) |
+| `decrypt<256>`      |     | |  | 416 | (1T) |
 | `dec_unrolled<128>` |    | | - | 282 | - |
 | `dec_unrolled<192>` |   | | - | 334 | - |
 | `dec_unrolled<256>` |   | | - | 386 | - |
