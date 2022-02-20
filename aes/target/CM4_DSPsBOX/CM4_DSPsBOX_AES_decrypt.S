@@ -86,7 +86,7 @@ CM4_DSPsBOX_AES_decrypt:
 	ldrb r3, [r7, r3]
 	ldrb r4, [r7, r4]
 	ldrb r5, [r7, r5]
-	ldrb.w r6, [r7, r6] // align to 4 bytes for the following loads
+	ldrb.w r6, [r7, r6] // loses cycles if .n below r12 load // align next load
 	ldrb r12, [r7, r12]
 
 	//repack bottom part
@@ -95,11 +95,11 @@ CM4_DSPsBOX_AES_decrypt:
 	orr r2, r2, r6, lsl #8
 	orr r3, r3, r12, lsl #8
 
-	//repack wholly // orr??
-	pkhbt r0, r0, r8, lsl #16
-	pkhbt r1, r1, r9, lsl #16
-	pkhbt r2, r2, r10, lsl #16
-	pkhbt r3, r3, r11, lsl #16
+	//repack wholly
+	orr r0, r0, r8, lsl #16
+	orr r1, r1, r9, lsl #16
+	orr r2, r2, r10, lsl #16
+	orr r3, r3, r11, lsl #16
 
 	//addroundkey
 	ldr r4, [r14, #-16]!
@@ -232,13 +232,9 @@ CM4_DSPsBOX_AES_decrypt:
 	uxtb r11, r1, ror #16
 
 	//row 3 - ST3x
-	//uxtb r4, r1, ror #24
-	//uxtb r5, r2, ror #24
-	//uxtb r6, r3, ror #24
 	lsrs r4, r1, #24
 	lsrs r5, r2, #24
 	lsrs r6, r3, #24
-
 	uxtb r12, r0, ror #24
 
 	//halfway sboxing
@@ -276,7 +272,7 @@ CM4_DSPsBOX_AES_decrypt:
 	ldrb r3, [r7, r3]
 	ldrb r4, [r7, r4]
 	ldrb r5, [r7, r5]
-	ldrb.w r6, [r7, r6] // align to 4 bytes for the following loads
+	ldrb.w r6, [r7, r6] // loses cycle if .n below r12 load // align next load
 	ldrb r12, [r7, r12]
 
 	//repack bottom part
@@ -285,18 +281,19 @@ CM4_DSPsBOX_AES_decrypt:
 	orr r2, r2, r6, lsl #8
 	orr r3, r3, r12, lsl #8
 
-	//repack wholly // orr??
-	pkhbt r0, r0, r8, lsl #16
-	pkhbt r1, r1, r9, lsl #16
-	pkhbt r2, r2, r10, lsl #16
-	pkhbt r3, r3, r11, lsl #16
+	//repack wholly
+	orr r0, r0, r8, lsl #16
+	orr r1, r1, r9, lsl #16
+	orr r2, r2, r10, lsl #16
+	orr r3, r3, r11, lsl #16
 
 	//final addroudkey
-	ldr r4, [r14, #-16]!
+	ldr r4, [r14, #-16]
+	ldr r5, [r14, #-12]
+	ldr r6, [r14, #-8]
+	ldr r8, [r14, #-4]
+
 	ldr r7, [sp, #4] // load output pointer
-	ldr r5, [r14, #4]
-	ldr r6, [r14, #8]
-	ldr r8, [r14, #12]
 
 	add sp, #8
 

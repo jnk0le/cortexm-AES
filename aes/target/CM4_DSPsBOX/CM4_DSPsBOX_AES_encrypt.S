@@ -47,7 +47,6 @@ CM4_DSPsBOX_AES_encrypt:
 	lsrs r4, r3, #24
 	lsrs r5, r0, #24
 	lsrs r6, r1, #24
-	//uxtb r6, r1, ror #24
 	uxtb r12, r2, ror #24
 
 	//halfway sboxing
@@ -85,7 +84,7 @@ CM4_DSPsBOX_AES_encrypt:
 	ldrb r3, [r7, r3]
 	ldrb r4, [r7, r4]
 	ldrb r5, [r7, r5]
-	ldrb.w r6, [r7, r6] // can't realign below
+	ldrb.w r6, [r7, r6] // loses cycles if .n below r12 load // align next load
 	ldrb r12, [r7, r12]
 
 	//repack bottom part

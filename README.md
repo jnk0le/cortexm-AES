@@ -169,9 +169,9 @@ TBD
 | `setDecKey<128>`          | 813/1101 | 0 | 811 | 0 |
 | `setDecKey<192>`          | 987/1341 | 0 | 987 | 0 |
 | `setDecKey<256>`          | 1163/1580 | 0 | 1164 | 0 |
-| `decrypt<128>`             | 651/901  |   | 650 | 1250 |
-| `decrypt<192>`             | 771/1072 |   | 770 | 1506 |
-| `decrypt<256>`             | 891/1242 |   | 892 | 1760 |
+| `decrypt<128>`             | 651/901  |   | 650 | 1249 |
+| `decrypt<192>`             | 771/1072 |   | 770 | 1505 |
+| `decrypt<256>`             | 891/1242 |   | 892 | 1759 |
 | `decrypt_unrolled<128>` | 606/847  |   | 604/785 | - |
 | `decrypt_unrolled<192>` | 716/1003 |   | 714/928 | - |
 | `decrypt_unrolled<256>` | 826/1159 |   | 824/1073 | - |
@@ -325,7 +325,7 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 
 Implements counter mode caching. Do not use if IV/counter is secret as it will lead to a timming leak of a single byte, every 256 aligned counter steps.
 
-## Cipher modes performance (in cycles per byte)
+## Cipher modes performance (in cycles per byte, some numbers are outdated)
 
 | Cipher function            | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32H7 - CM7_1T |
 |----------------------------|-----------------------------|-----------------------------|------------------|
