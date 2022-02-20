@@ -155,26 +155,28 @@ TBD
 
 #### performance
 
-| Cipher function  | STM32F1 (0ws/2ws) - CM3_1T | STM32F1 (0ws/2ws) - CM3_sBOX | STM32F4 (0ws/7ws) - CM3_1T | STM32F4 (0ws/7ws) - CM4_DSPsBOX |
-|--------------------------------|------|-------|-------|-------|
-| `setEncKey<128>`          | 302/358 |   |   |   |
-| `setEncKey<192>`          | 276/311 |   |   |   |
-| `setEncKey<256>`          | 378/485 |   |   |   |
-| `encrypt<128>`             | 646/884 |   |   |   |
-| `encrypt<192>`             | 766/1049 |   |   |   |
-| `encrypt<256>`             | 886/1217 |   |   |   |
-| `encrypt_unrolled<128>` | 603/836 |   |   |   |
-| `encrypt_unrolled<192>` | 713/990 |   |   |   |
-| `encrypt_unrolled<256>` | 823/1148 |   |   |   |
-| `setDecKey<128>`          | 813/1101 | 0 |   |   |
-| `setDecKey<192>`          | 987/1341 | 0 |   |   |
-| `setDecKey<256>`          | 1163/1580 | 0 |   |   |
-| `decrypt<128>`             | 651/901 |   |   |   |
-| `decrypt<192>`             | 771/1072 |   |   |   |
-| `decrypt<256>`             | 891/1242 |   |   |   |
-| `decrypt_unrolled<128>` | 606/847 |   |   |   |
-| `decrypt_unrolled<192>` | 716/1003 |   |   |   |
-| `decrypt_unrolled<256>` | 826/1159 |   |   |   |
+| Cipher function  | STM32F1 (0ws/2ws) - CM3_1T | STM32F1 (0ws/2ws) - CM3_sBOX | STM32F4 (0ws/5ws) - CM3_1T | STM32F4 (0ws/7ws) - CM4_DSPsBOX |
+|--------------------------------|---------|-------|-------|-------|
+| `setEncKey<128>`          | 302/358  |  | 302 |   |
+| `setEncKey<192>`          | 276/311  |  | 276 |   |
+| `setEncKey<256>`          | 378/485  |  | 379 |   |
+| `encrypt<128>`             | 646/884  |  | 645 |   |
+| `encrypt<192>`             | 766/1049 |  | 765 |   |
+| `encrypt<256>`             | 886/1217 |  | 887 |   |
+| `encrypt_unrolled<128>` | 603/836  |   | 602/779 |   |
+| `encrypt_unrolled<192>` | 713/990  |   | 712/922 |   |
+| `encrypt_unrolled<256>` | 823/1148 |   | 822/1067 |   |
+| `setDecKey<128>`          | 813/1101 | 0 | 811 |   |
+| `setDecKey<192>`          | 987/1341 | 0 | 987 |   |
+| `setDecKey<256>`          | 1163/1580 | 0 | 1164 |   |
+| `decrypt<128>`             | 651/901  |   | 650 |   |
+| `decrypt<192>`             | 771/1072 |   | 770 |   |
+| `decrypt<256>`             | 891/1242 |   | 892 |   |
+| `decrypt_unrolled<128>` | 606/847  |   | 604/785 |   |
+| `decrypt_unrolled<192>` | 716/1003 |   | 714/928 |   |
+| `decrypt_unrolled<256>` | 826/1159 |   | 824/1073 |   |
+
+results assume that input, expanded round key and stack lie in the same memory block (e.g. SRAM1 vs SRAM2 and CCM on f407)
 
 #### specific function sizes
 
@@ -214,6 +216,19 @@ no hardware available yet, TBD
 RI5CY as in GAP8, not the later CV32E40P that is more constrained.
 
 TBD
+
+## modes implementations
+
+### cortex-m0/m0+
+
+### cortex-m3/m4
+
+### cortex-m7
+
+### cortex-m55
+
+### RI5CY
+
 
 ## implementations (this part will be replaced later)
 
@@ -282,24 +297,24 @@ MixCloums stage is parallelized according to [this](http://www.wseas.us/e-librar
 
 | Cipher function     | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32F4 (0ws/7ws) - CM4_DSPsBOX | STM32H7 - CM7_1T | STM32H7 - CM7_DSPsBOX |
 |---------------------|----------------------------|----------------------------|---------------------------------|------------------|-----------------------|
-| `setEncKey<128>`    | 302/355   | 305      | 305 | 157* | 157* |
-| `setEncKey<192>`    | 278/348   | 281      | 281 | 140* | 140* |
-| `setEncKey<256>`    | 402/516   | 434      | 434 | 227* | 227* |
-| `encrypt<128>`      | 657/843   | 669      | 884 | 302 | 411 |
-| `encrypt<192>`      | 779/998   | 793      | 1056 | 358 | 491 |
-| `encrypt<256>`      | 901/1155  | 917      | 1228 | 414 | 571 |
-| `enc_unrolled<128>` | 604/834   | 604/1029 | - | 281 | - |
-| `enc_unrolled<192>` | 714/993   | 714/1221 | - | 333 | - |
-| `enc_unrolled<256>` | 824/1148  | 824/1413 | - | 385 | - |
-| `setDecKey<128>`    | 813/1102  | 816      | 0 | 412* | (1T) |
-| `setDecKey<192>`    | 989/1342  | 992      | 0 | 500* | (1T) |
-| `setDecKey<256>`    | 1165/1585 | 1168     | 0 | 588* | (1T) |
-| `decrypt<128>`      | 652/898   | 673      | 1272 | 304 | (1T) |
-| `decrypt<192>`      | 772/1071  | 797      | 1530 | 360 | (1T) |
-| `decrypt<256>`      | 892/1240  | 921      | 1788 | 416 | (1T) |
-| `dec_unrolled<128>` | 607/836   | 609/1032 | - | 282 | - |
-| `dec_unrolled<192>` | 717/995   | 719/1224 | - | 334 | - |
-| `dec_unrolled<256>` | 827/1150  | 829/1416 | - | 386 | - |
+| `setEncKey<128>`    |    |   | 305 | 157* | 157* |
+| `setEncKey<192>`    |    |    | 281 | 140* | 140* |
+| `setEncKey<256>`    |    |   | 434 | 227* | 227* |
+| `encrypt<128>`      |    | | 884 | 302 | 411 |
+| `encrypt<192>`      |    | | 1056 | 358 | 491 |
+| `encrypt<256>`      |   |  | 1228 | 414 | 571 |
+| `enc_unrolled<128>` |    | | - | 281 | - |
+| `enc_unrolled<192>` |    | | - | 333 | - |
+| `enc_unrolled<256>` |  | | - | 385 | - |
+| `setDecKey<128>`    |   | | 0 | 412* | (1T) |
+| `setDecKey<192>`    |   | | 0 | 500* | (1T) |
+| `setDecKey<256>`    |  | | 0 | 588* | (1T) |
+| `decrypt<128>`      |    | | 1272 | 304 | (1T) |
+| `decrypt<192>`      |   | | 1530 | 360 | (1T) |
+| `decrypt<256>`      |  | | 1788 | 416 | (1T) |
+| `dec_unrolled<128>` |    | | - | 282 | - |
+| `dec_unrolled<192>` |   | | - | 334 | - |
+| `dec_unrolled<256>` |   | | - | 386 | - |
 
 Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 `setDecKey<>` counts cycles required to perform equivalent inverse cipher transformation on expanded encryption key.

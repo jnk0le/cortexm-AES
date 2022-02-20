@@ -1,4 +1,5 @@
 // performs perform equivalent inverse cipher transformation on expanded encryption key
+// order of round keys is not inverted - decryption will read it in reverse
 
 .syntax unified
 .thumb

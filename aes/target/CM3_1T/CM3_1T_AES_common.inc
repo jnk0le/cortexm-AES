@@ -84,7 +84,7 @@
 	uxtb r2, r6
 	uxtb r3, r7
 
-	ldr r8, [r12, #-16]! // need to be splitted across other loads
+	ldr r8, [r12, #-16]!
 	ldr r0, [r14, r0, lsl #2]
 	ldr r1, [r14, r1, lsl #2]
 	ldr r2, [r14, r2, lsl #2]

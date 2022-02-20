@@ -47,7 +47,7 @@ CM3_1T_AES_256_keyschedule_enc:
 	eor r2, r2, r12, lsl #16
 	eor r2, r2, r14, lsl #24
 
-	// instead of 3x eor.w + bmi.w, put eors after branch and in epilogue // somehow saves 6 cycles at 0ws on cm3 (3 at 2ws)
+	// instead of 3x eor.w + bmi.w, put eors after branch and in epilogue // somehow saves 6 cycles
 	bmi 2f
 
 	eors r3, r2
