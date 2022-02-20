@@ -134,22 +134,21 @@ CM4_DSPsBOX_AES_decrypt:
 	eor r11, r6, #0x1b1b1b1b
 	sel r6, r11, r6 // if uadd carried then take reduced byte
 
-	// r8 - S{9} = S{8} ^ S{1}
-	// r9 - S{b} = S{9} ^ S{2}
-	// r10 - S{d} = S{9} ^ S{4}
+	// r0 - S{9} = S{8} ^ S{1}
+	// r4 - S{b} = S{9} ^ S{2}
+	// r5 - S{d} = S{9} ^ S{4}
 	// r6 - S{e} = S{8} ^ S{4} ^ S{2}
 
-	eor r8, r6, r0
-	eor r9, r8, r4
-	eor r10, r8, r5
+	eors r0, r6 // S{9}
 	eors r6, r5
-	eors r6, r4
+	eors r6, r4 // S{e}
+	eors r4, r0 // S{b}
+	eors r5, r0 // S{d}
 
 	// r0 = s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
-
-	eor r0, r6, r10, ror #16
-	eor r0, r0, r9, ror #8
-	eor r0, r0, r8, ror #24
+	eor r0, r6, r0, ror #24
+	eor r0, r0, r4, ror #8
+	eor r0, r0, r5, ror #16
 
 	//col 1 - STx1
 	uadd8 r4, r1, r1 // quad lsl #1
@@ -164,15 +163,15 @@ CM4_DSPsBOX_AES_decrypt:
 	eor r11, r6, #0x1b1b1b1b
 	sel r6, r11, r6 // if uadd carried then take reduced byte
 
-	eor r8, r6, r1
-	eor r9, r8, r4
-	eor r10, r8, r5
+	eors r1, r6 // S{9}
 	eors r6, r5
-	eors r6, r4
+	eors r6, r4 // S{e}
+	eors r4, r1 // S{b}
+	eors r5, r1 // S{d}
 
-	eor r1, r6, r10, ror #16
-	eor r1, r1, r9, ror #8
-	eor r1, r1, r8, ror #24
+	eor r1, r6, r1, ror #24
+	eor r1, r1, r4, ror #8
+	eor r1, r1, r5, ror #16
 
 	//col 2 - STx2
 	uadd8 r4, r2, r2 // quad lsl #1
@@ -187,15 +186,15 @@ CM4_DSPsBOX_AES_decrypt:
 	eor r11, r6, #0x1b1b1b1b
 	sel r6, r11, r6 // if uadd carried then take reduced byte
 
-	eor r8, r6, r2
-	eor r9, r8, r4
-	eor r10, r8, r5
+	eors r2, r6 // S{9}
 	eors r6, r5
-	eors r6, r4
+	eors r6, r4 // S{e}
+	eors r4, r2 // S{b}
+	eors r5, r2 // S{d}
 
-	eor r2, r6, r10, ror #16
-	eor r2, r2, r9, ror #8
-	eor r2, r2, r8, ror #24
+	eor r2, r6, r2, ror #24
+	eor r2, r2, r4, ror #8
+	eor r2, r2, r5, ror #16
 
 	//col 3 - STx3
 	uadd8 r4, r3, r3 // quad lsl #1
@@ -210,17 +209,17 @@ CM4_DSPsBOX_AES_decrypt:
 	eor r11, r6, #0x1b1b1b1b
 	sel r6, r11, r6 // if uadd carried then take reduced byte
 
-	eor r8, r6, r3
-	eor r9, r8, r4
-	eor r10, r8, r5
+	eors r3, r6 // S{9}
 	eors r6, r5
-	eors r6, r4
+	eors r6, r4 // S{e}
+	eors r4, r3 // S{b}
+	eors r5, r3 // S{d}
 
 	cmp r12, r14 // realigned here
 
-	eor r3, r6, r10, ror #16
-	eor r3, r3, r9, ror #8
-	eor r3, r3, r8, ror #24
+	eor r3, r6, r3, ror #24
+	eor r3, r3, r4, ror #8
+	eor r3, r3, r5, ror #16
 
 	bne.w 1b
 

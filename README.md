@@ -199,7 +199,7 @@ results assume that input, expanded round key and stack lie in the same memory b
 | `CM3_sBOX_AES_192_keyschedule_enc` | 100 | 32 | uses sbox table |
 | `CM3_sBOX_AES_256_keyschedule_enc` | 178 | 44(48) | uses sbox table |
 | `CM4_DSPsBOX_AES_encrypt` | 498 | 44(48) | uses sbox table |
-| `CM4_DSPsBOX_AES_decrypt` | 0 | 0 | uses inv_sbox table |
+| `CM4_DSPsBOX_AES_decrypt` | 630 | 44(48) | uses inv_sbox table |
 
 extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
 
