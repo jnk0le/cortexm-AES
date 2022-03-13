@@ -335,11 +335,11 @@ Implements counter mode caching. Do not use if IV/counter is secret as it will l
 | CTR_GENERIC<128>           |                  |                        | 19.50            |
 | CTR_GENERIC<192>           |                  |                        | 23.00            |
 | CTR_GENERIC<256>           |                  |                        | 26.50            |
-| CTR<128>                   |                  | 33.03                  | 15.64*           |
-| CTR<192>                   |                  | 40.53                  | 19.14*           |
-| CTR<256>                   |                  | 48.03                  | 22.64*           |
-| CTR_unrolled<128>          |                  |                  | 14.52           |
-| CTR_unrolled<192>          |                  |                  | 17.77           |
-| CTR_unrolled<256>          |                  |                  | 21.02           |
+| CTR<128>                   |                  | 33.03                  | 15.64           |
+| CTR<192>                   |                  | 40.53                  | 19.14           |
+| CTR<256>                   |                  | 48.03                  | 22.64           |
+| CTR_unrolled<128>          |                  | 30.84                 | 14.52           |
+| CTR_unrolled<192>          |                  | 37.72                 | 17.77           |
+| CTR_unrolled<256>          |                  | 44.59                 | 21.02           |
 
-`*` minor perf/consistency
+F407 results assume that input, expanded round key and stack lie in the same memory block (e.g. SRAM1 vs SRAM2 and CCM on f407)

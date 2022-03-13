@@ -38,11 +38,12 @@ CM3_1T_AES_CTR_enc:
 
 	// +20 - ctx+64
 	// +24 - data_in
-	// +28 - rk_end-16
+	// +28 - data_out
+	// +32 - rk_end-16
 
 	// stacked registers
 
-	// +72 - (blocks_cnt) -> final data ptr
+	// +72 - (blocks_cnt) -> data_end
 
 ctr_partial_precompute:
 
@@ -416,7 +417,6 @@ ctr_encrypt_first:
 	b ctr_partial_precompute
 
 ctr_exit:
-
 	add sp, #20+16
 	pop {r4-r11,pc}
 #else
