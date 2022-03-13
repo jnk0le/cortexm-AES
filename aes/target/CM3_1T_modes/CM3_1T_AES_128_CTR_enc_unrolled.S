@@ -194,20 +194,19 @@ ctr_encrypt_first:
 
 	// expect ctr[3] in r1
 
-	//load key[3]
-	ldr r2, [r12, #28]
+	// load MSB of key[3]
+	ldrb r2, [r12, #31]
 
-	//load precomputed_x0
+	// load precomputed_x0
 	ldr r3, [sp, #16]
 
 	// rev and inc ctr here
 	rev r0, r1
 	adds r0, #1
-	rev r0, r0
 
 	//round 1
-	eors r1, r2
-	lsrs r1, #24
+	eor.w r1, r2, r1, lsr #24 // truncate ctr, key is already byte
+	rev r0, r0
 	ldr r1, [r14, r1, lsl #2]
 	str r0, [r12, #12] // incremented ctr
 	eor r3, r3, r1, ror #24
