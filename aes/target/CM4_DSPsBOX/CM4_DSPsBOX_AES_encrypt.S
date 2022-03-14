@@ -154,16 +154,17 @@ CM4_DSPsBOX_AES_encrypt:
 	eor r3, r4, r5, ror #8 // effective r5 = s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
 
 	//addroundkey
+	// aggregate loads by source in case it lies in different memory blocks
+	ldr r5, [r14, #4]
+	ldr r8, [r14, #8]
+	ldr r9, [r14, #12]
 	ldr r4, [r14], #16
-	ldr.w r6, [sp, #4] // get final condition
-	ldr r5, [r14, #-12]
-	ldr r8, [r14, #-8]
-	ldr r9, [r14, #-4]
+	ldr r6, [sp, #4] // get final condition
 
 	eors r0, r4
 	eors r1, r5
 
-	cmp.w r6, r14 // cmp must be .w
+	cmp r6, r14
 
 	eor.w r2, r8
 	eor.w r3, r9

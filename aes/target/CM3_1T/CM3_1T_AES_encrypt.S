@@ -32,6 +32,17 @@ CM3_1T_AES_encrypt:
 	uxtb r2, r6
 	uxtb r3, r7
 
+#ifdef __ARM_ARCH_7EM__
+	// aggregate loads by source in case it lies in different memory blocks
+	ldr r0, [r14, r0, lsl #2]
+	ldr r1, [r14, r1, lsl #2]
+	ldr r2, [r14, r2, lsl #2]
+	ldr r3, [r14, r3, lsl #2]
+	ldr r9, [r12, #4]
+	ldr r10, [r12, #8]
+	ldr r11, [r12, #12]
+	ldr r8, [r12], #16
+#else // cm3 can't post index anywhere but first load
 	ldr r8, [r12], #16
 	ldr r0, [r14, r0, lsl #2]
 	ldr r1, [r14, r1, lsl #2]
@@ -40,6 +51,7 @@ CM3_1T_AES_encrypt:
 	ldr r9, [r12, #-12]
 	ldr r10, [r12, #-8]
 	ldr r11, [r12, #-4]
+#endif
 
 	eor r8, r8, r0, ror #16
 	eor r9, r9, r1, ror #16

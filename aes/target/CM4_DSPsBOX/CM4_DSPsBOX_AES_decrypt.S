@@ -102,11 +102,12 @@ CM4_DSPsBOX_AES_decrypt:
 	orr r3, r3, r11, lsl #16
 
 	//addroundkey
-	ldr r4, [r14, #-16]!
+	// aggregate loads by source in case it lies in different memory blocks
 	ldr r12, [sp] // load also final address to compare later
-	ldr r5, [r14, #4]
-	ldr r6, [r14, #8]
-	ldr r8, [r14, #12]
+	ldr r5, [r14, #-12]
+	ldr r6, [r14, #-8]
+	ldr r8, [r14, #-4]
+	ldr r4, [r14, #-16]!
 
 	eors r0, r4
 	eors r1, r5
