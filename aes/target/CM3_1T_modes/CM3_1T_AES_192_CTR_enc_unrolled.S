@@ -333,7 +333,7 @@ ctr_encrypt_first:
 	str r5, [r2, #4]
 	str r6, [r2, #8]
 	str r7, [r2, #12]
-	str r4, [r2], #16 // cm3?
+	str r4, [r2], #16
 
 	beq ctr_exit //if len==0: exit
 

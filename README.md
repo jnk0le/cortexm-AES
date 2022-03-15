@@ -335,9 +335,9 @@ Implements counter mode caching. Do not use if IV/counter is secret as it will l
 | CTR_GENERIC<128>           |                  |                        | 19.50            |
 | CTR_GENERIC<192>           |                  |                        | 23.00            |
 | CTR_GENERIC<256>           |                  |                        | 26.50            |
-| CTR<128>                   |                  | 32.91                  | 15.64           |
-| CTR<192>                   |                  | 40.41                  | 19.14           |
-| CTR<256>                   |                  | 47.91                  | 22.64           |
+| CTR<128>                   | 32.97                 | 32.91                  | 15.64           |
+| CTR<192>                   | 40.47                | 40.41                  | 19.14           |
+| CTR<256>                   | 47.97                 | 47.91                  | 22.64           |
 | CTR_unrolled<128>          |                  | 30.72                 | 14.52           |
 | CTR_unrolled<192>          |                  | 37.59                 | 17.77           |
 | CTR_unrolled<256>          |                  | 44.47                 | 21.02           |
