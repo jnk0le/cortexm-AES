@@ -207,6 +207,20 @@ extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
 
 TBD
 
+
+#### performance
+
+| Cipher function  | STM32H7 - CM7_1T | |
+|--------------------------------|---------|-------|
+| `setEncKey<128>`          | 151 |  |
+
+#### specific function sizes
+
+| Function | code size in bytes | stack usage in bytes | notes |
+|----------|--------------------|----------------------|-------|
+| `CM7_1T_AES_128_keyschedule_enc` | 124 | 24 | uses Te2 table |
+
+
 ### cortex-m55
 
 no hardware available yet, TBD
