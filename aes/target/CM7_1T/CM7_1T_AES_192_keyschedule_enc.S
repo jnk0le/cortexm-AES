@@ -26,7 +26,7 @@ CM7_1T_AES_192_keyschedule_enc:
 	mov.w r1, #0x01000000 // calculate rcon in highest byte to use a carry flag
 
 	//just copy a key
-	stmia.w r0!, {r2-r5} // align loop entry // r6, r7 stored at beggining of loop
+	stmia.w r0!, {r2-r5} // align loop entry // r6, r7 stored at beggining of the loop
 
 1:	and.w r12, r7, #0xff
 	lsr.w r10, r7, #24
