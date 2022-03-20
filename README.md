@@ -213,12 +213,14 @@ TBD
 | Cipher function  | STM32H7 - CM7_1T | |
 |--------------------------------|---------|-------|
 | `setEncKey<128>`          | 151 |  |
+| `setEncKey<192>`          | 131 |  |
 
 #### specific function sizes
 
 | Function | code size in bytes | stack usage in bytes | notes |
 |----------|--------------------|----------------------|-------|
 | `CM7_1T_AES_128_keyschedule_enc` | 124 | 24 | uses Te2 table |
+| `CM7_1T_AES_128_keyschedule_enc` | 124 | 32 | uses Te2 table |
 
 
 ### cortex-m55

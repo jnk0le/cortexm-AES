@@ -11,7 +11,6 @@
 // void CM7_1T_AES_128_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
 .global CM7_1T_AES_128_keyschedule_enc
 .type   CM7_1T_AES_128_keyschedule_enc,%function
-	nop.w // align loop entry
 CM7_1T_AES_128_keyschedule_enc:
 #if __ARM_ARCH_7EM__
 	push {r4-r8, lr}
@@ -20,20 +19,20 @@ CM7_1T_AES_128_keyschedule_enc:
 	movt r14, #:upper16:AES_Te2
 
 	//load key once
-	ldmia r1!, {r2-r5}
+	ldmia.w r1!, {r2-r5} // align loop entry
 
 	// calculate rcon in highest byte to use a carry flag
 	// use constructed immediate rather than shifted one for more issuable constants
 	mov.w r1, #0x01010101
 
 	//just copy a key
-	stmia r0!, {r2-r5}
+	stmia.w r0!, {r2-r5} // align loop entry
 
 1:	and.w r12, r5, #0xff
 	eor r2, r2, r1, lsr #24 // rcon is in highest byte
 
 	lsr.w r8, r5, #24
-	lsls r1, #1
+	lsls r1, #1 // next rcon
 
 	uxtb r7, r5, ror #16
 	ldrb r12, [r14, r12, lsl #2] // load sbox from Te2
@@ -54,7 +53,7 @@ CM7_1T_AES_128_keyschedule_enc:
 	cmp.w r1, #0x6c6c6c6c
 
 	orr r6, r6, r7, lsl #8 // lower 16 bits
-	eor.w r3, r2 // start now, there is bubble nyway
+	eor.w r3, r2 // start now, there is bubble anyway
 
 	eor.w r2, r6
 	eor.w r3, r6
