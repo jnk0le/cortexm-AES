@@ -30,16 +30,16 @@ CM7_1T_AES_128_keyschedule_enc:
 
 	strd r3,r4, [r0], #8 // r5 stored inside of the loop
 
-1:	and.w r12, r5, #0xff // 24
+1:	and.w r12, r5, #0xff
 	eor r2, r2, r1, lsr #24 // rcon is in highest byte
 
-	lsr.w r8, r5, #24 // 16
+	lsr.w r8, r5, #24
 	lsls r1, #1
 
-	uxtb r7, r5, ror #16 // 8
+	uxtb r7, r5, ror #16
 	ldrb r12, [r14, r12, lsl #2] // load sbox from Te2
 
-	uxtb r6, r5, ror #8 // 0
+	uxtb r6, r5, ror #8
 	ldrb r8, [r14, r8, lsl #2] // load sbox from Te2
 
 	// better than `it` instruction // works the same in younger and older slot
