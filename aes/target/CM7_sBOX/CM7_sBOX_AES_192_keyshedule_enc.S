@@ -1,8 +1,6 @@
 // precesses 192 bits of key in every iteration
 // 8 rounds of rcon can be computed as left shift only
 
-// LUT loads are splitted to avoid data dependent issuing capability from even/odd DTCM words
-
 .syntax unified
 .thumb
 .text
@@ -20,56 +18,54 @@ CM7_sBOX_AES_192_keyschedule_enc:
 	movt r14, #:upper16:AES_sbox
 
 	//load key
-	ldmia r1!, {r2-r7}
-	movw r1, #0x01 //first rcon //align following code to 4 bytes
+	ldmia.w r1!, {r2-r7} // align loop entry
+
+	mov.w r1, #0x01000000 // calculate rcon in highest byte to use a carry flag
 
 	//just copy a key
-	stmia r0!, {r2-r7}
+	stmia.w r0!, {r2-r5} // align loop entry // r6, r7 stored at beggining of the loop
 
-1:	uxtb r8, r7, ror #8
+1:	and.w r12, r7, #0xff
+	lsr.w r10, r7, #24
+
+	strd r6,r7, [r0], #8
+
 	uxtb r9, r7, ror #16
-	//cannot dual issue when load offset is blocked by uxtb
+	ldrb r12, [r14, r12] // load sbox from Te2
 
-	uxtb r10, r7, ror #24
-	ldrb r8, [r14, r8]
+	uxtb r8, r7, ror #8
+	ldrb r10, [r14, r10] // load sbox from Te2
 
-	uxtb r12, r7
-	ldrb r9, [r14, r9]
-
-	eors r2, r1 //apply rcon
-	ldrb r10, [r14, r10]
-
-	eor r2, r2, r8
-	ldrb r12, [r14, r12]
-	//cannot use r12 in the next cycle
-
-	eor r2, r2, r9, lsl #8
-	lsls r1, #1
-
-	eor r2, r2, r10, lsl #16
-	cmp r1, 0x80 //break when rcon is greater than 0x80 // will use flags later
+	eor r2, r2, r1, lsr #24 // rcon is in highest byte
+	ldrb r9, [r14, r9] // load sbox from Te2
 
 	eor r2, r2, r12, lsl #24
-	str r2, [r0], #4
+	ldrb r8, [r14, r8] // load sbox from Te2
 
-	eor r3, r2 // do not set a flags
-	str r3, [r0], #4
+	eor r2, r2, r10, lsl #16
+	lsls.w r1, #1 // next rcon // cant .n even when epilogue aligned
 
-	eor r4, r3 // do not set a flags
-	str r4, [r0], #4
+	orr r8, r8, r9, lsl #8 // lower 16 bits
+	eor.w r3, r2 // start now, there is bubble anyway
 
-	eor r5, r4 // do not set a flags
-	str r5, [r0], #4
+	eor.w r2, r8
+	eor.w r3, r8
 
-	itttt ls  // last 2 words are ommited
-	eorls r6, r5 // do not set a flags
-	strls r6, [r0], #4
+	eor.w r4, r3
+	str.w r2, [r0], #4
 
-	eorls r7, r6 // do not set a flags
-	strls r7, [r0], #4
+	eor.w r5, r4
+	str.w r3, [r0], #4
 
-	bls 1b
+	strd r4,r5, [r0], #8
 
+	bcs 2f
+	eors r6, r5
+
+	eors r7, r6
+	b 1b // can bcc here at +1 cycles
+
+2:
 	pop {r4-r10, pc}
 #else
 	b . //crash in case the function was called on thumb1 core

@@ -1,8 +1,5 @@
-// can be reimplemented to use only 256 byte sbox
 // precesses 192 bits of key in every iteration
 // 8 rounds of rcon can be computed as left shift only
-
-// LUT loads are splitted to avoid data dependent issuing capability from even/odd DTCM words
 
 .syntax unified
 .thumb

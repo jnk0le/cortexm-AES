@@ -1,4 +1,3 @@
-// can be reimplemented to use only 256 byte sbox
 // 10 rounds of rcon can be computed as left shift + conditional reload of rcon to 0x1b after 0x80
 // it can also serve as loop counter to reduce register pressure
 
