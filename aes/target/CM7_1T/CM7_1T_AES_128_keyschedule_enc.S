@@ -66,8 +66,8 @@ CM7_1T_AES_128_keyschedule_enc:
 
 	eor.w r5, r4
 	bne 1b
-
 	str r5, [r0]
+
 	pop {r4-r8, pc}
 #else
 	b . //crash in case the function was called on thumb1 core
