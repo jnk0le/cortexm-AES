@@ -10,10 +10,8 @@
 // void CM7_sBOX_AES_128_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
 .global CM7_sBOX_AES_128_keyschedule_enc
 .type   CM7_sBOX_AES_128_keyschedule_enc,%function
-
-#if __ARM_ARCH_7EM__
-	nop.w // align loop entry
 CM7_sBOX_AES_128_keyschedule_enc:
+#if __ARM_ARCH_7EM__
 	push {r4-r8, lr}
 
 	movw r14, #:lower16:AES_sbox
@@ -27,7 +25,11 @@ CM7_sBOX_AES_128_keyschedule_enc:
 	mov.w r1, #0x01010101
 	str.w r2, [r0], #4 // just copy a keys
 
-	strd r3,r4, [r0], #8 // r5 stored inside of the loop
+	movw r14, #:lower16:AES_Te2
+	str.w r3, [r0], #4
+
+	movt r14, #:upper16:AES_Te2
+	str.w r4, [r0], #4 // r5 stored inside of the loop
 
 1:	and.w r12, r5, #0xff
 	eor r2, r2, r1, lsr #24 // rcon is in highest byte
@@ -71,6 +73,5 @@ CM7_sBOX_AES_128_keyschedule_enc:
 	str r5, [r0]
 	pop {r4-r8, pc}
 #else
-CM7_1T_AES_128_keyschedule_enc:
 	b . //crash in case the function was called on thumb1 core
 #endif

@@ -212,7 +212,7 @@ TBD
 
 | Cipher function  | STM32H7 - CM7_1T | STM32H7 - CM7_DSPsBOX |
 |--------------------------------|---------|-------|
-| `setEncKey<128>`          | 142 | 142 |
+| `setEncKey<128>`          | 141 | 141 |
 | `setEncKey<192>`          | 131 | 131 |
 
 #### specific function sizes
