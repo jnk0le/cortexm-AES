@@ -38,19 +38,19 @@ CM7_sBOX_AES_128_keyschedule_enc:
 	lsls r1, #1
 
 	uxtb r7, r5, ror #16
-	ldrb r12, [r14, r12] // load sbox from Te2
+	ldrb r12, [r14, r12] // load sbox
 
 	uxtb r6, r5, ror #8
-	ldrb r8, [r14, r8] // load sbox from Te2
+	ldrb r8, [r14, r8] // load sbox
 
 	// better than `it` instruction // works the same in younger and older slot
 	// needs 2 cycle clearance from lsls, .n instruction within 3 cycles above
 	bcc 2f
 	mov r1, #0x1b1b1b1b
-2:	ldrb r7, [r14, r7] // load sbox from Te2
+2:	ldrb r7, [r14, r7] // load sbox
 
 	eor r2, r2, r12, lsl #24
-	ldrb r6, [r14, r6] // load sbox from Te2
+	ldrb r6, [r14, r6] // load sbox
 
 	eor r2, r2, r8, lsl #16
 	str r5, [r0], #4 // from a previous loop or prologue
