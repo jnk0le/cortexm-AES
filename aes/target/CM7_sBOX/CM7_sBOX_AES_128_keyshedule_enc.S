@@ -25,10 +25,10 @@ CM7_sBOX_AES_128_keyschedule_enc:
 	mov.w r1, #0x01010101
 	str.w r2, [r0], #4 // just copy a keys
 
-	movw r14, #:lower16:AES_Te2
+	movw r14, #:lower16:AES_sbox
 	str.w r3, [r0], #4
 
-	movt r14, #:upper16:AES_Te2
+	movt r14, #:upper16:AES_sbox
 	str.w r4, [r0], #4 // r5 stored inside of the loop
 
 1:	and.w r12, r5, #0xff
