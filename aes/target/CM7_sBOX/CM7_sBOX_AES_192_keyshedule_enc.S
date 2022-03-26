@@ -48,7 +48,7 @@ CM7_sBOX_AES_192_keyschedule_enc:
 	orr r8, r8, r9, lsl #8 // lower 16 bits
 	eor.w r3, r2 // start now, there is bubble anyway
 
-	eor.w r2, r8
+	eor.w r2, r8 // finish r2
 	eor.w r3, r8
 
 	eor.w r4, r3

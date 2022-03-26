@@ -14,9 +14,6 @@ CM7_sBOX_AES_128_keyschedule_enc:
 #if __ARM_ARCH_7EM__
 	push {r4-r8, lr}
 
-	movw r14, #:lower16:AES_sbox
-	movt r14, #:upper16:AES_sbox
-
 	//load key once
 	ldmia.w r1!, {r2-r5}
 
