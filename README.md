@@ -214,6 +214,7 @@ TBD
 |--------------------------------|---------|-------|
 | `setEncKey<128>`          | 141 | 142 |
 | `setEncKey<192>`          | 131 | 131 |
+| `setEncKey<256>`          | 181 | 181 |
 
 #### specific function sizes
 
@@ -221,10 +222,12 @@ TBD
 |----------|--------------------|----------------------|-------|
 | `CM7_1T_AES_128_keyschedule_enc` | 132 | 24 | uses Te2 table |
 | `CM7_1T_AES_192_keyschedule_enc` | 124 | 32 | uses Te2 table |
-| `CM7_1T_AES_256_keyschedule_enc` |  |  | uses Te2 table |
+| `CM7_1T_AES_256_keyschedule_enc` | 208 | 36(40) | uses Te2 table |
 | `CM7_sBOX_AES_128_keyschedule_enc` | 132 | 24 | uses sbox table |
 | `CM7_sBOX_AES_192_keyschedule_enc` | 124 | 32 | uses sbox table |
-| `CM7_sBOX_AES_256_keyschedule_enc` |  |  | uses sbox table |
+| `CM7_sBOX_AES_256_keyschedule_enc` | 208 | 36(40) | uses sbox table |
+
+extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
 
 ### cortex-m55
 
@@ -316,9 +319,9 @@ MixCloums stage is parallelized according to [this](http://www.wseas.us/e-librar
 
 | Cipher function     | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32F4 (0ws/7ws) - CM4_DSPsBOX | STM32H7 - CM7_1T | STM32H7 - CM7_DSPsBOX |
 |---------------------|----------------------------|----------------------------|---------------------------------|------------------|-----------------------|
-| `setEncKey<128>`    |    |   |  | 157* | 157* |
-| `setEncKey<192>`    |    |    |  | 140* | 140* |
-| `setEncKey<256>`    |    |   |  | 227* | 227* |
+| `setEncKey<128>`    |    |   |  |  |  |
+| `setEncKey<192>`    |    |    |  |  |  |
+| `setEncKey<256>`    |    |   |  |  |  |
 | `encrypt<128>`      |    | |  | 302 | 411 |
 | `encrypt<192>`      |    | |  | 358 | 491 |
 | `encrypt<256>`      |   |  |  | 414 | 571 |
