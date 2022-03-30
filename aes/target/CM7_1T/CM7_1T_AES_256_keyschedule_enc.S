@@ -1,4 +1,3 @@
-// can be reimplemented to use only 256 byte sbox
 // precesses 256 bits of key per iteration
 // 7 rounds of rcon can be computed as left shift only
 
@@ -18,21 +17,20 @@ CM7_1T_AES_256_keyschedule_enc:
 	//load key
 	ldmia.w r1!, {r2-r9}
 
-	movw r14, #:lower16:AES_Te2
-	movt r14, #:upper16:AES_Te2
+	strd r2,r3, [r0], #8 // just copy a key // 2x strd to keep loop aligned
 
+	movw r14, #:lower16:AES_Te2 // top loaded in loop
 	mov.w r1, #0x01000000 // calculate rcon in highest byte to use negative flag
 
-	//just copy a key
-	stmia.w r0!, {r2-r5} // upper part is stored in first half of the loop
+	strd r4,r5, [r0], #8 // upper part is stored in first half of the loop
 
 1:	uxtb r10, r9, ror #8
-	and.w r11, r9, #0xff
+	movt r14, #:upper16:AES_Te2
 
-	uxtb.w r12, r9, ror #16
+	and.w r11, r9, #0xff
 	str.w r6, [r0], #4
 
-	nop.w // cant .n
+	uxtb.w r12, r9, ror #16
 	ldrb r10, [r14, r10, lsl #2] // load sbox from Te2
 
 	eor.w r2, r2, r1, lsr #24 // rcon is in highest byte
