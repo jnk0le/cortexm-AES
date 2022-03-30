@@ -25,10 +25,10 @@ CM7_sBOX_AES_256_keyschedule_enc:
 	//just copy a key
 	stmia.w r0!, {r2-r5} // upper part is stored in first half of the loop
 
-1:	uxtb r10, r9, ror #8 // 0
-	and.w r11, r9, #0xff // 24
+1:	uxtb r10, r9, ror #8
+	and.w r11, r9, #0xff
 
-	uxtb.w r12, r9, ror #16 // 8
+	uxtb.w r12, r9, ror #16
 	str.w r6, [r0], #4
 
 	nop.w // cant .n
@@ -40,7 +40,7 @@ CM7_sBOX_AES_256_keyschedule_enc:
 	eor.w r2, r10
 	ldrb r12, [r14, r12] // load sbox
 
-	lsr.w r10, r9, #24 // 16 // early alu can be consumed by load next cycle
+	lsr.w r10, r9, #24 // early alu can be consumed by load next cycle
 	str.w r7, [r0], #4
 
 	eor.w r2, r2, r11, lsl #24
