@@ -9,7 +9,7 @@
 .type   CM7_1T_AES_encrypt,%function
 CM7_1T_AES_encrypt:
 #if __ARM_ARCH_7EM__
-	pld [r1, #0] // dead cycle anyway, preload in case data is still in external mem, cacheline is 32 bytes
+	pld [r1, #0] // dead cycle anyway, preload in case data is still in external mem
 	add r3, r0, r3, lsl #4 //rk_end-16 = rk + rounds * 16
 
 	push {r3,r4-r11,lr} //stack rk_end-16
@@ -32,9 +32,7 @@ CM7_1T_AES_encrypt:
 	eors r2, r6
 	eors r3, r7
 
-1:
-	//start extending from the highest byte and load key/loop later
-	uxtb r8, r2, ror #16
+1:	uxtb r8, r2, ror #16
 	lsr.w r4, r3, #24
 
 	uxtb r9, r3, ror #16
@@ -119,7 +117,7 @@ CM7_1T_AES_encrypt:
 	eor r5, r5, r9, ror #8
 	ldr r10, [r14, r10, lsl #2]
 
-	cmp.w r8, r12 // cmp at least 3 cycles before branch
+	cmp.w r8, r12 // cmp early
 	ldr r11, [r14, r11, lsl #2]
 
 	eor r7, r7, r10, ror #16
@@ -135,10 +133,6 @@ CM7_1T_AES_encrypt:
 	bne.w 1b
 
 	//final round
-
-	//recycle final round from DSPsBOX
-	//bfi way should be similar
-
 	uxtb r9, r2, ror #16 //row 2 col 0
 	lsrs r7, r3, #24 //row 3 col 0
 

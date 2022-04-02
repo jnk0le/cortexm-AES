@@ -11,21 +11,24 @@
 .type   CM7_1T_AES_decrypt,%function
 CM7_1T_AES_decrypt:
 #if __ARM_ARCH_7EM__
-	pld [r1, #0] // dead cycle anyway, preload in case data is still in external mem, cacheline is 32 bytes
+	pld [r1, #0] // dead cycle anyway, preload in case data is still in external mem
 	adds r0, #16 //to compare against before final round
 
-	push {r2,r4-r11,lr} //stack out
+	push {r5-r11,lr} // need to stack out after rk+16
 
 	add r12, r0, r3, lsl #4 //rk_end = rk+16 + rounds * 16
-	str.w r0, [sp, #-4]! //stack rk+16
+	str.w r4, [sp, #-4]!
 
 	movw r14, #:lower16:AES_Td2
+	str.w r0, [sp, #-4]! //stack rk+16
+
 	movt r14, #:upper16:AES_Td2
+	str.w r2, [sp, #-4]! //stack out
 
 	//load input
 	ldmia r1!, {r4-r7}
 
-	//load initial round key
+	//load key
 	ldmdb r12!, {r0-r3}
 
 	//initial addroundkey
@@ -34,8 +37,7 @@ CM7_1T_AES_decrypt:
 	eors r2, r6
 	eors r3, r7
 
-1:
-	uxtb r8, r2, ror #16
+1:	uxtb r8, r2, ror #16
 	lsr.w r4, r1, #24
 
 	uxtb r9, r3, ror #16
@@ -115,12 +117,12 @@ CM7_1T_AES_decrypt:
 	ldr r3, [r12, #12]
 
 	eor r6, r6, r8, ror #16
-	ldr.w r8, [sp, #0]
+	ldr.w r8, [sp, #4]
 
 	eor r7, r7, r9, ror #8
 	ldr r10, [r14, r10, lsl #2]
 
-	cmp.w r8, r12 // cmp at least 3 cycles before branch
+	cmp.w r8, r12 // cmp early
 	ldr r11, [r14, r11, lsl #2]
 
 	eor r7, r7, r10, ror #16
@@ -282,7 +284,7 @@ CM7_1T_AES_decrypt:
 	eor.w r5, r11, r5, lsl #16 // col 3
 	ldr r1, [r12, #4]
 
-	add sp, #4 // clear stack
+	eors r0, r4
 	ldr r2, [r12, #8]
 
 	orr.w r7, r7, r6, lsl #8 // col 2 upper
@@ -302,11 +304,8 @@ CM7_1T_AES_decrypt:
 	// r10 - col 2 bottom
 	// r11 -
 
-	nop // half cycle is lost anyway
-	ldr r6, [sp], #4 //load output pointer and clear stack
-
-	eors r0, r4
 	eor r1, r8
+	ldr r6, [sp], #8 //load output pointer and clear stack
 
 	orr.w r7, r10, r7, lsl #16 // col2
 	ldr r4, [sp], #4 // pop early to pop even number of registers later
