@@ -43,6 +43,22 @@ CM7_DSPsBOX_AES_encrypt:
 	// r12 - rk ptr
 	// r14 - sbox
 
+	/* do mixcolumns as
+	eor tmp1, r0, r0, ror #8 // tmp1 = s0^s1 | s1^s2 | s2^s3 | s3^s0
+	eor r0, tmp1, r0, ror #16 // r0 = s0^s1^s2 | s1^s2^s3 | s0^s2^s3 | s0^s1^s3
+
+	uadd8 tmp2, tmp1, tmp1 // quad lsl #1
+	eor tmp3, tmp2, #0x1b1b1b1b
+	sel tmp4, tmp3, tmp2 // if uadd carried then take reduced byte
+
+	eor r0, tmp4, r0, ror #8 // effective r0 = s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
+	eor r0, r0, rk[n] // and final addroundkey
+
+	alternatively
+	eor r0, rk[n], r0, ror #8 // effective r0 = s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
+	eor r0, r0, tmp4
+	*/
+
 1:	// prepare column 1 asap (col 0 would require r3 on early alu)
 	uxtb.w r6, r3, ror #16 // row 2 col 1
 	lsr.w r7, r0, #24 // row 3 col 1
@@ -433,9 +449,7 @@ CM7_DSPsBOX_AES_encrypt:
 	eors r3, r6
 	str r3, [r5, #12]
 
-
 	pop {r5-r11,pc}
-
 #else
 	b . //crash in case the function was called on non dsp core
 #endif
