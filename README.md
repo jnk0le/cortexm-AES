@@ -24,7 +24,7 @@ section).
 - do not use cortex-m3 and cortex-m4 implementations on cortex-m7 since it is slower and will introduce timming leaks.
 - Unrolled ciphers might perform slower than looped versions due to (usually LRU) cache pressure and flash waitstates. (like STM32F4 with 1K ART cache and up to 8WS)
 - input/output buffers might have to be word aligned due to use of ldm,stm,ldrd and strd instructions.
-- for optimization gimmicks refer to [pipeline cycle test repo](https://github.com/jnk0le/random/tree/master/pipeline%20cycle%20test) (ignore old (CM7) comments inside code here - they are likely outdated)
+- for optimization gimmicks refer to [pipeline cycle test repo](https://github.com/jnk0le/random/tree/master/pipeline%20cycle%20test) (ignore old cm7 comments)
 - included unit tests don't cover timming leaks (performance difference on different runs may not be a data dependent ones)  
 - asm functions (and CM*.h headers) can be extracted and used as C only code, but that may require extra boilerplate code (structures etc.)
 
@@ -215,15 +215,15 @@ TBD
 | `setEncKey<128>`          | 141 | 141 |
 | `setEncKey<192>`          | 131 | 131 |
 | `setEncKey<256>`          | 180 | 180 |
-| `encrypt<128>`            | 302 | |
-| `encrypt<192>`            | 358 | |
-| `encrypt<256>`            | 414 | |
+| `encrypt<128>`            | 302 | 400 |
+| `encrypt<192>`            | 358 | 478 |
+| `encrypt<256>`            | 414 | 556 |
 | `setDecKey<128>`          | 357 | 357 |
 | `setDecKey<192>`          | 433 | 433 |
 | `setDecKey<256>`          | 509 | 509 |
-| `decrypt<128>`            | 303 | |
-| `decrypt<192>`            | 359 | |
-| `decrypt<256>`            | 415 | |
+| `decrypt<128>`            | 303 | (1T) |
+| `decrypt<192>`            | 359 | (1T) |
+| `decrypt<256>`            | 415 | (1T) |
 
 #### specific function sizes
 
@@ -239,6 +239,7 @@ TBD
 | `CM7_sBOX_AES_128_keyschedule_enc` | 132 | 24 | uses sbox table |
 | `CM7_sBOX_AES_192_keyschedule_enc` | 124 | 32 | uses sbox table |
 | `CM7_sBOX_AES_256_keyschedule_enc` | 208 | 36(40) | uses sbox table |
+| `CM7_DSPsBOX_AES_encrypt` | 550 | 40 | uses sbox table |
 
 extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
 
