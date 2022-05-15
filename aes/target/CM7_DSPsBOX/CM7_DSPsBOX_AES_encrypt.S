@@ -32,11 +32,7 @@ CM7_DSPsBOX_AES_encrypt:
 	//load key
 	ldmia.w r12!, {r0-r3}
 
-	//initial addroundkey
-	eors r0, r4
-	eors r1, r5
-	eors r2, r6
-	eors r3, r7
+	//initial addroundkey in loop
 
 	// global allocation
 	// r11 - final ptr
@@ -59,18 +55,25 @@ CM7_DSPsBOX_AES_encrypt:
 	eor r0, r0, tmp4
 	*/
 
-1:	// prepare column 1 asap (col 0 would require r3 on early alu)
-	uxtb.w r6, r3, ror #16 // row 2 col 1
-	lsr.w r7, r0, #24 // row 3 col 1
+1:	// skew addroundkey to begginning of loop
+	eors r0, r4
+	eors r3, r7
 
-	uxtb.w r5, r2, ror #8 // row 1 col 1
-	ldrb.w r7, [r14, r7]
+	eors r2, r6
+	lsrs r7, r0, #24 // row 3 col 1
 
-	and.w r4, r1, #0xff // row 0 col 1  //can uxtb.n
-	ldrb.w r6, [r14, r6]
+	// prepare column 1 asap
+	uxtab.w r6, r14, r3, ror #16 // row 2 col 1
+	eors r1, r5
 
-	uxtb.w r8, r2, ror #16 // row 2 col 0
-	ldrb.w r5, [r14, r5]
+	uxtab.w r5, r14, r2, ror #8 // row 1 col 1
+	ldrb.w r10, [r14, r7]
+
+	uxtb r4, r1 // row 0 col 1
+	ldrb r6, [r6]
+
+	uxtab.w r7, r14, r2, ror #16 // row 2 col 0
+	ldrb r5, [r5]
 
 	//current alloctaion
 	// r0 - s00 | s10 | s20 |
@@ -80,16 +83,16 @@ CM7_DSPsBOX_AES_encrypt:
 	// r4 - s01  //r0c1
 	// r5 - s12` //r1c1
 	// r6 - s23` //r2c1
-	// r7 - s30` //r3c1
-	// r8 - s22  //r2c0
+	// r7 - s22  //r2c0
+	// r8 -
 	// r9 -
-	// r10 -
+	// r10 - s30` //r3c1
 
-	orr.w r9, r6, r7, lsl #8 // col 0 upper part
+	orr.w r9, r6, r10, lsl #8 // col 1 upper part
 	ldrb.w r4, [r14, r4]
 
-	lsr.w r7, r3, #24 // row 3 col 0
-	ldrb.w r8, [r14, r8]
+	lsrs r6, r3, #24 // row 3 col 0
+	ldrb r7, [r7]
 
 	//current alloctaion
 	// r0 - s00 | s10 | s20 |
@@ -98,17 +101,17 @@ CM7_DSPsBOX_AES_encrypt:
 	// r3 - s03 | s13 |     |
 	// r4 - s01` //r0c1
 	// r5 - s12` //r1c1
-	// r6 -
-	// r7 - s33  //r3c0
-	// r8 - s22` //r2c0
+	// r6 - s33  //r3c0
+	// r7 - s22` //r2c0
+	// r8 -
 	// r9 - s23` | s30` //c1 upper
 	// r10 -
 
-	uxtb.w r6, r1, ror #8 // row 1 col 0
-	ldrb.w r7, [r14, r7]
-
 	orr.w r10, r4, r5, lsl #8 //c1 bottom
-	lsr.w r5, r1, #24 // row 3 col 2
+	ldrb.w r8, [r14, r6]
+
+	uxtab.w r6, r14, r1, ror #8 // row 1 col 0
+	lsrs r5, r1, #24 // row 3 col 2
 
 	//current alloctaion
 	// r0 - s00 | s10 | s20 |
@@ -118,83 +121,81 @@ CM7_DSPsBOX_AES_encrypt:
 	// r4 -
 	// r5 - s31  //r3c2
 	// r6 - s11  //r1c0
-	// r7 - s33` //r3c0
-	// r8 - s22` //r2c0
+	// r7 - s22` //r2c0
+	// r8 - s33` //r3c0
 	// r9 - s23` | s30` //c1 upper
 	// r10 - s01` | s12` //c1 bottom
 
-	and.w r4, r0, 0xff // row 0 col 0 // can uxtb.n
-	orr.w r10, r10, r9, lsl #16 // col1
+	uxtb r4, r0 // row 0 col 0
+	orr.w r10, r10, r9, lsl #16 // col 1
 
-	orr.w r8, r8, r7, lsl #8 // col 0 upper
-	ldrb.w r6, [r14, r6]
+	orr.w r8, r7, r8, lsl #8 // col 0 upper
+	ldrb.w r6, [r6]	// alignment??
 
-	uxtb.w r7, r0, ror #16 // row 2 col 2
-	ldrb.w r4, [r14, r4]
+	uxtab.w r7, r14, r0, ror #16 // row 2 col 2
+	ldrb.w r9, [r14, r4]
 
 	//current alloctaion
 	// r0 -     | s10 |     |
 	// r1 -     |     | s21 |
 	// r2 - s02 |     |     | s32
 	// r3 - s03 | s13 |     |
-	// r4 - s00` //r0c0
+	// r4 -
 	// r5 - s31  //r3c2
 	// r6 - s11` //r1c0
 	// r7 - s20  //r2c2
 	// r8 - s22` | s33` //c0 upper
-	// r9 -
+	// r9 - s00` //r0c0
 	// r10 - col 1
 
-	uxtb r9, r3, ror #8 // row 1 col 2
+	uxtab.w r4, r14, r3, ror #8 // row 1 col 2
 	ldrb.w r5, [r14, r5]
 
-	orr.w r6, r4, r6, lsl #8 // col 0 bottom
-	ldrb.w r7, [r14, r7]
+	orr.w r9, r9, r6, lsl #8 // col 0 bottom
+	ldrb r7, [r7]
 
 	//current alloctaion
 	// r0 -     | s10 |     |
 	// r1 -     |     | s21 |
 	// r2 - s02 |     |     | s32
 	// r3 - s03 |     |     |
-	// r4 -
+	// r4 - s13  //r1c2
 	// r5 - s31` //r3c2
-	// r6 - s00` | s11` //c0 bottom
+	// r6 -
 	// r7 - s20` //r2c2
 	// r8 - s22` | s33` //c0 upper
-	// r9 - s13  //r1c2
+	// r9 - s00` | s11` //c0 bottom
 	// r10 - col 1
 
-	and.w r4, r2, 0xff // row 0 col 2 // can uxtb.n
-	orr.w r6, r6, r8, lsl #16 // col 0
+	uxtb r6, r2 // row 0 col 2
+	orr.w r9, r9, r8, lsl #16 // col 0
 
 	eor.w r8, r10, r10, ror #8 // start col 1 mixcolumn
-	ldrb.w r9, [r14, r9]
+	ldrb r4, [r4]
 
 	orr.w r5, r7, r5, lsl #8 // col 2 upper
-	ldrb.w r4, [r14, r4]
+	ldrb.w r6, [r14, r6]
 
 	//current alloctaion
 	// r0 -     | s10 |     |
 	// r1 -     |     | s21 |
 	// r2 -     |     |     | s32
 	// r3 - s03 |     |     |
-	// r4 - s02` //r0c2
+	// r4 - s13` //r1c2
 	// r5 - s20` | s31` //c2 upper
-	// r6 - col 0
+	// r6 - s02` //r0c2
 	// r7 -
 	// r8 - col 1 (tmp1) - s0^s1 | s1^s2 | s2^s3 | s3^s0
-	// r9 - s13` //r1c2
+	// r9 - col 0
 	// r10 - col 1
 
-	// --------------------------------
-
 	eor.w r10, r8, r10, ror #16
-	lsr.w r2, r2, #24 // row 3 col 3
+	lsrs r2, r2, #24 // row 3 col 3
 
-	uxtb.w r1, r1, ror #16 // row 2 col 3
-	orr.w r9, r4, r9, lsl #8 // col 2 bottom
+	uxtb.w r1, r1, ror #16 // row 2 col 3 // cant uxtab with inline shift
+	orr.w r6, r6, r4, lsl #8 // col 2 bottom
 
-	uxtb.w r7, r0, ror #8 // row 1 col 3
+	uxtab.w r7, r14, r0, ror #8 // row 1 col 3
 	ldrb.w r2, [r14, r2]
 
 	//current alloctaion
@@ -204,17 +205,18 @@ CM7_DSPsBOX_AES_encrypt:
 	// r3 - s03 |     |     |
 	// r4 -
 	// r5 - s20` | s31` //c2 upper
-	// r6 - col 0
+	// r6 - s02` | s13` //c2 bottom
 	// r7 - s10 //r1c3
 	// r8 - col 1 (tmp1) - s0^s1 | s1^s2 | s2^s3 | s3^s0
-	// r9 - s02` | s13` //c2 bottom
+	// r9 - col 0
 	// r10 - col 1 - s0^s1^s2 | s1^s2^s3 | s0^s2^s3 | s0^s1^s3
 
-	and.w r3, r3, #0xff // can uxtb.n
+	uxtb r3, r3
+	//and.w r3, r3, #0xff
 	ldrb.w r1, [r14, r1]
 
 	uadd8 r8, r8, r8 // quad lsl #1
-	orr.w r9, r9, r5, lsl #16 // col 2
+	orr.w r6, r6, r5, lsl #16 // col 2
 
 	//current alloctaion
 	// r0 -
@@ -223,17 +225,17 @@ CM7_DSPsBOX_AES_encrypt:
 	// r3 - s03  //r0c3
 	// r4 -
 	// r5 -
-	// r6 - col 0
+	// r6 - col 2
 	// r7 - s10 //r1c3
 	// r8 - col 1 (tmp2)
-	// r9 - col 2
+	// r9 - col 0
 	// r10 - col 1 - s0^s1^s2 | s1^s2^s3 | s0^s2^s3 | s0^s1^s3
 
 	eor.w r4, r8, #0x1b1b1b1b
 	orr.w r5, r1, r2, lsl #8 // col 3 upper
 
 	sel r1, r4, r8 // if uadd carried then take reduced byte
-	eor.w r8, r6, r6, ror #8 // start col 0 mixcolumn
+	eor.w r8, r9, r9, ror #8 // start col 0 mixcolumn
 
 	//current alloctaion
 	// r0 -
@@ -242,14 +244,14 @@ CM7_DSPsBOX_AES_encrypt:
 	// r3 - s03  //r0c3
 	// r4 -
 	// r5 - s21` | s32` //c3 upper
-	// r6 - col 0
+	// r6 - col 2
 	// r7 - s10  //r1c3
 	// r8 - col 0 (tmp1) - s0^s1 | s1^s2 | s2^s3 | s3^s0
-	// r9 - col 2
+	// r9 - col 0
 	// r10 - col 1 - s0^s1^s2 | s1^s2^s3 | s0^s2^s3 | s0^s1^s3
 
-	eor.w r6, r8, r6, ror #16
-	ldrb.w r7, [r14, r7]
+	eor.w r9, r8, r9, ror #16
+	ldrb r7, [r7]
 
 	eor.w r1, r1, r10, ror #8 // effective r10 - s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
 	ldrb.w r3, [r14, r3]
@@ -261,20 +263,20 @@ CM7_DSPsBOX_AES_encrypt:
 	// r3 - s03` //r0c3
 	// r4 -
 	// r5 - s21` | s32` //c3 upper
-	// r6 - col 0 - s0^s1^s2 | s1^s2^s3 | s0^s2^s3 | s0^s1^s3
+	// r6 - col 2
 	// r7 - s10` //r1c3
 	// r8 - col 0 (tmp1) - s0^s1 | s1^s2 | s2^s3 | s3^s0
-	// r9 - col 2
+	// r9 - col 0 - s0^s1^s2 | s1^s2^s3 | s0^s2^s3 | s0^s1^s3
 	// r10 -
 
 	uadd8 r0, r8, r8 // quad lsl #1
-	eor.w r4, r9, r9, ror #8 // start col 2 mixcolumn
+	eor.w r4, r6, r6, ror #8 // start col 2 mixcolumn
 
 	eor.w r10, r0, #0x1b1b1b1b
 	orr.w r7, r3, r7, lsl #8 // col 3 bottom
 
 	sel r0, r10, r0 // if uadd carried then take reduced byte
-	eor.w r9, r4, r9, ror #16
+	eor.w r10, r4, r6, ror #16
 
 	//current alloctaion
 	// r0 - col 0 (tmp4)
@@ -283,55 +285,54 @@ CM7_DSPsBOX_AES_encrypt:
 	// r3 -
 	// r4 - col 2 (tmp1) - s0^s1 | s1^s2 | s2^s3 | s3^s0
 	// r5 - s21` | s32` //c3 upper
-	// r6 - col 0 - s0^s1^s2 | s1^s2^s3 | s0^s2^s3 | s0^s1^s3
+	// r6 -
 	// r7 - s03` | s10` //c3 bottom
 	// r8 -
-	// r9 - col 2 - s0^s1^s2 | s1^s2^s3 | s0^s2^s3 | s0^s1^s3
-	// r10 -
+	// r9 - col 0 - s0^s1^s2 | s1^s2^s3 | s0^s2^s3 | s0^s1^s3
+	// r10 - col 2 - s0^s1^s2 | s1^s2^s3 | s0^s2^s3 | s0^s1^s3
 
 	uadd8 r2, r4, r4 // quad lsl #1
-	orr.w r10, r7, r5, lsl #16 // col 3
+	orr.w r3, r7, r5, lsl #16 // col 3
 
 	eor.w r8, r2, #0x1b1b1b1b
-	eor.w r0, r0, r6, ror #8 // effective r6 - s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
+	eor.w r0, r0, r9, ror #8 // effective r9 - s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
 
 	sel r2, r8, r2 // if uadd carried then take reduced byte
-	eor.w r8, r10, r10, ror #8 // start col 3 mixcolumn
+	eor.w r8, r3, r3, ror #8 // start col 3 mixcolumn
 
-	ldrd r4,r5, [r12], #8
-
-	ldrd r6,r7, [r12], #8
+	ldmia r12!, {r4,r5,r6,r7}
 
 	//current alloctaion
 	// r0 - col 0 mixed
 	// r1 - col 1 mixed
 	// r2 - col 2 (tmp4)
-	// r3 -
+	// r3 - col 3
 	// r4 - rk[0]
 	// r5 - rk[1]
 	// r6 - rk[2]
 	// r7 - rk[3]
 	// r8 - col 3 (tmp1) - s0^s1 | s1^s2 | s2^s3 | s3^s0
-	// r9 - col 2 - s0^s1^s2 | s1^s2^s3 | s0^s2^s3 | s0^s1^s3
-	// r10 - col 3
+	// r9 -
+	// r10 - col 2 - s0^s1^s2 | s1^s2^s3 | s0^s2^s3 | s0^s1^s3
 
-	eor.w r3, r8, r10, ror #16
+	eor.w r3, r8, r3, ror #16
 	cmp.w r12, r11 // cmp early
 
 	uadd8 r8, r8, r8 // quad lsl #1
-	eor.w r2, r2, r9, ror8 // effective r9 = s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
+	eor.w r2, r2, r10, ror8 // effective r10 = s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
 
 	eor.w r10, r8, #0x1b1b1b1b
 	eor.w r3, r7, r3, ror #8 // effective r3 - s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2 // consume rk, alt representation
 
-	sel r8, r10, r8 // if uadd carried then take reduced byte
+	sel r7, r10, r8 // if uadd carried then take reduced byte // make loop addroundkey identical to initial add roundkey
+	bne.w 1b
+
+	// opt later
+	eor.w r0, r4
 	eor.w r1, r5
 
-	eor.w r0, r4
 	eor.w r2, r6
-
-	eor.w r3, r8
-	bne.w 1b
+	eor.w r3, r7
 
 	//final round
 	uxtb r9, r2, ror #16 //row 2 col 0
