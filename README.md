@@ -239,7 +239,7 @@ TBD
 | `CM7_sBOX_AES_128_keyschedule_enc` | 132 | 24 | uses sbox table |
 | `CM7_sBOX_AES_192_keyschedule_enc` | 124 | 32 | uses sbox table |
 | `CM7_sBOX_AES_256_keyschedule_enc` | 208 | 36(40) | uses sbox table |
-| `CM7_DSPsBOX_AES_encrypt` | 518 | 40 | uses sbox table |
+| `CM7_DSPsBOX_AES_encrypt` | 466 | 40 | uses sbox table |
 
 extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
 
