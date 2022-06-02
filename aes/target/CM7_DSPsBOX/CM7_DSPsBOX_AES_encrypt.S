@@ -130,7 +130,7 @@ CM7_DSPsBOX_AES_encrypt:
 	orr.w r10, r10, r9, lsl #16 // col 1
 
 	orr.w r8, r7, r8, lsl #8 // col 0 upper
-	ldrb.w r6, [r6]	// can't .n
+	ldrb.w r6, [r6] // can't .n
 
 	uxtab.w r7, r14, r0, ror #16 // row 2 col 2
 	ldrb.w r9, [r14, r4]

@@ -215,9 +215,9 @@ TBD
 | `setEncKey<128>`          | 141 | 141 |
 | `setEncKey<192>`          | 131 | 131 |
 | `setEncKey<256>`          | 180 | 180 |
-| `encrypt<128>`            | 302 | 400 |
-| `encrypt<192>`            | 358 | 478 |
-| `encrypt<256>`            | 414 | 556 |
+| `encrypt<128>`            | 292 | 400 |
+| `encrypt<192>`            | 346 | 478 |
+| `encrypt<256>`            | 400 | 556 |
 | `setDecKey<128>`          | 357 | 357 |
 | `setDecKey<192>`          | 433 | 433 |
 | `setDecKey<256>`          | 509 | 509 |
@@ -234,7 +234,7 @@ TBD
 | `CM7_1T_AES_256_keyschedule_enc` | 208 | 36(40) | uses Te2 table |
 | `CM7_1T_AES_keyschedule_dec` | 180 | 32 | uses Te2 and Td2 table |
 | `CM7_1T_AES_keyschedule_dec_noTe` | 180 | 32 | uses sbox and Td2 table |
-| `CM7_1T_AES_encrypt` | 478 | 44(48) | uses Te2 table |
+| `CM7_1T_AES_encrypt` | 452 | 40 | uses Te2 table |
 | `CM7_1T_AES_decrypt` | 490 | 44(48) | uses Td2 and inv_sbox table |
 | `CM7_sBOX_AES_128_keyschedule_enc` | 132 | 24 | uses sbox table |
 | `CM7_sBOX_AES_192_keyschedule_enc` | 124 | 32 | uses sbox table |
