@@ -326,11 +326,10 @@ CM7_DSPsBOX_AES_encrypt:
 	sel r7, r10, r8 // if uadd carried then take reduced byte // make loop addroundkey identical to initial add roundkey
 	bne.w 1b
 
-	//final round
-
 	eors r0, r4
 	eors r3, r7
 
+	//final round
 	lsrs r7, r0, #24 // row 3 col 1
 	eors r2, r6
 
