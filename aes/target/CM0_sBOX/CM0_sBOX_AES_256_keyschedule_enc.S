@@ -86,10 +86,8 @@ CM0_sBOX_AES_256_keyschedule_enc:
 	eors r4, r3
 	eors r5, r4
 
-	lsls r1, #1 // next rcon
-	mov r12, r1 // put rcon back
-
-	cmp r1, #0x80
+	add r12, r12 // left shift rcon
+	cmp r1, #0x40
 
 	mov r1, r14 // get rk
 

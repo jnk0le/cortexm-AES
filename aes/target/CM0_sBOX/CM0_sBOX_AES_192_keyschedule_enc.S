@@ -62,13 +62,12 @@ CM0_sBOX_AES_192_keyschedule_enc:
 	eors r6, r5
 	eors r7, r6
 
-	lsls r1, #1 // next rcon
-	cmp r1, #0x80
+	add r12, r12 // left shift rcon
+	cmp r1, #0x40
 
-	mov r12, r1 // put rcon back
 	mov r1, r14 // get rk
 
-	bhi 2f // we need one round with 0x80, break when shift overflows to 0x100
+	bhi 2f // we need one round with 0x80 rcon applied
 
 	stmia r1!, {r2-r7} // write full roundkey
 	mov r14, r1 // put rk back
