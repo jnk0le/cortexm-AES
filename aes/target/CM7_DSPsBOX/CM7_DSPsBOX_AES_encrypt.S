@@ -190,7 +190,7 @@ CM7_DSPsBOX_AES_encrypt:
 	// r10 - col 1
 
 	eor.w r10, r8, r10, ror #16
-	lsrs r2, r2, #24 // row 3 col 3
+	lsrs r2, #24 // row 3 col 3
 
 	uxtb.w r1, r1, ror #16 // row 2 col 3 // cant uxtab with inline shift
 	orr.w r6, r6, r4, lsl #8 // col 2 bottom
@@ -422,7 +422,7 @@ CM7_DSPsBOX_AES_encrypt:
 	uxtb r6, r2 // row 0 col 2
 	lsrs r7, r1, #24 // row 3 col 2
 
-	lsrs r2, r2, #24 // row 3 col 3
+	lsrs r2, #24 // row 3 col 3
 	ldrb.w r7, [r14, r7]
 
 	//current alloctaion
