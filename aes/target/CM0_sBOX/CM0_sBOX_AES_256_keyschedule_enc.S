@@ -22,7 +22,8 @@ CM0_sBOX_AES_256_keyschedule_enc:
 	push {r4-r7, lr}
 	mov r4, r8
 	mov r5, r9
-	push {r4-r5}
+	mov r6, r10
+	push {r4-r6}
 
 	ldmia r1!, {r2-r5} // load key
 	stmia r0!, {r2-r5} // just copy a key
@@ -46,17 +47,16 @@ CM0_sBOX_AES_256_keyschedule_enc:
 
 1:	// r8 - r3 part1
 	// r9 - r4 part1
+	// r10 -
 	// r12 - rcon
 	// r14 - rk
 
 	// unswap to process first part
-	mov r1, r3
+	mov r10, r3
 	mov r3, r8
-	mov r8, r1
 
-	mov r1, r4
+	mov r8, r4
 	mov r4, r9
-	mov r9, r1
 
 	lsrs r1, r7, #8
 	uxtb r1, r1
@@ -96,22 +96,18 @@ CM0_sBOX_AES_256_keyschedule_enc:
 
 	mov r14, r1 // put rk back
 
-	// r8 - r3 part2
-	// r9 - r4 part2
-	// r12 - rcon
-	// r14 - rk
+	// r8 - r4 part2
+	// r9 -
+	// r10 - r3 part2
 
 	// swap to process second part
-	mov r1, r3
-	mov r3, r8
-	mov r8, r1
+	mov r9, r4
+	mov r4, r8
 
-	mov r1, r4
-	mov r4, r9
-	mov r9, r1
+	mov r8, r3
+	mov r3, r10
 
 	//g transform // just sbox
-
 	uxtb r1, r5
 	ldrb r1, [r0, r1]
 	eors r3, r1
@@ -142,7 +138,8 @@ CM0_sBOX_AES_256_keyschedule_enc:
 	mov r14, r1 // put rk back
 	b 1b
 
-2:	pop {r4-r5}
+2:	pop {r4-r6}
 	mov r8, r4
 	mov r9, r5
+	mov r10, r6
 	pop {r4-r7, pc}

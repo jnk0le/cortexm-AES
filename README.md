@@ -90,7 +90,7 @@ out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 |----------------------|---|---|---|---|
 | `setEncKey<128>` | 417/431 | (sBOX) |  |  |
 | `setEncKey<192>` | 378/390 | (sBOX) |  |  |
-| `setEncKey<256>` | 591/602 | (sBOX) |  |  |
+| `setEncKey<256>` | 569/587 | (sBOX) |  |  |
 | `encrypt<128>`    | 1666/1680 | 1587/1600 |  |  |
 | `encrypt<192>`    | 2000/2016 | 1905/1920 |  |  |
 | `encrypt<256>`    | 2334/2352 | 2223/2240 |  |  |
@@ -111,7 +111,7 @@ STM32L0 is cortex-m0+ (prefetch enabled for 1ws)
 |----------|--------------------|----------------------|-------| 
 | `CM0_sBOX_AES_128_keyschedule_enc` | 76 | 16 | uses sbox table |
 | `CM0_sBOX_AES_192_keyschedule_enc` | 88 | 20(24) | uses sbox table |
-| `CM0_sBOX_AES_256_keyschedule_enc` | 168 | 28(32) | uses sbox table |
+| `CM0_sBOX_AES_256_keyschedule_enc` | 164 | 32 | uses sbox table |
 | `CM0_sBOX_AES_encrypt` | 508 | 40 | uses sbox table |
 | `CM0_sBOX_AES_decrypt` | 712 | 40 | uses inv_sbox table |
 | `CM0_FASTMULsBOX_AES_encrypt` | 480 | 36(40) | uses sbox table, requires single cycle multiplier |
