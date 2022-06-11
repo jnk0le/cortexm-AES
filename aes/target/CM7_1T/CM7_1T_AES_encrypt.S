@@ -13,7 +13,7 @@ CM7_1T_AES_encrypt:
 	push {r2,r4-r11,lr} //stack out
 
 	mov r12, r0
-	add r11, r0, r3, lsl #4 //rk_end-16 = rk + rounds * 16
+	add r11, r0, r3, lsl #4 // rk_end-16 = rk + rounds * 16
 
 	movw r14, #:lower16:AES_Te2
 	movt r14, #:upper16:AES_Te2
@@ -28,18 +28,23 @@ CM7_1T_AES_encrypt:
 
 	// global allocation
 	// r11 - final ptr
-	// r12 - rk ptr
+	// r12 - current rk ptr
 	// r14 - Te2
 
-	//      s00 | s10 | s20 | s30
-	//      s01 | s11 | s21 | s31
-	//      s02 | s12 | s22 | s32
-	//      s03 | s13 | s23 | s33
+	// r0 - s00 | s10 | s20 | s30
+	// r1 - s01 | s11 | s21 | s31
+	// r2 - s02 | s12 | s22 | s32
+	// r3 - s03 | s13 | s23 | s33
 
 	// rotation after Te2
 	// xor   16 |  8  |  0  |  24
 
-1: // skew addroundkey to begginning of loop
+	// r4 - s00T ^ s11T ^ s22T ^ s33T
+	// r5 - s01T ^ s12T ^ s23T ^ s30T
+	// r6 - s02T ^ s13T ^ s20T ^ s31T
+	// r7 - s03T ^ s10T ^ s21T ^ s32T
+
+1:	// skew addroundkey to begginning of loop
 	eors r0, r4
 	eors r1, r5
 
@@ -54,7 +59,7 @@ CM7_1T_AES_encrypt:
 	ldr.w r10, [r14, r4, lsl #2]
 
 	//current alloctaion
-	// r0 -     | s10 | s20 |
+	// r0 - s00 | s10 | s20 |
 	// r1 -     | s11 | s21 | s31
 	// r2 - s02 | s12 | s22 | s32
 	// r3 - s03 | s13 |     | s33
@@ -257,7 +262,7 @@ CM7_1T_AES_encrypt:
 	eors r2, r6
 	eors r3, r7
 
-	//final round
+	// final round
 	uxtb r6, r3, ror #16 // row 2 col 1
 	lsrs.w r7, r0, #24 // row 3 col 1 // cant .n
 

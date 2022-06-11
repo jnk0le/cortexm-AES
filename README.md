@@ -24,7 +24,7 @@ section).
 - do not use cortex-m3 and cortex-m4 implementations on cortex-m7 since it is slower and will introduce timming leaks.
 - Unrolled ciphers might perform slower than looped versions due to (usually LRU) cache pressure and flash waitstates. (like STM32F4 with 1K ART cache and up to 8WS)
 - input/output buffers might have to be word aligned due to use of ldm,stm,ldrd and strd instructions.
-- for optimization gimmicks refer to [pipeline cycle test repo](https://github.com/jnk0le/random/tree/master/pipeline%20cycle%20test) (ignore old cm7 comments)
+- for optimization gimmicks refer to [pipeline cycle test repo](https://github.com/jnk0le/random/tree/master/pipeline%20cycle%20test)
 - included unit tests don't cover timming leaks (performance difference on different runs may not be a data dependent ones)  
 - asm functions (and CM*.h headers) can be extracted and used as C only code, but that may require extra boilerplate code (structures etc.)
 
@@ -221,9 +221,9 @@ TBD
 | `setDecKey<128>`          | 357 | 357 |
 | `setDecKey<192>`          | 433 | 433 |
 | `setDecKey<256>`          | 509 | 509 |
-| `decrypt<128>`            | 303 | (1T) |
-| `decrypt<192>`            | 359 | (1T) |
-| `decrypt<256>`            | 415 | (1T) |
+| `decrypt<128>`            | 293 | (1T) |
+| `decrypt<192>`            | 347 | (1T) |
+| `decrypt<256>`            | 401 | (1T) |
 
 #### specific function sizes
 
@@ -235,7 +235,7 @@ TBD
 | `CM7_1T_AES_keyschedule_dec` | 180 | 32 | uses Te2 and Td2 table |
 | `CM7_1T_AES_keyschedule_dec_noTe` | 180 | 32 | uses sbox and Td2 table |
 | `CM7_1T_AES_encrypt` | 410 | 40 | uses Te2 table |
-| `CM7_1T_AES_decrypt` | 490 | 44(48) | uses Td2 and inv_sbox table |
+| `CM7_1T_AES_decrypt` | 456 | 40 | uses Td2 and inv_sbox table |
 | `CM7_sBOX_AES_128_keyschedule_enc` | 132 | 24 | uses sbox table |
 | `CM7_sBOX_AES_192_keyschedule_enc` | 124 | 32 | uses sbox table |
 | `CM7_sBOX_AES_256_keyschedule_enc` | 208 | 36(40) | uses sbox table |
