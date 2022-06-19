@@ -55,7 +55,7 @@ CM7_1T_AES_decrypt:
 	eors r2, r6
 	eors r3, r7
 
-	//start from col 0
+	// start from col 0
 	uxtb.w r4, r2, ror #16
 	lsrs r5, r1, #24
 
@@ -260,185 +260,254 @@ CM7_1T_AES_decrypt:
 	eors r2, r6
 	eors r3, r7
 
-	// final round // opt later
-
+	// final round
 	movw r14, #:lower16:AES_inv_sbox
 	movt r14, #:upper16:AES_inv_sbox
 
-	uxtb r4, r2, ror #16 // row 2 col 0
-	lsr.w r5, r1, #24 // row 3 col 0
+	// r0 - s00 | s10 | s20 | s30
+	// r1 - s01 | s11 | s21 | s31
+	// r2 - s02 | s12 | s22 | s32
+	// r3 - s03 | s13 | s23 | s33
 
-	uxtb r6, r3, ror #8 // row 1 col 0
-	and.w r7, r0, #0xff // row 0 col 0
+	//final
+	//    - s00`| s13`| s22`| s31`
+	//    - s01`| s10`| s23`| s32`
+	//    - s02`| s11`| s20`| s33`
+	//    - s03`| s12`| s21`| s30`
 
-	lsr.w r8, r2, #24 //row 3 col 1
-	ldrb r5, [r14, r5]
+	// start from col 0
+	uxtb r4, r0
+	lsrs r7, r1, #24
 
-	uxtb r9, r3, ror #16 // row 2 col 1
-	ldrb r4, [r14, r4]
+	uxtab r6, r14, r2, ror #16
+	ldrb r10, [r14, r7]
 
-	uxtb r10, r0, ror #8 // row 1 col 1
-	ldrb r6, [r14, r6]
-
-	uxtb r11, r1 // row 0 col 1
-	ldrb r7, [r14, r7]
-
-	orr.w r4, r4, r5, lsl #8  //column 0 upper part
-	ldrb r8, [r14, r8]
-
-	// clear r0 first
-
-	uxtb r5, r0, ror #24 // row 3 col 3
-	ldrb r9, [r14, r9]
-
-	orr.w r6, r7, r6, lsl #8 // column 0 bottom part
-	ldrb r10, [r14, r10]
-
-	uxtab r7, r14, r0, ror #16 // row 2 col 2
-	ldrb r11, [r14, r11]
-
-	//current allocation
-	// r0 -
-	// r1 - old col 1
-	// r2 - old col 2
-	// r3 - old col 3
-	// r4 - col 0 upper
-	// r5 - row 3 col 3
-	// r6 - col 0 bottom
-	// r7 - row 2 col 2
-	// r8 - row 3 col 1
-	// r9 - row 2 col 1
-	// r10 - row 1 col 1
-	// r11 - row 0 col 1
-
-	orr.w r4, r6, r4, lsl #16 // col 0
-ldrb.w r5, [r14, r5]
-
-	//clear r1
-
-	uxtb r6, r1, ror #8 // row 1 col 2
-	orr.w r8, r9, r8, lsl #8 // col 1 upper part
-
-	uxtb r9, r1, ror #16 // row 2 col 3
-	orr.w r10, r11, r10, lsl #8 // col 1 bottom part
-
-	//current allocation
-	// r0 -
-	// r1 -
-	// r2 - old col 2
-	// r3 - old col 3
-	// r4 - col 0
-	// r5 - row 3 col 3
-	// r6 - row 1 col 2
-	// r7 - row 2 col 2
-	// r8 - col 1 upper
-	// r9 - row 2 col 3
-	// r10 - col 1 bottom
+	//current alloctaion
+	// r0 -     | s10 | s20 | s30
+	// r1 - s01 | s11 | s21 |
+	// r2 - s02 | s12 |     | s32
+	// r3 - s03 | s13 | s23 | s33
+	// r4 - s00 //r0c0
+	// r5 -
+	// r6 - s22 //r2c0
+	// r7 -
+	// r8 -
+	// r9 -
+	// r10 - s31` //r3c0
 	// r11 -
 
-	//clear r2
+	uxtab r7, r14, r3, ror #8
+	ldrb r9, [r14, r4]
 
-	uxtb r11, r2, ror #8 // row 1 col 3
-ldrb.w r7, [r7]
+	lsrs r5, r2, #24
+	ldrb r6, [r6]
 
-	orr.w r8, r10, r8, lsl #16 // col 1
-	ldrb r9, [r14, r9]
+	//current alloctaion
+	// r0 -     | s10 | s20 | s30
+	// r1 - s01 | s11 | s21 |
+	// r2 - s02 | s12 |     |
+	// r3 - s03 |     | s23 | s33
+	// r4 -
+	// r5 - s32 //r3c1
+	// r6 - s22` //r2c0
+	// r7 - s13 //r1c0
+	// r8 -
+	// r9 - s00` //r0c0
+	// r10 - s31` //r3c0
+	// r11 -
 
-	uxtb r10, r2 // row 0 col 2
-	ldrb r6, [r14, r6]
+	uxtab r4, r14, r3, ror #16
+	ldrb r7, [r7]
 
-	//current allocation
-	// r0 -
-	// r1 -
-	// r2 -
-	// r3 - old col 3
-	// r4 - col 0
-	// r5 - row 3 col 3
-	// r6 - row 1 col 2
-	// r7 - row 2 col 2
-	// r8 - col 1
-	// r9 - row 2 col 3
-	// r10 - row 0 col 2
-	// r11 - row 1 col 3
+	orr.w r10, r6, r10, lsl #8
+	ldrb r8, [r14, r5]
 
-	// clear r3
+	//current alloctaion
+	// r0 -     | s10 | s20 | s30
+	// r1 - s01 | s11 | s21 |
+	// r2 - s02 | s12 |     |
+	// r3 - s03 |     |     | s33
+	// r4 - s23 //r2c1
+	// r5 -
+	// r6 -
+	// r7 - s13` //r1c0
+	// r8 - s32` //r3c1
+	// r9 - s00` //r0c0
+	// r10 - s22` | s31` //c0 upper
+	// r11 -
 
-uxtb.w r2, r3 //row 0 col 3
-	ldrb r11, [r14, r11]
+	uxtab r5, r14, r0, ror #8
+	ldrb r4, [r4]
 
-lsrs.w r1, r3, #24 // row 3 col 2
-	ldrb r10, [r14, r10]
+	uxtb r6, r1
+	orr.w r9, r9, r7, lsl #8
 
-	orr.w r5, r9, r5, lsl #8 // col 3 upper part
-	ldrb r9, [r14, r2]
+	//current alloctaion
+	// r0 -     |     | s20 | s30
+	// r1 -     | s11 | s21 |
+	// r2 - s02 | s12 |     |
+	// r3 - s03 |     |     | s33
+	// r4 - s23` //r2c1
+	// r5 - s10 //r1c1
+	// r6 - s01 //r0c1
+	// r7 -
+	// r8 - s32` //r3c1
+	// r9 - s00` | s13` //c0 bottom
+	// r10 - s22` | s31` //c0 upper
+	// r11 -
 
-	//current allocation
-	// r0 -
-	// r1 - row 3 col 2
-	// r2 -
-	// r3 -
-	// r4 - col 0
-	// r5 - col 3 upper
-	// r6 - row 1 col 2
-	// r7 - row 2 col 2
-	// r8 - col 1
-	// r9 - row 0 col 3
-	// r10 - row 0 col 2
-	// r11 - row 1 col 3
+	orr.w r7, r9, r10, lsl #16
+	ldrb r5, [r5]
 
-	orr.w r10, r10, r6, lsl #8 // col 2 bottom part
-	ldrb r6, [r14, r1]
+	orr.w r8, r4, r8, lsl #8
+	ldrb r10, [r14, r6]
 
-	//current allocation
-	// r0 -
-	// r1 -
-	// r2 -
-	// r3 -
-	// r4 - col 0
-	// r5 - col 3 upper
-	// r6 - row 3 col 2
-	// r7 - row 2 col 2
-	// r8 - col 1
-	// r9 - row 0 col 3
-	// r10 - col 2 bottom
-	// r11 - row 1 col 3
+	//current alloctaion
+	// r0 -     |     | s20 | s30
+	// r1 -     | s11 | s21 |
+	// r2 - s02 | s12 |     |
+	// r3 - s03 |     |     | s33
+	// r4 -
+	// r5 - s10` //r1c1
+	// r6 -
+	// r7 - col 0
+	// r8 - s23` | s32` //c1 upper
+	// r9 -
+	// r10 - s01` //r0c1
+	// r11 -
 
-	eor.w r11, r9, r11, lsl #8 // col 3 bottom
-	ldr r0, [r12, #-16]!
+	uxtab r4, r14, r0, ror #16
+	lsrs r6, r3, #24
 
-	eor.w r5, r11, r5, lsl #16 // col 3
-	ldr r1, [r12, #4]
+	uxtb r3, r3
+	orr.w r10, r10, r5, lsl #8
 
-eors.w r0, r4
-	ldr r2, [r12, #8]
+	//current alloctaion
+	// r0 -     |     |     | s30
+	// r1 -     | s11 | s21 |
+	// r2 - s02 | s12 |     |
+	// r3 - s03 //r0c3
+	// r4 - s20 //r2c2
+	// r5 -
+	// r6 - s33 //r3c2
+	// r7 - col 0
+	// r8 - s23` | s32` //c1 upper
+	// r9 -
+	// r10 - s01` | s10` //c1 bottom
+	// r11 -
 
-	orr.w r7, r7, r6, lsl #8 // col 2 upper
-	ldr r3, [r12, #12]
+	uxtb r5, r2
+	ldrb r9, [r14, r6]
 
-	//current allocation
+	uxtab r6, r14, r1, ror #8
+	ldrb r4, [r4]
+
+	//current alloctaion
+	// r0 -     |     |     | s30
+	// r1 -     |     | s21 |
+	// r2 -     | s12 |     |
+	// r3 - s03 //r0c3
+	// r4 - s20` //r2c2
+	// r5 - s02 //r0c2
+	// r6 - s11 //r1c2
+	// r7 - col 0
+	// r8 - s23` | s32` //c1 upper
+	// r9 - s33` //r3c2
+	// r10 - s01` | s10` //c1 bottom
+	// r11 -
+
+	lsrs r0, #24
+	ldrb r5, [r14, r5]
+
+	uxtab r1, r14, r1, ror #16
+	ldrb r6, [r6]
+
+	//current alloctaion
+	// r0 - s30 //r3c3
+	// r1 - s21 //r2c3
+	// r2 -     | s12 |     |
+	// r3 - s03 //r0c3
+	// r4 - s20` //r2c2
+	// r5 - s02` //r0c2
+	// r6 - s11` //r1c2
+	// r7 - col 0
+	// r8 - s23` | s32` //c1 upper
+	// r9 - s33` //r3c2
+	// r10 - s01` | s10` //c1 bottom
+	// r11 -
+
+	uxtab r2, r14, r2, ror #8
+	ldrb.w r0, [r14, r0]
+
+	orr.w r9, r4, r9, lsl #8
+	ldrb r1, [r1]
+
+	//current alloctaion
+	// r0 - s30` //r3c3
+	// r1 - s21` //r2c3
+	// r2 - s12 //r1c3
+	// r3 - s03 //r0c3
+	// r4 -
+	// r5 - s02` //r0c2
+	// r6 - s11` //r1c2
+	// r7 - col 0
+	// r8 - s23` | s32` //c1 upper
+	// r9 - s20` | s33` //c2 upper
+	// r10 - s01` | s10` //c1 bottom
+	// r11 -
+
+	orr.w r11, r5, r6, lsl #8
+	ldrb r2, [r2]
+
+	orr.w r6, r10, r8, lsl #16
+	ldrb r3, [r14, r3]
+
+	//current alloctaion
+	// r0 - s30` //r3c3
+	// r1 - s21` //r2c3
+	// r2 - s12` //r1c3
+	// r3 - s03` //r0c3
+	// r4 -
+	// r5 -
+	// r6 - col 1
+	// r7 - col 0
+	// r8 -
+	// r9 - s20` | s33` //c2 upper
+	// r10 -
+	// r11 - s02` | s11` //c2 bottom
+
+	orr.w r10, r1, r0, lsl #8
+	ldr r4, [sp, #4] // pop early to pop even number of registers later
+
+	orr.w r8, r3, r2, lsl #8
+	ldr r5, [sp], #8 // load output pointer and clear stack
+
+	ldmdb r12, {r0-r3}
+
+	//current alloctaion
 	// r0 - rk[0]
 	// r1 - rk[1]
 	// r2 - rk[2]
 	// r3 - rk[3]
-	// r4 - col 0
-	// r5 - col 3
-	// r6 -
-	// r7 - col 2 upper
-	// r8 - col 1
-	// r9 -
-	// r10 - col 2 bottom
-	// r11 -
+	// r4 - unstacked
+	// r5 - out p
+	// r6 - col 1
+	// r7 - col 0
+	// r8 - s03` | s12` //c3 bottom
+	// r9 - s20` | s33` //c2 upper
+	// r10 - s21` | s30` //c3 upper
+	// r11 - s02` | s11` //c2 bottom
 
-	eor r1, r8
-	ldr r6, [sp], #4 //load output pointer and clear stack
+	eors r0, r7
+	orr.w r7, r11, r9, lsl #16
 
-	orr.w r7, r10, r7, lsl #16 // col2
-	ldr r4, [sp], #4 // pop early to pop even number of registers later
+	eors r1, r6
+	orr.w r6, r8, r10, lsl #16
 
-eors.w r2, r7
-eors.w r3, r5
+	eors r2, r7
+	eors r3, r6
 
-stmia.w r6!, {r0-r3}
+	stmia r5!, {r0-r3}
 
 	pop {r5-r11, pc}
 #else

@@ -450,16 +450,18 @@ CM7_1T_AES_encrypt:
 	// r11 - s23` | s30` //c1 upper
 
 	orr.w r7, r4, r7, lsl #16 // col 2
-	ldr r6, [sp], #4 // load output pointer and clear stack
+	ldr r4, [sp, #4] // pop early to pop even number of registers
 
 	orr.w r9, r3, r0, lsl #8 // col 3 bottom part
-	ldr r4, [sp], #4 // pop early to pop even number of registers
+	ldr r6, [sp], #8 // load output pointer and clear stack
+
+	ldm r12, {r0-r3}
 
 	//current alloctaion
-	// r0 -
-	// r1 -
-	// r2 -
-	// r3 -
+	// r0 - rk[0]
+	// r1 - rk[1]
+	// r2 - rk[2]
+	// r3 - rk[3]
 	// r4 - unstacked
 	// r5 - col 0
 	// r6 - out p
@@ -468,8 +470,6 @@ CM7_1T_AES_encrypt:
 	// r9 - s03` | s10` //c3 bottom
 	// r10 - s01` | s12` //c1 bottom
 	// r11 - s23` | s30` //c1 upper
-
-	ldm r12, {r0-r3}
 
 	eors r0, r5
 	orr.w r5, r10, r11, lsl #16 // col 1
