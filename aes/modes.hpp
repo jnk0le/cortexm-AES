@@ -55,9 +55,8 @@ namespace mode
 		};
 
 
-	namespace ctr
+	namespace ctr // workaround
 	{
-		// workaround
 		class Nonce
 		{
 		public:
@@ -66,12 +65,12 @@ namespace mode
 	}
 
 	//SP 800-38A compliant, 32 bit counter
-	template<size_t key_length, template<size_t> class base_impl = aes::target::CM3_1T, template<size_t key_len, template<size_t> class base> class mode_impl = aes::mode::target::CTR_GENERIC>
-		class CTR : protected ctr::Nonce, private mode_impl<key_length, base_impl> // put the nonce before rk, to be compatible with current implementations
+	template<size_t key_length, template<size_t> class base_impl = aes::target::CM3_1T, template<size_t key_len, template<size_t> class base> class mode_impl = aes::mode::target::CTR32_GENERIC>
+		class CTR32 : protected ctr::Nonce, private mode_impl<key_length, base_impl> // put the nonce before rk, to be compatible with current implementations
 		{
 		public:
-			CTR() {}
-			~CTR() {}
+			CTR32() {}
+			~CTR32() {}
 
 			void setNonce(void* n_nonce, size_t len = 12) {
 				memcpy(this->nonce, n_nonce, len);

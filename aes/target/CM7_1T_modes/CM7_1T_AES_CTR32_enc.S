@@ -12,10 +12,10 @@
 .text
 
 .align 3
-// void CM7_1T_AES_CTR_enc(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t rounds, uint32_t blocks_cnt) {
-.global CM7_1T_AES_CTR_enc
-.type   CM7_1T_AES_CTR_enc,%function
-CM7_1T_AES_CTR_enc:
+// void CM7_1T_AES_CTR32_enc(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t rounds, uint32_t blocks_cnt) {
+.global CM7_1T_AES_CTR32_enc
+.type   CM7_1T_AES_CTR32_enc,%function
+CM7_1T_AES_CTR32_enc:
 #if __ARM_ARCH_7EM__
 	ldr r12, [sp]
 	str lr, [sp, #-4]! // use dead cycles for pushing

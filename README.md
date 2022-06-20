@@ -255,6 +255,8 @@ TBD
 
 ## modes implementations
 
+### generic
+
 ### cortex-m0/m0+
 
 ### cortex-m3/m4
@@ -357,7 +359,7 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 `*` pipeline performance not fixed yet
 `**` Cortex-M7 results may differ depending on the code around the caller (`encrypt<128>` should have 299 retired "uop pairs", goes up by e.g. 9 cycles if unrolled code is also compiled in)
 
-### XXX_1T_CTR
+### XXX_1T_CTR32
 
 Implements counter mode caching. Do not use if IV/counter is secret as it will lead to a timming leak of a single byte, every 256 aligned counter steps.
 
@@ -368,14 +370,14 @@ Implements counter mode caching. Do not use if IV/counter is secret as it will l
 | CBC_GENERIC<128> enc(+dec) |      |                 | 19.83(+0.24)      |
 | CBC_GENERIC<192> enc(+dec) |     |                 | 23.39(+0.24)      |
 | CBC_GENERIC<256> enc(+dec) |     |                  | 26.88(+0.24)      |
-| CTR_GENERIC<128>           |                  |                        | 19.50            |
-| CTR_GENERIC<192>           |                  |                        | 23.00            |
-| CTR_GENERIC<256>           |                  |                        | 26.50            |
-| CTR<128>                   | 32.97                 | 32.91                  | 15.64           |
-| CTR<192>                   | 40.47                | 40.41                  | 19.14           |
-| CTR<256>                   | 47.97                 | 47.91                  | 22.64           |
-| CTR_unrolled<128>          |                  | 30.72                 | 14.52           |
-| CTR_unrolled<192>          |                  | 37.59                 | 17.77           |
-| CTR_unrolled<256>          |                  | 44.47                 | 21.02           |
+| CTR32_GENERIC<128>           |                  |                        | 19.50            |
+| CTR32_GENERIC<192>           |                  |                        | 23.00            |
+| CTR32_GENERIC<256>           |                  |                        | 26.50            |
+| CTR32<128>                   | 32.97                 | 32.91                  | 15.64           |
+| CTR32<192>                   | 40.47                | 40.41                  | 19.14           |
+| CTR32<256>                   | 47.97                 | 47.91                  | 22.64           |
+| CTR32_unrolled<128>          |                  | 30.72                 | 14.52           |
+| CTR32_unrolled<192>          |                  | 37.59                 | 17.77           |
+| CTR32_unrolled<256>          |                  | 44.47                 | 21.02           |
 
 F407 results assume that input, expanded round key and stack lie in the same memory block (e.g. SRAM1 vs SRAM2 and CCM on f407)

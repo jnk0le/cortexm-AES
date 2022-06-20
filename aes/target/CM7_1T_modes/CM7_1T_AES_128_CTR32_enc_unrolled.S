@@ -14,10 +14,10 @@
 .text
 
 .align 3
-// void CM7_1T_AES_192_CTR_enc_unrolled(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt) {
-.global CM7_1T_AES_192_CTR_enc_unrolled
-.type   CM7_1T_AES_192_CTR_enc_unrolled,%function
-CM7_1T_AES_192_CTR_enc_unrolled:
+// void CM7_1T_AES_128_CTR32_enc_unrolled(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt) {
+.global CM7_1T_AES_128_CTR32_enc_unrolled
+.type   CM7_1T_AES_128_CTR32_enc_unrolled,%function
+CM7_1T_AES_128_CTR32_enc_unrolled:
 #if __ARM_ARCH_7EM__
 	pld [r0, #0] // dead cycle anyway, preload anything, cacheline is 32 bytes
 	add r3, r1, r3, lsl #4 // in_p + cnt*16
@@ -45,7 +45,7 @@ ctr_partial_precompute:
 	eor.w r3, r7
 
 	//round 1
-uxtb.w r6, r2
+	uxtb.w r6, r2
 	ldr r4, [r14, r4, lsl #2]
 
 	uxtb.w r7, r3
@@ -108,7 +108,7 @@ uxtb.w r6, r2
 	eor r1, r9, r4, ror #24
 	ldr r7, [r14, r7, lsl #2]
 
-	//round 2 // columns 1-3 only
+	//round 2
 	uxtb r5, r1, ror #8
 	eor r2, r10, r6, ror #24
 
@@ -207,7 +207,7 @@ uxtb.w r6, r2
 
 	//.align 3
 ctr_encrypt_block:
-	//expect {precomputed_y0..y3, precomputed_x0} on top of stack
+//expect {precomputed_y0..y3, precomputed_x0} on top of stack
 	//expect ctr[3] in r10
 	//expect key[3]^ctr[3] in r8
 	//expect r12 pointing at beginning of ctx
@@ -257,8 +257,6 @@ ctr_encrypt_block:
 	CM7_1T_unrolled_enc_round_n 7, 16
 	CM7_1T_unrolled_enc_round_n 8, 16
 	CM7_1T_unrolled_enc_round_n 9, 16
-	CM7_1T_unrolled_enc_round_n 10, 16
-	CM7_1T_unrolled_enc_round_n 11, 16
 
 	//final round
 
@@ -296,7 +294,7 @@ ctr_encrypt_block:
 	ldrb r7, [r14, r7, lsl #2]
 
 	orr.w r11, r11, r9, lsl #16 // col 0
-	ldr r0, [r12, #208] // column 0 is ready to eor and store
+	ldr r0, [r12, #176] // column 0 is ready to eor and store
 
 	orr.w r5, r5, r4, lsl #8 // column 1 upper part
 	ldrb r8, [r14, r8, lsl #2]
@@ -403,13 +401,13 @@ ctr_encrypt_block:
 	// r11 -
 
 	cmp.w r1, r6 // cmp at least 3 cycles ahead
-	ldr.w r1, [r12, #212] // rk[1]
+	ldr.w r1, [r12, #180] // rk[1]
 
 	eor.w r1, r7
-	ldr.w r7, [r12, #216] // rk[2]
+	ldr.w r7, [r12, #184] // rk[2]
 
 	eor.w r1, r3
-	ldr.w r3, [r12, #220] // rk[3]
+	ldr.w r3, [r12, #188] // rk[3]
 
 	eor.w r5, r4
 	ldr.w r4, [sp, #20+4] // out p

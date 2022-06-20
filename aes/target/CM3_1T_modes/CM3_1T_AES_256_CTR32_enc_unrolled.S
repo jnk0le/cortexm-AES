@@ -8,10 +8,10 @@
 .text
 
 .align 3
-// void CM3_1T_AES_256_CTR_enc_unrolled(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt) {
-.global CM3_1T_AES_256_CTR_enc_unrolled
-.type   CM3_1T_AES_256_CTR_enc_unrolled,%function
-CM3_1T_AES_256_CTR_enc_unrolled:
+// void CM3_1T_AES_256_CTR32_enc_unrolled(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt) {
+.global CM3_1T_AES_256_CTR32_enc_unrolled
+.type   CM3_1T_AES_256_CTR32_enc_unrolled,%function
+CM3_1T_AES_256_CTR32_enc_unrolled:
 #if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
 	add r3, r1, r3, lsl #4 // in_p + cnt*16
 

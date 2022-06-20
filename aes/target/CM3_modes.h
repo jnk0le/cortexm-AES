@@ -23,11 +23,11 @@
 	//    uint8_t rk[(n+1)*16];
 	//} ctx;
 
-	void CM3_1T_AES_CTR_enc(void* ctx, const uint8_t* data_in, uint8_t* data_out, uint32_t rounds, uint32_t blocks_cnt);
+	void CM3_1T_AES_CTR32_enc(void* ctx, const uint8_t* data_in, uint8_t* data_out, uint32_t rounds, uint32_t blocks_cnt);
 
-	void CM3_1T_AES_128_CTR_enc_unrolled(void* ctx, const uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt);
-	void CM3_1T_AES_192_CTR_enc_unrolled(void* ctx, const uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt);
-	void CM3_1T_AES_256_CTR_enc_unrolled(void* ctx, const uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt);
+	void CM3_1T_AES_128_CTR32_enc_unrolled(void* ctx, const uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt);
+	void CM3_1T_AES_192_CTR32_enc_unrolled(void* ctx, const uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt);
+	void CM3_1T_AES_256_CTR32_enc_unrolled(void* ctx, const uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt);
 
 #ifdef __cplusplus
 	}
