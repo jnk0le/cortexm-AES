@@ -2,11 +2,11 @@
  * \file aes_cipher.hpp
  * \brief basic cipher context class
  *
- * \warning Do not use ECB mode for any serious encryptions.
+ * \warning Do not use directly, use modes other than ECB instaed
  *
- * \author jnk0le <jnk0le@hotmail.com>
- * \copyright MIT License
- * \date Jun 2018
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
+ * \license SPDX-License-Identifier: MIT
+ * \date 9 Jun 2018
  */
 
 #ifndef AES_CIPHER_HPP

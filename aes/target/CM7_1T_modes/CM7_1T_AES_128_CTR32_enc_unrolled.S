@@ -1,3 +1,13 @@
+/*!
+ * \file CM7_1T_AES_128_CTR32_enc_unrolled.S
+ * \brief
+ *
+ *
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
+ * \license SPDX-License-Identifier: MIT
+ * \date 30 sep 2018
+ */
+
 // counter mode, SP 800-38A compliant (32bit, big endian ctr), can start from any counter value
 // counter is written back and can be used to continue encryption later
 

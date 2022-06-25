@@ -1,3 +1,13 @@
+/*!
+ * \file CM7_sBOX_AES_128_keyshedule_enc.S
+ * \brief
+ *
+ *
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
+ * \license SPDX-License-Identifier: MIT
+ * \date 9 feb 2019
+ */
+
 // 10 rounds of rcon can be computed as left shift + conditional reload of rcon to 0x1b after 0x80
 // it can also serve as loop counter to reduce register pressure
 

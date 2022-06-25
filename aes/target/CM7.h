@@ -2,9 +2,9 @@
  * \file CM7.h
  * \brief FIPS 197 compliant software AES implementations optimized for cortex-m7
  *
- * \author jnk0le <jnk0le@hotmail.com>
- * \copyright MIT License
- * \date Jun 2018
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
+ * \license SPDX-License-Identifier: MIT
+ * \date 17 Jun 2018
  */
 
 #ifndef AES_CM7_H

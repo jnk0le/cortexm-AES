@@ -3,13 +3,13 @@
  * \brief
  *
  *
- * \author jnk0le <jnk0le@hotmail.com>
- * \copyright MIT License
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
+ * \license SPDX-License-Identifier: MIT
  * \date 17 oct 2021
  */
 
 // 10 rounds of rcon can be computed as left shift + conditional reload of rcon to 0x1b after 0x80
-// it can also serve as loop counter to reduce register pressure // cant do rev16 optimization
+// it can also serve as loop counter to reduce register pressure
 
 .syntax unified
 .thumb

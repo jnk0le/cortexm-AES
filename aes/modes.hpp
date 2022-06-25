@@ -2,9 +2,9 @@
  * \file aes_modes.hpp
  * \brief block mode implementations
  *
- * \author jnk0le <jnk0le@hotmail.com>
- * \copyright MIT License
- * \date Jul 2018
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
+ * \license SPDX-License-Identifier: MIT
+ * \date 10 Jul 2018
  */
 
 #ifndef AES_MODES_HPP

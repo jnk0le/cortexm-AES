@@ -2,9 +2,9 @@
  * \file modes_impl.hpp
  * \brief wrappers for block mode ciphers
  *
- * \author jnk0le <jnk0le@hotmail.com>
- * \copyright MIT License
- * \date Jul 2018
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
+ * \license SPDX-License-Identifier: MIT
+ * \date 10 Jul 2018
  */
 
 #ifndef AES_MODES_IMPL_HPP
@@ -112,7 +112,6 @@ namespace target
 			}
 		};
 
-	//SP 800-38A compliant
 	template<size_t key_length, template<size_t> class base_impl>
 		class CTR32_CM3_1T : private CipherContext<key_length, base_impl>
 		{

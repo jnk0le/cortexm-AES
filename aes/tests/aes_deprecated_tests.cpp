@@ -1,9 +1,12 @@
+//This api is unversioned
+//will be replaced by proper implementation
+
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <cmsis_device.h>
 
-#include "aes_tests.hpp"
+#include "aes_deprecated_tests.hpp"
 
 #include "../cipher.hpp"
 #include "../modes.hpp"

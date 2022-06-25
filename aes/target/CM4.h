@@ -2,9 +2,9 @@
  * \file CM4.h
  * \brief FIPS 197 compliant software AES implementations optimized for cortex-m4
  *
- * \author jnk0le <jnk0le@hotmail.com>
- * \copyright MIT License
- * \date Dec 2018
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
+ * \license SPDX-License-Identifier: MIT
+ * \date 28 Dec 2018
  */
 
 #ifndef AES_CM4_H

@@ -1,3 +1,13 @@
+/*!
+ * \file CM3_1T_AES_keyschedule_dec.S
+ * \brief
+ *
+ *
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
+ * \license SPDX-License-Identifier: MIT
+ * \date 9 jun 2018
+ */
+
 // performs perform equivalent inverse cipher transformation on expanded encryption key
 // order of round keys is not inverted - decryption will read it in reverse
 

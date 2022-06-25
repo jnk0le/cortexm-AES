@@ -1,3 +1,14 @@
+/*!
+ * \file CM3_1T_AES_256_decrypt_unrolled.S
+ * \brief
+ *
+ *
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
+ * Peter Schwabe & Ko Stoffelen @2016
+ * \license SPDX-License-Identifier: MIT
+ * \date 18 jul 2018
+ */
+
 .include "aes/target/CM3_1T/CM3_1T_AES_common.inc"
 
 .syntax unified

@@ -1,4 +1,13 @@
-// precesses 256 bits of key per iteration
+/*!
+ * \file CM7_1T_AES_256_keyschedule_enc.S
+ * \brief
+ *
+ *
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
+ * \license SPDX-License-Identifier: MIT
+ * \date 17 Jun 2018
+ */
+
 // 7 rounds of rcon can be computed as left shift only
 
 .syntax unified

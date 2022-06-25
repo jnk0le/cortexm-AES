@@ -1,4 +1,13 @@
-// precesses 192 bits of key in every iteration
+/*!
+ * \file CM3_1T_AES_192_keyschedule_enc.S
+ * \brief
+ *
+ *
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
+ * \license SPDX-License-Identifier: MIT
+ * \date 9 jun 2018
+ */
+
 // 8 rounds of rcon can be computed as left shift only
 
 .syntax unified

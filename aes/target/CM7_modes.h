@@ -2,9 +2,9 @@
  * \file CM7_modes.h
  * \brief AES block mode implementations optimized for cortex-m7
  *
- * \author jnk0le <jnk0le@hotmail.com>
- * \copyright MIT License
- * \date Aug 2018
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
+ * \license SPDX-License-Identifier: MIT
+ * \date 28 sep 2018
  */
 
 #ifndef AES_CM7_MODES_H

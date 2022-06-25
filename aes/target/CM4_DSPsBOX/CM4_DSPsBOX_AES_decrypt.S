@@ -2,8 +2,8 @@
  * \file CM4_DSPsBOX_AES_decrypt.S
  * \brief
  *
- * \author jnk0le <jnk0le@hotmail.com>
- * \copyright MIT License
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
+ * \license SPDX-License-Identifier: MIT
  * \date Dec 2018
  */
 

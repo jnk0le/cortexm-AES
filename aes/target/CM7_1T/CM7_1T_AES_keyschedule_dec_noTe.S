@@ -1,3 +1,13 @@
+/*!
+ * \file CM7_1T_AES_keyschedule_dec_noTe.S
+ * \brief
+ *
+ *
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
+ * \license SPDX-License-Identifier: MIT
+ * \date 9 feb 2019
+ */
+
 // performs perform equivalent inverse cipher transformation on expanded encryption key
 // order of round keys is not inverted - decryption will read it in reverse
 
@@ -30,7 +40,7 @@ CM7_1T_AES_keyschedule_dec_noTe:
 	//expand backwards for better code density, redoing to forward needs care for stalls due to .w/.n instr combinations
 
 	//Td[sbox[]] - 4 regs, cannot be dual issued with itself or other block
-	//dsp invMixColums - 4+1 regs + few more insns, cannot be dual issued with itself
+	//dsp invMixColums - 4+1 regs + few more insns, cannot be dual issued with itself or other block
 	// r2 = S{1}
 	// r5 = S{2}
 	// r6 = S{4}

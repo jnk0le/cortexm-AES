@@ -1,10 +1,10 @@
 /*!
  * \file CM0_FASTMULsBOX_AES_decrypt.S
- * \brief
+ * \brief faster than standard version, only when running on core with 1 cycle multiplier
  *
  *
- * \author jnk0le <jnk0le@hotmail.com>
- * \copyright MIT License
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
+ * \license SPDX-License-Identifier: MIT
  * \date 10 nov 2021
  */
 
@@ -58,7 +58,7 @@ CM0_FASTMULsBOX_AES_decrypt:
 	// r8 - decrement constant
 	// r9 - inv_sbox
 	// r10 - 0x01010101
-	// r11 - x
+	// r11 - 0x80808080
 	// r12 - final ptr // rk+16
 	// r14 - current ptr
 

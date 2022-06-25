@@ -2,9 +2,9 @@
  * \file CM3_modes.h
  * \brief AES block mode implementations optimized for cortex-m3/4
  *
- * \author jnk0le <jnk0le@hotmail.com>
- * \copyright MIT License
- * \date Aug 2018
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
+ * \license SPDX-License-Identifier: MIT
+ * \date 1 Aug 2018
  */
 
 #ifndef AES_CM3_MODES_H
