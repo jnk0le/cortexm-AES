@@ -1,8 +1,8 @@
 //This api is unversioned
 //will be replaced by proper implementation
 
-#ifndef AES_OLDTESTS_HPP
-#define AES_OLDTESTS_HPP
+#ifndef AES_DEPRECATED_TESTS_HPP
+#define AES_DEPRECATED_TESTS_HPP
 
 //__attribute__ ((section(".itcm.text"), noinline))
 void aes_ecb_test(void);
