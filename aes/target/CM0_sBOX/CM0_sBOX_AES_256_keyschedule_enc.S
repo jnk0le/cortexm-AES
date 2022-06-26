@@ -86,15 +86,14 @@ CM0_sBOX_AES_256_keyschedule_enc:
 	eors r4, r3
 	eors r5, r4
 
-	add r12, r12 // left shift rcon
 	cmp r1, #0x40
 
 	mov r1, r14 // get rk
-
 	stmia r1!, {r2-r5} // first half
 	beq 2f // break halfway
 
 	mov r14, r1 // put rk back
+	add r12, r12 // left shift rcon
 
 	// r8 - r4 part2
 	// r9 -

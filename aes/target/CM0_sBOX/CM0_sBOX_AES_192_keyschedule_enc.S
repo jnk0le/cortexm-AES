@@ -59,15 +59,15 @@ CM0_sBOX_AES_192_keyschedule_enc:
 	eors r3, r2
 	eors r4, r3
 	eors r5, r4
-	eors r6, r5
-	eors r7, r6
+
+	cmp r1, #0x40
+	mov r1, r14 // get rk
+	bhi 2f // we need one round with 0x80 rcon applied
 
 	add r12, r12 // left shift rcon
-	cmp r1, #0x40
 
-	mov r1, r14 // get rk
-
-	bhi 2f // we need one round with 0x80 rcon applied
+	eors r6, r5
+	eors r7, r6
 
 	stmia r1!, {r2-r7} // write full roundkey
 	mov r14, r1 // put rk back

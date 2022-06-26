@@ -59,12 +59,14 @@ CM0_sBOX_AES_128_keyschedule_enc:
 
 	stmia r0!, {r4-r7} // write roundkey
 
+	cmp r1, #0x36 // final condition
+	beq 2f
+
 	lsls r1, #1 // next rcon
 	cmp r1, #0x80
-	bls 2f // rcon is not secret
+	bls 1b // rcon is not secret
 	movs r1, #0x1b
-2:	cmp r1, #0x6c // final condition
-	bne 1b
+	b 1b
 
-	pop {r4-r7}
+2:	pop {r4-r7}
 	bx lr
