@@ -237,7 +237,7 @@ ctr_encrypt_first:
 	ldr r3, [r14, r3, lsl #2]
 	eor r4, r4, r0, ror #16
 	eor r5, r5, r1, ror #24
-	eor r6, r6, r2 // align loop entry
+	eor.w r6, r6, r2 // align loop entry
 	eor r7, r7, r3, ror #8
 
 1:	uxtb r0, r4

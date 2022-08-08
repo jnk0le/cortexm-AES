@@ -225,6 +225,8 @@ TBD
 | `decrypt<192>`            | 347 | (1T) |
 | `decrypt<256>`            | 401 | (1T) |
 
+cm7 runtime cycles are biased a bit by caller or around caller code (numbers are from current ecb unit test)
+
 #### specific function sizes
 
 | Function | code size in bytes | stack usage in bytes | notes |
@@ -262,6 +264,13 @@ TBD
 ### cortex-m3/m4
 
 ### cortex-m7
+
+
+#### specific function sizes
+
+| Function | code size in bytes | stack usage in bytes | notes |
+|----------|--------------------|----------------------|-------|
+| `CM7_1T_AES_CTR32_enc` | 860 | 72 (+1 arg passed on stack) | uses Te2 table |
 
 ### cortex-m55
 
@@ -367,17 +376,17 @@ Implements counter mode caching. Do not use if IV/counter is secret as it will l
 
 | Cipher function            | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32H7 - CM7_1T |
 |----------------------------|-----------------------------|-----------------------------|------------------|
-| CBC_GENERIC<128> enc(+dec) |      |                 | 19.83(+0.24)      |
-| CBC_GENERIC<192> enc(+dec) |     |                 | 23.39(+0.24)      |
-| CBC_GENERIC<256> enc(+dec) |     |                  | 26.88(+0.24)      |
-| CTR32_GENERIC<128>           |                  |                        | 19.50            |
-| CTR32_GENERIC<192>           |                  |                        | 23.00            |
-| CTR32_GENERIC<256>           |                  |                        | 26.50            |
-| CTR32<128>                   | 32.97                 | 32.91                  | 15.64           |
-| CTR32<192>                   | 40.47                | 40.41                  | 19.14           |
-| CTR32<256>                   | 47.97                 | 47.91                  | 22.64           |
-| CTR32_unrolled<128>          |                  | 30.72                 | 14.52           |
-| CTR32_unrolled<192>          |                  | 37.59                 | 17.77           |
-| CTR32_unrolled<256>          |                  | 44.47                 | 21.02           |
+| CBC_GENERIC<128> enc(+dec) |      |                 |       |
+| CBC_GENERIC<192> enc(+dec) |     |                 |       |
+| CBC_GENERIC<256> enc(+dec) |     |                  |       |
+| CTR32_GENERIC<128>           |                  |                        |             |
+| CTR32_GENERIC<192>           |                  |                        |             |
+| CTR32_GENERIC<256>           |                  |                        |             |
+| CTR32<128>                   | 32.97*                 | 32.91*                  | 15.21           |
+| CTR32<192>                   | 40.47*                | 40.41*                  | 18.58           |
+| CTR32<256>                   | 47.97*                 | 47.91*                  | 21.96           |
+| CTR32_unrolled<128>          |                  | 30.72*                 | 14.52*           |
+| CTR32_unrolled<192>          |                  | 37.59*                 | 17.77*          |
+| CTR32_unrolled<256>          |                  | 44.47*                 | 21.02*           |
 
 F407 results assume that input, expanded round key and stack lie in the same memory block (e.g. SRAM1 vs SRAM2 and CCM on f407)
