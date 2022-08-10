@@ -354,8 +354,7 @@ ctr_encrypt_first:
 	tst r1, #0xff000000 // set flags early to optimize speculative fetches in cm3
 	str r2, [sp, #20+4] // out p
 
-	bne ctr_encrypt_block
-	//if ctr%256==0: partial_precompute
+	bne ctr_encrypt_block //if (BE)ctr%256!=0
 
 	b ctr_partial_precompute
 

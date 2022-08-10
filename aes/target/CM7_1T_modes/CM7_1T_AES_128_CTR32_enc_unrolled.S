@@ -456,7 +456,7 @@ ctr_encrypt_block:
 	//strd #16
 
 	str.w r4, [sp, #20+4] // out p
-	bne.w ctr_encrypt_block //if ctr%256==0: partial_precompute
+	bne.w ctr_encrypt_block //if (BE)ctr%256!=0
 
 	//nop.w // align exit point
 	b.w ctr_partial_precompute

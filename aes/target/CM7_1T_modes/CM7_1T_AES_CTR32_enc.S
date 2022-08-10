@@ -1039,7 +1039,7 @@ ctr_encrypt_block:
 	str.w r9, [sp, #28] // in p
 
 	str r4, [sp, #32] // out p
-	bne.w ctr_encrypt_block //if (BE)ctr%256==0: partial_precompute
+	bne.w ctr_encrypt_block //if (BE)ctr%256!=0
 
 	sub.w r12, #64 //reset to p, as required by partial_precompute
 	b ctr_partial_precompute
