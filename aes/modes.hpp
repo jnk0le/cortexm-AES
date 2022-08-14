@@ -89,11 +89,24 @@ namespace mode
 			using mode_impl<key_length, base_impl>::setEncKey;
 
 			void encrypt(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
-				mode_impl<key_length, base_impl>::encrypt(data_in, data_out, this->nonce, (len+15)/16);
+
+				uint32_t block_len = len/16;
+				uint32_t bytes_remainining = len & 15;
+
+				mode_impl<key_length, base_impl>::encrypt(data_in, data_out, this->nonce, block_len);
+
+				//handle the truncation aka padding
+				if(bytes_remainining) {
+					uint8_t tmp[16];
+
+					memcpy(tmp, &data_in[block_len], bytes_remainining);
+					mode_impl<key_length, base_impl>::encrypt(tmp, tmp, this->nonce, 1);
+					memcpy(&data_out[block_len], tmp, bytes_remainining);
+				}
 			}
 
 			void decrypt(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
-				mode_impl<key_length, base_impl>::encrypt(data_in, data_out, this->nonce, (len+15)/16);
+				encrypt(data_in, data_out, len);
 			}
 
 		private:
