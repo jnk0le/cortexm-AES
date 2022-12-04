@@ -34,8 +34,8 @@
 
 	.data : ALIGN(4) {
 		PROVIDE(__data_start__ = .);
-		*(.AES_TABLES .AES_TABLES*)
-		*(.data .data* .gnu.linkonce.d*)
+		*(.AES_TABLES .AES_TABLES.*)
+		*(.data .data.* .gnu.linkonce.d.*)
 		PROVIDE(__data_end__ = .);
 	} > DTCM AT > FLASH
 
@@ -43,7 +43,7 @@
 
 	.AES_TABLES : ALIGN(4) {
 		PROVIDE(__aes_tables_start__ = .);
-		*(.AES_TABLES .AES_TABLES*)
+		*(.AES_TABLES .AES_TABLES.*)
 		PROVIDE(__aes_tables_end__ = .);
 	} > DTCM AT > FLASH
 
