@@ -87,19 +87,19 @@ out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 #### performance
 
 | Cipher function  | STM32F0 (0ws/1ws) - CM0_sBOX | STM32F0 (0ws/1ws) - CM0_FASTMULsBOX | STM32L0 (0ws/1ws) - CM0_sBOX | STM32L0 (0ws/1ws) - CM0_FASTMULsBOX |
-|----------------------|---|---|---|---|
+|------------------|------------------------------|-------------------------------------|------------------------------|-------------------------------------|
 | `setEncKey<128>` | 399/415 | (sBOX) |  |  |
 | `setEncKey<192>` | 375/389 | (sBOX) |  |  |
 | `setEncKey<256>` | 568/586 | (sBOX) |  |  |
-| `encrypt<128>`    | 1666/1680 | 1587/1600 |  |  |
-| `encrypt<192>`    | 2000/2016 | 1905/1920 |  |  |
-| `encrypt<256>`    | 2334/2352 | 2223/2240 |  |  |
+| `encrypt<128>`   | 1666/1680 | 1587/1600 |  |  |
+| `encrypt<192>`   | 2000/2016 | 1905/1920 |  |  |
+| `encrypt<256>`   | 2334/2352 | 2223/2240 |  |  |
 | `setDecKey<128>` | 0 | 0 | 0 | 0 |
 | `setDecKey<192>` | 0 | 0 | 0 | 0 |
 | `setDecKey<256>` | 0 | 0 | 0 | 0 |
-| `decrypt<128>`    | 2567/2580 | 2387/2400 |  |  |
-| `decrypt<192>`    | 3099/3114 | 2879/2894 |  |  |
-| `decrypt<256>`    | 3631/3648 | 3371/3388 |  |  |
+| `decrypt<128>`   | 2567/2580 | 2387/2400 |  |  |
+| `decrypt<192>`   | 3099/3114 | 2879/2894 |  |  |
+| `decrypt<256>`   | 3631/3648 | 3371/3388 |  |  |
 
 STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% performance degradation)
 
@@ -156,22 +156,22 @@ TBD
 #### performance
 
 | Cipher function  | STM32F1 (0ws/2ws) - CM3_1T | STM32F1 (0ws/2ws) - CM3_sBOX | STM32F4 (0ws/5ws) - CM3_1T | STM32F4 - CM4_DSPsBOX |
-|--------------------------------|---------|-------|-------|-------|
-| `setEncKey<128>`          | 302/358  |  | 302 | 302 |
-| `setEncKey<192>`          | 276/311  |  | 276 | 277 |
-| `setEncKey<256>`          | 378/485  |  | 379 | 381 |
-| `encrypt<128>`             | 646/884  |  | 645 | 852 |
-| `encrypt<192>`             | 766/1049 |  | 765 | 1020 |
-| `encrypt<256>`             | 886/1217 |  | 887 | 1188 |
+|------------------|----------------------------|------------------------------|----------------------------|-----------------------|
+| `setEncKey<128>`        | 302/358  |  | 302 | 302 |
+| `setEncKey<192>`        | 276/311  |  | 276 | 277 |
+| `setEncKey<256>`        | 378/485  |  | 379 | 381 |
+| `encrypt<128>`          | 646/884  |  | 645 | 852 |
+| `encrypt<192>`          | 766/1049 |  | 765 | 1020 |
+| `encrypt<256>`          | 886/1217 |  | 887 | 1188 |
 | `encrypt_unrolled<128>` | 603/836  |   | 602/779 | - |
 | `encrypt_unrolled<192>` | 713/990  |   | 712/922 | - |
 | `encrypt_unrolled<256>` | 823/1148 |   | 822/1067 | - |
-| `setDecKey<128>`          | 813/1101 | 0 | 811 | 0 |
-| `setDecKey<192>`          | 987/1341 | 0 | 987 | 0 |
-| `setDecKey<256>`          | 1163/1580 | 0 | 1164 | 0 |
-| `decrypt<128>`             | 651/901  |   | 650 | 1249 |
-| `decrypt<192>`             | 771/1072 |   | 770 | 1505 |
-| `decrypt<256>`             | 891/1242 |   | 892 | 1759 |
+| `setDecKey<128>`        | 813/1101 | 0 | 811 | 0 |
+| `setDecKey<192>`        | 987/1341 | 0 | 987 | 0 |
+| `setDecKey<256>`        | 1163/1580 | 0 | 1164 | 0 |
+| `decrypt<128>`          | 651/901  |   | 650 | 1249 |
+| `decrypt<192>`          | 771/1072 |   | 770 | 1505 |
+| `decrypt<256>`          | 891/1242 |   | 892 | 1759 |
 | `decrypt_unrolled<128>` | 606/847  |   | 604/785 | - |
 | `decrypt_unrolled<192>` | 716/1003 |   | 714/928 | - |
 | `decrypt_unrolled<256>` | 826/1159 |   | 824/1073 | - |
@@ -211,19 +211,19 @@ TBD
 #### performance
 
 | Cipher function  | STM32H7 - CM7_1T | STM32H7 - CM7_DSPsBOX |
-|--------------------------------|---------|-------|
-| `setEncKey<128>`          | 141 | 141 |
-| `setEncKey<192>`          | 131 | 131 |
-| `setEncKey<256>`          | 180 | 180 |
-| `encrypt<128>`            | 292 | 400 |
-| `encrypt<192>`            | 346 | 478 |
-| `encrypt<256>`            | 400 | 556 |
-| `setDecKey<128>`          | 357 | 357 |
-| `setDecKey<192>`          | 433 | 433 |
-| `setDecKey<256>`          | 509 | 509 |
-| `decrypt<128>`            | 293 | (1T) |
-| `decrypt<192>`            | 347 | (1T) |
-| `decrypt<256>`            | 401 | (1T) |
+|------------------|------------------|-----------------------|
+| `setEncKey<128>` | 141 | 141 |
+| `setEncKey<192>` | 131 | 131 |
+| `setEncKey<256>` | 180 | 180 |
+| `encrypt<128>`   | 292 | 400 |
+| `encrypt<192>`   | 346 | 478 |
+| `encrypt<256>`   | 400 | 556 |
+| `setDecKey<128>` | 357 | 357 |
+| `setDecKey<192>` | 433 | 433 |
+| `setDecKey<256>` | 509 | 509 |
+| `decrypt<128>`   | 293 | (1T) |
+| `decrypt<192>`   | 347 | (1T) |
+| `decrypt<256>`   | 401 | (1T) |
 
 cm7 runtime cycles are biased a bit by caller or around caller code (numbers are from current ecb unit test)
 
@@ -265,6 +265,13 @@ TBD
 
 ### cortex-m7
 
+#### performance (in cycles per byte)
+
+| Mode cipher function       | STM32H7 - CM7_1T |
+|----------------------------|------------------|
+| CTR32<128>                 | 15.21            |
+| CTR32<192>                 | 18.58            |
+| CTR32<256>                 | 21.96            |
 
 #### specific function sizes
 
@@ -340,25 +347,14 @@ The timing effects of simultaneous access to DTCM memory by core and DMA/AHBS ar
 Utilizes dsp instructions to perform constant time, quad (gf)multiplications in mixcolumns stage.
 MixCloums stage is parallelized according to [this](http://www.wseas.us/e-library/conferences/2009/moscow/AIC/AIC44.pdf) or [this](https://www.researchgate.net/publication/221002183_Efficient_AES_implementations_for_ARM_based_platforms) paper, InvMixColums is done through more straightforward representation.
 
-## Base ciphers performance (in cycles per block, some numbers are outdated)
+## Base ciphers performance (in cycles per block,  numbers are outdated)
 
 | Cipher function     | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32F4 (0ws/7ws) - CM4_DSPsBOX | STM32H7 - CM7_1T | STM32H7 - CM7_DSPsBOX |
 |---------------------|----------------------------|----------------------------|---------------------------------|------------------|-----------------------|
-| `setEncKey<128>`    |    |   |  |  |  |
-| `setEncKey<192>`    |    |    |  |  |  |
-| `setEncKey<256>`    |    |   |  |  |  |
-| `encrypt<128>`      |    | |  | 302 | 411 |
-| `encrypt<192>`      |    | |  | 358 | 491 |
-| `encrypt<256>`      |   |  |  | 414 | 571 |
 | `enc_unrolled<128>` |    | | - | 281 | - |
 | `enc_unrolled<192>` |    | | - | 333 | - |
 | `enc_unrolled<256>` |  | | - | 385 | - |
-| `setDecKey<128>`    |   | |  | 412* | (1T) |
-| `setDecKey<192>`    |   | |  | 500* | (1T) |
-| `setDecKey<256>`    |  | |  | 588* | (1T) |
-| `decrypt<128>`      |    | |  | 304 | (1T) |
-| `decrypt<192>`      |   | |  | 360 | (1T) |
-| `decrypt<256>`      |     | |  | 416 | (1T) |
+
 | `dec_unrolled<128>` |    | | - | 282 | - |
 | `dec_unrolled<192>` |   | | - | 334 | - |
 | `dec_unrolled<256>` |   | | - | 386 | - |
@@ -372,7 +368,7 @@ Results are averaged over 1024 runs + one ommited (instruction) cache train run.
 
 Implements counter mode caching. Do not use if IV/counter is secret as it will lead to a timming leak of a single byte, every 256 aligned counter steps.
 
-## Cipher modes performance (in cycles per byte, some numbers are outdated)
+## Cipher modes performance (in cycles per byte, numbers are outdated)
 
 | Cipher function            | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32H7 - CM7_1T |
 |----------------------------|-----------------------------|-----------------------------|------------------|
@@ -382,11 +378,11 @@ Implements counter mode caching. Do not use if IV/counter is secret as it will l
 | CTR32_GENERIC<128>           |                  |                        |             |
 | CTR32_GENERIC<192>           |                  |                        |             |
 | CTR32_GENERIC<256>           |                  |                        |             |
-| CTR32<128>                   | 32.97*                 | 32.91*                  | 15.21           |
-| CTR32<192>                   | 40.47*                | 40.41*                  | 18.58           |
-| CTR32<256>                   | 47.97*                 | 47.91*                  | 21.96           |
-| CTR32_unrolled<128>          |                  | 30.72*                 | 14.52*           |
-| CTR32_unrolled<192>          |                  | 37.59*                 | 17.77*          |
-| CTR32_unrolled<256>          |                  | 44.47*                 | 21.02*           |
+| CTR32<128>                   | 32.97*                 | 32.91*                  |            |
+| CTR32<192>                   | 40.47*                | 40.41*                  |           |
+| CTR32<256>                   | 47.97*                 | 47.91*                  |          |
+| CTR32_unrolled<128>          |                  | 30.72*                 | 14.52*u          |
+| CTR32_unrolled<192>          |                  | 37.59*                 | 17.77*u          |
+| CTR32_unrolled<256>          |                  | 44.47*                 | 21.02*u           |
 
 F407 results assume that input, expanded round key and stack lie in the same memory block (e.g. SRAM1 vs SRAM2 and CCM on f407)
