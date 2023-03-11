@@ -349,20 +349,6 @@ MixCloums stage is parallelized according to [this](http://www.wseas.us/e-librar
 
 ## Base ciphers performance (in cycles per block,  numbers are outdated)
 
-| Cipher function     | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32F4 (0ws/7ws) - CM4_DSPsBOX | STM32H7 - CM7_1T | STM32H7 - CM7_DSPsBOX |
-|---------------------|----------------------------|----------------------------|---------------------------------|------------------|-----------------------|
-| `enc_unrolled<128>` |    | | - | 281 | - |
-| `enc_unrolled<192>` |    | | - | 333 | - |
-| `enc_unrolled<256>` |  | | - | 385 | - |
-
-| `dec_unrolled<128>` |    | | - | 282 | - |
-| `dec_unrolled<192>` |   | | - | 334 | - |
-| `dec_unrolled<256>` |   | | - | 386 | - |
-
-Results are averaged over 1024 runs + one ommited (instruction) cache train run.
-`setDecKey<>` counts cycles required to perform equivalent inverse cipher transformation on expanded encryption key.
-`*` pipeline performance not fixed yet
-`**` Cortex-M7 results may differ depending on the code around the caller (`encrypt<128>` should have 299 retired "uop pairs", goes up by e.g. 9 cycles if unrolled code is also compiled in)
 
 ### XXX_1T_CTR32
 

@@ -307,67 +307,6 @@ namespace target
 	};
 
 	template<size_t key_length>
-	class CM7_1T_unrolled : public CM7_1T<key_length>
-	{
-	public: // override only unrolled functions
-		void encrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
-			//CM7_1T_AES_encrypt_unrolled(rk, data_in, data_out, this->key_rounds);
-			switch(key_length)
-			{
-			case 128:
-				CM7_1T_AES_128_encrypt_unrolled(rk, data_in, data_out);
-				break;
-			case 192:
-				CM7_1T_AES_192_encrypt_unrolled(rk, data_in, data_out);
-				break;
-			case 256:
-				CM7_1T_AES_256_encrypt_unrolled(rk, data_in, data_out);
-				break;
-			}
-		}
-
-		void decrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
-			//CM7_1T_AES_decrypt_unrolled(rk, data_in, data_out, this->key_rounds);
-			switch(key_length)
-			{
-			case 128:
-				CM7_1T_AES_128_decrypt_unrolled(rk, data_in, data_out);
-				break;
-			case 192:
-				CM7_1T_AES_192_decrypt_unrolled(rk, data_in, data_out);
-				break;
-			case 256:
-				CM7_1T_AES_256_decrypt_unrolled(rk, data_in, data_out);
-				break;
-			}
-		}
-	};
-
-	template<size_t key_length>
-	class CM7_1T_unrolled_deconly : public CM7_1T_unrolled<key_length>
-	{
-	public: // override only key expansions (encryption will take extra 256 bytes more than normally, if used)
-		void key_schedule_enc(uint8_t* rk, const uint8_t* key) {
-			switch(key_length)
-			{
-			case 128:
-				CM7_sBOX_AES_128_keyschedule_enc(rk, key);
-				break;
-			case 192:
-				CM7_sBOX_AES_192_keyschedule_enc(rk, key);
-				break;
-			case 256:
-				CM7_sBOX_AES_256_keyschedule_enc(rk, key);
-				break;
-			}
-		}
-
-		void key_schedule_dec(uint8_t* rk) {
-			CM7_1T_AES_keyschedule_dec_noTe(rk, this->key_rounds);
-		}
-	};
-
-	template<size_t key_length>
 	class CM7_DSPsBOX : public CM7_1T_deconly<key_length>  //reuse existing decryption for now
 	{
 	public:
