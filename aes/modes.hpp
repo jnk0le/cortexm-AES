@@ -89,18 +89,19 @@ namespace mode
 
 		void encrypt(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
 
-			uint32_t block_len = len/16;
-			uint32_t bytes_remainining = len & 15;
+			uint32_t block_len = len >> 4; // div by 16
 
 			mode_impl<key_length, base_impl>::encrypt(data_in, data_out, this->nonce, block_len);
 
-			//handle the truncation aka padding
-			if(bytes_remainining) {
-				uint8_t tmp[16];
+			uint32_t bytes_remaining = len & 15;
 
-				memcpy(tmp, &data_in[block_len], bytes_remainining);
-				mode_impl<key_length, base_impl>::encrypt(tmp, tmp, this->nonce, 1);
-				memcpy(&data_out[block_len], tmp, bytes_remainining);
+			//handle the truncation aka padding
+			if(bytes_remaining) {
+				uint8_t tmp[16]; // uninitialized part will go through encryption but won't be sent out.
+
+				memcpy(tmp, &data_in[len - bytes_remaining], bytes_remaining);
+				mode_impl<key_length, base_impl>::encrypt(tmp, tmp, this->nonce, 1); // finish with same function
+				memcpy(&data_out[len - bytes_remaining], tmp, bytes_remaining);
 			}
 		}
 
