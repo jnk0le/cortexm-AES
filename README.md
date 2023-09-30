@@ -30,7 +30,7 @@ section).
 
 ## cryptoanalysis 
 
-some of the cryptoanalysis works, that tested one or more of the provided implementations.
+some of the cryptoanalysis works/papers, that tested one or more of the provided implementations.
 
 https://webthesis.biblio.polito.it/secure/26870/1/tesi.pdf - (CM3_1T)
 
