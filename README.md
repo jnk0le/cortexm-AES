@@ -32,7 +32,7 @@ section).
 
 some of the cryptoanalysis works/papers, that tested one or more of the provided implementations.
 
-https://webthesis.biblio.polito.it/secure/26870/1/tesi.pdf - (CM3_1T)
+https://webthesis.biblio.polito.it/secure/26870/1/tesi.pdf - (CM3_1T on cortex-m4)
 
 ## base implementations
 
