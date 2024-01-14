@@ -323,7 +323,7 @@ uint8_t ctr_expected_ciphertext[64] = {
 
 uint8_t ctr_tmp[64];
 
-aes::mode::CTR32<256, aes::target::CM7_1T, aes::mode::target::CTR32_CM7_1T> tctr;
+aes::mode::CTR32<256, aes::target::CM7_1T, aes::mode::target::CTR32_CM7_1T_unrolled> tctr;
 
 void aes_ctr_nist_test(void)
 {
@@ -428,9 +428,9 @@ void aes_cbc_perf_test(void)
 
 }
 
-aes::mode::CTR32<128, aes::target::CM7_1T, aes::mode::target::CTR32_CM7_1T> tctr128;
-aes::mode::CTR32<192, aes::target::CM7_1T, aes::mode::target::CTR32_CM7_1T> tctr192;
-aes::mode::CTR32<256, aes::target::CM7_1T, aes::mode::target::CTR32_CM7_1T> tctr256;
+aes::mode::CTR32<128, aes::target::CM7_1T, aes::mode::target::CTR32_CM7_1T_unrolled> tctr128;
+aes::mode::CTR32<192, aes::target::CM7_1T, aes::mode::target::CTR32_CM7_1T_unrolled> tctr192;
+aes::mode::CTR32<256, aes::target::CM7_1T, aes::mode::target::CTR32_CM7_1T_unrolled> tctr256;
 
 void aes_ctr_perf_test(void)
 {

@@ -21,7 +21,7 @@
 .thumb
 .text
 
-.align 3
+.balign 8
 // void CM7_1T_AES_CTR32_enc(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t rounds, uint32_t blocks_cnt) {
 .global CM7_1T_AES_CTR32_enc
 .type   CM7_1T_AES_CTR32_enc,%function
@@ -59,7 +59,7 @@ CM7_1T_AES_CTR32_enc:
 
 	// stacked registers
 
-	// +72 - (blocks_cnt) -> data_end
+	// +72 - (blocks_cnt) -> data_in_end (final ptr)
 
 	// global allocation
 	// r11 - inner loop final ptr
@@ -464,7 +464,7 @@ ctr_partial_precompute:
 	// r10 - s21T // c3
 
 	eor.w r7, r10, r7, ror #16
-	ldr r0, [r12, #-36] //load key[3]
+	ldr r0, [r12, #-36] //preload key[3]
 
 	eor.w r6, r6, r8, ror #24
 	ldr r1, [r12, #-52] //preload ctr[3]
@@ -979,11 +979,11 @@ ctr_encrypt_block:
 
 	//current alloctaion
 	// r0 - rk[0] ^ col 0
-	// r1 - rk[1] ^ col 1
+	// r1 - rk[1]
 	// r2 - rk[2]
 	// r3 - s10` //r1c3
 	// r4 - col 2
-	// r5 -
+	// r5 - col 1
 	// r6 - s03` //r0c3
 	// r7 - rk[3]
 	// r8 - s21` | s32` //c3 upper
@@ -1024,11 +1024,11 @@ ctr_encrypt_block:
 	eors r2, r6
 
 	eors r3, r7
-	cmp r9, r10 // compare early
+	cmp r9, r10 // compare early //???
 
 	stmia r4!, {r0-r3}
 
-	// works here with lsrs, for tst, needs to be cycle earlier
+	// works here with lsrs, for tst, needs to be cycle earlier //????
 	ldr.w r1, [r12, #-52] // ctr, incremented at the beginning of the loop
 	beq ctr_exit //if in_p == final_p: exit
 

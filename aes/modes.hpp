@@ -88,7 +88,6 @@ namespace mode
 		using mode_impl<key_length, base_impl>::setEncKey;
 
 		void encrypt(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
-
 			uint32_t block_len = len >> 4; // div by 16
 
 			mode_impl<key_length, base_impl>::encrypt(data_in, data_out, this->nonce, block_len);

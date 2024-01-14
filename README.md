@@ -278,12 +278,18 @@ TBD
 | CTR32<128>                 | 15.21            |
 | CTR32<192>                 | 18.58            |
 | CTR32<256>                 | 21.96            |
+| CTR32_unrolled<128>        | 14.46            |
+| CTR32_unrolled<192>        | 17.70            |
+| CTR32_unrolled<256>        | 20.95            |
 
 #### specific function sizes
 
 | Function | code size in bytes | stack usage in bytes | notes |
 |----------|--------------------|----------------------|-------|
 | `CM7_1T_AES_CTR32_enc` | 860 | 72 (+1 arg passed on stack) | uses Te2 table |
+| `CM7_1T_AES_128_CTR32_enc_unrolled` | | | uses Te2 table |
+| `CM7_1T_AES_192_CTR32_enc_unrolled` | | | uses Te2 table |
+| `CM7_1T_AES_256_CTR32_enc_unrolled` | | | uses Te2 table |
 
 ### cortex-m55
 
@@ -373,8 +379,8 @@ Implements counter mode caching. Do not use if IV/counter is secret as it will l
 | CTR32<128>                   | 32.97*                 | 32.91*                  |            |
 | CTR32<192>                   | 40.47*                | 40.41*                  |           |
 | CTR32<256>                   | 47.97*                 | 47.91*                  |          |
-| CTR32_unrolled<128>          |                  | 30.72*                 | 14.52*u          |
-| CTR32_unrolled<192>          |                  | 37.59*                 | 17.77*u          |
-| CTR32_unrolled<256>          |                  | 44.47*                 | 21.02*u           |
+| CTR32_unrolled<128>          |                  | 30.72*                 |           |
+| CTR32_unrolled<192>          |                  | 37.59*                 |          |
+| CTR32_unrolled<256>          |                  | 44.47*                 |            |
 
 F407 results assume that input, expanded round key and stack lie in the same memory block (e.g. SRAM1 vs SRAM2 and CCM on f407)
