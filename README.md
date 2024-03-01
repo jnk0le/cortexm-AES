@@ -43,7 +43,9 @@ https://webthesis.biblio.polito.it/secure/26870/1/tesi.pdf - (CM3_1T on cortex-m
 
 Uses simple sbox with parallel mixcolumns
 
-Forward mixcolumns is done as (and according to [this](http://www.wseas.us/e-library/conferences/2009/moscow/AIC/AIC44.pdf) or [this](https://www.researchgate.net/publication/221002183_Efficient_AES_implementations_for_ARM_based_platforms) paper, can be done with 3 xor + 3 rotations or 4 xor + 2 rotations as used here):
+Forward mixcolumns is done as (and according to [this](http://www.wseas.us/e-library/conferences/2009/moscow/AIC/AIC44.pdf)
+or [this](https://www.researchgate.net/publication/221002183_Efficient_AES_implementations_for_ARM_based_platforms) 
+paper, can be done with 3 xor + 3 rotations or 4 xor + 2 rotations as used here):
 
 ```
 tmp = s0 ^ s1 ^ s2 ^ s3
@@ -129,14 +131,19 @@ extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
 
 ### cortex-m3/m4
 
+32 bit LDR opcodes are aligned to 4 byte boundaries (instructions not data) to prevent weird 
+undocumented "feature" of cortex-m3/4 that prevents some pipelining of neighbouring loads.
+
+LUT tables have to be placed in non cached and non waitstated SRAM memory with 32bit 
+wide access, that is not crossing different memory domains (eg. AHB slaves).
+
 #### CM3_1T
 
+cortex m3 and cortex m4 optimized implementation.
+Uses a single T table per enc/dec cipher and additional inv_sbox for final round in decryption.
 
-can be used on cortex-m3 and cortex m4
-
-
-
-
+Originally based on "Peter Schwabe and Ko Stoffelen" AES implementation available 
+[here](https://github.com/Ko-/aes-armcortexm).
 
 #### CM3_1T_unrolled
 
@@ -152,11 +159,47 @@ Same as CM3_1T_deconly but uses unrollend enc/dec functions
 
 #### CM3_sBOX
 
-TBD
 
 #### CM4_DSPsBOX
 
+Utilizes simple sbox and dsp instructions to perform constant time, quad (gf)multiplications in mixcolumns stage.
 
+Forward mixcolumns is done as (and according to [this](http://www.wseas.us/e-library/conferences/2009/moscow/AIC/AIC44.pdf)
+or [this](https://www.researchgate.net/publication/221002183_Efficient_AES_implementations_for_ARM_based_platforms) 
+paper, can be done with 4 xor + 2 rotations or 3 xor + 3 rotations as used here):
+
+```
+tmp = s0 ^ s1 ^ s2 ^ s3
+s0` ^= tmp ^ gmul2(s0^s1) // s1^s2^s3^gmul2(s0^s1)
+s1` ^= tmp ^ gmul2(s1^s2) // s0^s2^s3^gmul2(s1^s2)
+s2` ^= tmp ^ gmul2(s2^s3) // s0^s1^s3^gmul2(s2^s3)
+S3` ^= tmp ^ gmul2(s3^s0) // s0^s1^s2^gmul2(s3^s0)
+```
+
+Inverse mixcolums is implemented as:
+
+```
+S{2} = gmul2(S{1})
+S{4} = gmul2(S{2})
+S{8} = gmul2(S{4})
+
+S{9} = S{8} ^ S{1}
+S{b} = S{9} ^ S{2}
+S{d} = S{9} ^ S{4}
+S{e} = S{8} ^ S{4} ^ S{2}
+
+out = S{e} ^ ror8(S{b}) ^ ror16(S{d}) ^ ror24(S{9})
+	
+s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
+```
+
+`gmul2()` is implementend as:
+
+```
+	uadd8 r6, r4, r4 // quad lsl #1
+	eor r8, r6, #0x1b1b1b1b
+	sel r4, r8, r6 // if uadd carried then take reduced byte
+```
 
 
 #### performance
@@ -211,8 +254,95 @@ extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
 
 ### cortex-m7
 
-TBD
+optimized to avoid dual issue of data dependent loads which cause stalls when accessing DTCM 
+(implemented as 2 separate single ported SRAMs) on both even or odd words. 
 
+The timmming issue can be visualized by following snippet (immediate vs register offset doesn't matter):
+
+```
+	tick = DWT->CYCCNT;
+	asm volatile(""
+			"movw r12, #:lower16:AES_Te0 \n"
+			"movt r12, #:upper16:AES_Te0 \n"
+			"ldr r0, [r12, #0] \n"
+			"ldr r1, [r12, #8] \n"
+			"ldr r2, [r12, #16] \n"
+			"ldr r3, [r12, #24] \n"
+			""::: "r0","r1","r2","r3","r12");
+	tick = DWT->CYCCNT - tick - 1;
+
+	printf("4 even loads, cycles: %lu\n", tick);
+
+	tick = DWT->CYCCNT;
+	asm volatile(""
+			"movw r12, #:lower16:AES_Te0 \n"
+			"movt r12, #:upper16:AES_Te0 \n"
+			"ldr r0, [r12, #0] \n"
+			"ldr r1, [r12, #4] \n"
+			"ldr r2, [r12, #8] \n"
+			"ldr r3, [r12, #12] \n"
+			""::: "r0","r1","r2","r3","r12");
+	tick = DWT->CYCCNT - tick - 1;
+
+	printf("4 linear loads, cycles: %lu\n", tick);
+	printf("This is why any two data dependent LDRs cannot be placed next to each other\n");
+```
+
+Only DTCM memory can be used for LUT tables, since everything else is cached through AXI bus.
+The timing effects of simultaneous access to DTCM memory by core and DMA/AHBS are yet unknown.
+(there was some changes in r1p0 revision: "Improved handling of simultaneous AHBS and software activity relating to the same TCM", details are of course Proprietary&Confidential)
+
+
+
+#### CM7_1T
+
+cortex m7 optimized implementation.
+Uses a single T table per enc/dec cipher and additional inv_sbox for final round in decryption.
+
+#### CM7_1T_deconly
+
+Same as CM7_1T. Uses sbox table in key expansions instead of Te2 to reduce pressure on SRAM for decryption only use cases
+
+#### CM7_DSPsBOX
+
+Utilizes simple sbox and dsp instructions to perform constant time, quad (gf)multiplications in mixcolumns stage.
+
+Forward mixcolumns is done as (and according to [this](http://www.wseas.us/e-library/conferences/2009/moscow/AIC/AIC44.pdf)
+or [this](https://www.researchgate.net/publication/221002183_Efficient_AES_implementations_for_ARM_based_platforms) 
+paper, can be done with 4 xor + 2 rotations or 3 xor + 3 rotations as used here):
+
+```
+tmp = s0 ^ s1 ^ s2 ^ s3
+s0` ^= tmp ^ gmul2(s0^s1) // s1^s2^s3^gmul2(s0^s1)
+s1` ^= tmp ^ gmul2(s1^s2) // s0^s2^s3^gmul2(s1^s2)
+s2` ^= tmp ^ gmul2(s2^s3) // s0^s1^s3^gmul2(s2^s3)
+S3` ^= tmp ^ gmul2(s3^s0) // s0^s1^s2^gmul2(s3^s0)
+```
+
+Inverse mixcolums is implemented as:
+
+```
+S{2} = gmul2(S{1})
+S{4} = gmul2(S{2})
+S{8} = gmul2(S{4})
+
+S{9} = S{8} ^ S{1}
+S{b} = S{9} ^ S{2}
+S{d} = S{9} ^ S{4}
+S{e} = S{8} ^ S{4} ^ S{2}
+
+out = S{e} ^ ror8(S{b}) ^ ror16(S{d}) ^ ror24(S{9})
+	
+s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
+```
+
+`gmul2()` is implementend as:
+
+```
+	uadd8 r6, r4, r4 // quad lsl #1
+	eor r8, r6, #0x1b1b1b1b
+	sel r4, r8, r6 // if uadd carried then take reduced byte
+```
 
 #### performance
 
@@ -251,25 +381,29 @@ cm7 runtime cycles are biased a bit by caller or around caller code (numbers are
 
 extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
 
-### cortex-m55
+### ch32v003
 
-no hardware available yet, TBD
 
-### RI5CY
 
-RI5CY as in GAP8, not the later CV32E40P that is more constrained.
-
-TBD
 
 ## modes implementations
 
 ### generic
+
+#### CBC_GENERIC
+
+#### CTR32_GENERIC
 
 ### cortex-m0/m0+
 
 ### cortex-m3/m4
 
 ### cortex-m7
+
+### CM7_1T_CTR32
+
+Implements counter mode caching. Do not use if IV/counter is secret as it will lead to a timming leak of a single byte, every 256 aligned counter steps.
+
 
 #### performance (in cycles per byte)
 
@@ -290,97 +424,3 @@ TBD
 | `CM7_1T_AES_128_CTR32_enc_unrolled` | | | uses Te2 table |
 | `CM7_1T_AES_192_CTR32_enc_unrolled` | | | uses Te2 table |
 | `CM7_1T_AES_256_CTR32_enc_unrolled` | | | uses Te2 table |
-
-### cortex-m55
-
-### RI5CY
-
-
-## implementations (this part will be replaced later)
-
-
-### CM3_1T
-
-cortex m3 and cortex m4 optimized implementation.
-Uses a single T table per enc/dec cipher and additional inv_sbox for final round in decryption.
-
-Originally based on "Peter Schwabe and Ko Stoffelen" AES implementation available [here](https://github.com/Ko-/aes-armcortexm).
-
-32 bit LDR opcodes are aligned to 4 byte boundaries to prevent weird undocumented "feature" of cortex-m3/4 that prevents some pipelining of neighbouring loads.
-As well as other architecture specific optimizations.
-
-LUT tables have to be placed in non cached and non waitstated SRAM memory with 32bit wide access, that is not crossing different memory domains (eg. AHB slaves).
-FLASH memory simply cannot be used since vendors usually implements some kind of cache, wide prefetch buffers, and waitstates that will anyway make cipher slower than boxless one.
-
-### CM7_1T
-
-cortex m7 optimized implementation.
-Uses a single T table per enc/dec cipher and additional inv_sbox for final round in decryption.
-
-Based on cortex m3/4 one, with carefully reordered instructions for cortex-m7 pipeline, to increase IPC and avoid data dependent 
-stalls when accessing 2x32 bit DTCM (separate single ported SRAMs) on even/odd words. 
-
-The timmming issue can be visualized by following snippet (immediate vs register offset doesn't matter):
-
-```
-	tick = DWT->CYCCNT;
-	asm volatile(""
-			"movw r12, #:lower16:AES_Te0 \n"
-			"movt r12, #:upper16:AES_Te0 \n"
-			"ldr r0, [r12, #0] \n"
-			"ldr r1, [r12, #8] \n"
-			"ldr r2, [r12, #16] \n"
-			"ldr r3, [r12, #24] \n"
-			""::: "r0","r1","r2","r3","r12");
-	tick = DWT->CYCCNT - tick - 1;
-
-	printf("4 even loads, cycles: %lu\n", tick);
-
-	tick = DWT->CYCCNT;
-	asm volatile(""
-			"movw r12, #:lower16:AES_Te0 \n"
-			"movt r12, #:upper16:AES_Te0 \n"
-			"ldr r0, [r12, #0] \n"
-			"ldr r1, [r12, #4] \n"
-			"ldr r2, [r12, #8] \n"
-			"ldr r3, [r12, #12] \n"
-			""::: "r0","r1","r2","r3","r12");
-	tick = DWT->CYCCNT - tick - 1;
-
-	printf("4 linear loads, cycles: %lu\n", tick);
-	printf("This is why any two data dependent LDRs cannot be placed next to each other\n");
-```
-
-Only DTCM memory can be used for LUT tables, since everything else is cached through AXI bus.
-The timing effects of simultaneous access to DTCM memory by core and DMA/AHBS are yet unknown. (there was some changes in r1p0 revision: "Improved handling of simultaneous AHBS and software activity relating to the same TCM", details are of course Proprietary&Confidential)
-
-### XXX_DSPsBOX
-
-Utilizes dsp instructions to perform constant time, quad (gf)multiplications in mixcolumns stage.
-MixCloums stage is parallelized according to [this](http://www.wseas.us/e-library/conferences/2009/moscow/AIC/AIC44.pdf) or [this](https://www.researchgate.net/publication/221002183_Efficient_AES_implementations_for_ARM_based_platforms) paper, InvMixColums is done through more straightforward representation.
-
-## Base ciphers performance (in cycles per block,  numbers are outdated)
-
-
-### XXX_1T_CTR32
-
-Implements counter mode caching. Do not use if IV/counter is secret as it will lead to a timming leak of a single byte, every 256 aligned counter steps.
-
-## Cipher modes performance (in cycles per byte, numbers are outdated)
-
-| Cipher function            | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/7ws) - CM3_1T | STM32H7 - CM7_1T |
-|----------------------------|-----------------------------|-----------------------------|------------------|
-| CBC_GENERIC<128> enc(+dec) |      |                 |       |
-| CBC_GENERIC<192> enc(+dec) |     |                 |       |
-| CBC_GENERIC<256> enc(+dec) |     |                  |       |
-| CTR32_GENERIC<128>           |                  |                        |             |
-| CTR32_GENERIC<192>           |                  |                        |             |
-| CTR32_GENERIC<256>           |                  |                        |             |
-| CTR32<128>                   | 32.97*                 | 32.91*                  |            |
-| CTR32<192>                   | 40.47*                | 40.41*                  |           |
-| CTR32<256>                   | 47.97*                 | 47.91*                  |          |
-| CTR32_unrolled<128>          |                  | 30.72*                 |           |
-| CTR32_unrolled<192>          |                  | 37.59*                 |          |
-| CTR32_unrolled<256>          |                  | 44.47*                 |            |
-
-F407 results assume that input, expanded round key and stack lie in the same memory block (e.g. SRAM1 vs SRAM2 and CCM on f407)
