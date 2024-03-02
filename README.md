@@ -400,10 +400,15 @@ extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
 
 ### cortex-m7
 
-### CM7_1T_CTR32
+#### CTR32_CM7_1T
 
 Implements counter mode caching. Do not use if IV/counter is secret as it will lead to a timming leak of a single byte, every 256 aligned counter steps.
 
+Preloads input data in case it's in SDRAM or QSPI memory.
+
+#### CTR32_CM7_1T_unrolled
+
+unrolled version of CTR32_CM7_1T, doesn't preload input data except first cacheline.
 
 #### performance (in cycles per byte)
 
