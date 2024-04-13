@@ -76,7 +76,7 @@ CM7_1T_AES_128_keyschedule_enc:
 
 	eor.w r5, r4
 	bne 1b
-	str r5, [r0]
+	str r5, [r0] // at 9th round execution is skewed by half cycle
 
 	pop {r4-r8, pc}
 #else
