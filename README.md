@@ -348,9 +348,9 @@ s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3
 
 | Cipher function  | STM32H7 - CM7_1T | STM32H7 - CM7_DSPsBOX |
 |------------------|------------------|-----------------------|
-| `setEncKey<128>` | 141 | 141 |
-| `setEncKey<192>` | 131 | 131 |
-| `setEncKey<256>` | 180 | 180 |
+| `setEncKey<128>` | 139 | 139 |
+| `setEncKey<192>` | 129 | 129 |
+| `setEncKey<256>` | 178 | 178 |
 | `encrypt<128>`   | 292 | 400 |
 | `encrypt<192>`   | 346 | 478 |
 | `encrypt<256>`   | 400 | 556 |
@@ -361,7 +361,8 @@ s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3
 | `decrypt<192>`   | 347 | (1T) |
 | `decrypt<256>`   | 401 | (1T) |
 
-cm7 runtime cycles are biased a bit by caller or around caller code (numbers are from current ecb unit test)
+cm7 runtime cycles are biased a bit by caller or around caller code (numbers are from current ecb unit test,
+no other code in loop)
 
 #### specific function sizes
 
