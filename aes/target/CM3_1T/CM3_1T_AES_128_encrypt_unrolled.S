@@ -9,6 +9,9 @@
  * \date 18 jul 2018
  */
 
+// compile for compatible targets only
+#if __ARM_EABI__ && __thumb2__
+
 .include "aes/target/CM3_1T/CM3_1T_AES_common.inc"
 
 .syntax unified
@@ -20,7 +23,6 @@
 .global CM3_1T_AES_128_encrypt_unrolled
 .type   CM3_1T_AES_128_encrypt_unrolled,%function
 CM3_1T_AES_128_encrypt_unrolled:
-#if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
 	push {r2,r4-r11,lr} // stack output pointer
 
 	mov.w r12, r0 // align following code to 4 bytes
@@ -138,6 +140,5 @@ CM3_1T_AES_128_encrypt_unrolled:
 	str r3, [r7, #12]
 
 	pop {r4-r11,pc}
-#else
-	b . //crash in case the function was called on thumb1 core
+
 #endif

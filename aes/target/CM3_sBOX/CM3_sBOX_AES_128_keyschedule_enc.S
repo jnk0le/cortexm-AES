@@ -8,6 +8,9 @@
  * \date 9 jan 2019
  */
 
+// compile for compatible targets only
+#if __ARM_EABI__ && __thumb2__
+
 // 10 rounds of rcon can be computed as left shift + conditional reload of rcon to 0x1b after 0x80
 // it can also serve as loop counter to reduce register pressure
 
@@ -20,7 +23,6 @@
 .global CM3_sBOX_AES_128_keyschedule_enc
 .type   CM3_sBOX_AES_128_keyschedule_enc,%function
 CM3_sBOX_AES_128_keyschedule_enc:
-#if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
 	push {r4-r8, lr}
 
 	movw r14, #:lower16:AES_sbox
@@ -64,6 +66,5 @@ CM3_sBOX_AES_128_keyschedule_enc:
 	bne 1b
 
 	pop {r4-r8, pc}
-#else
-	b . // crash in case the function was called on thumb1 core
+
 #endif

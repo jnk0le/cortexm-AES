@@ -17,6 +17,9 @@
 //    uint8_t rk[(n+1)*16];
 //} ctx;
 
+// compile for compatible targets only
+#if __ARM_EABI__ && __thumb2__ && __ARM_FEATURE_DSP
+
 .include "aes/target/CM7_1T_modes/CM7_1T_AES_unrolled.inc"
 
 .syntax unified
@@ -28,7 +31,6 @@
 .global CM7_1T_AES_256_CTR32_enc_unrolled
 .type   CM7_1T_AES_256_CTR32_enc_unrolled,%function
 CM7_1T_AES_256_CTR32_enc_unrolled:
-#if __ARM_ARCH_7EM__
 	mov.w r12, r0 // align
 	add r3, r1, r3, lsl #4 // in_p + cnt*16
 
@@ -882,6 +884,5 @@ ctr_exit:
 	str r5, [r4] // store last block
 	strd r6,r7, [r4, #4]
 	pop {r4-r11,pc}
-#else
-	b . //crash in case the function was called on thumb1 core
+
 #endif

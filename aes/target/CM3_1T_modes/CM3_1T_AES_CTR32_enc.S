@@ -2,6 +2,8 @@
  * \file CM3_1T_AES_CTR32_enc.S
  * \brief
  *
+ * counter mode, SP 800-38A compliant (32bit, big endian ctr), can start from any counter value
+ * counter is written back and can be used to continue encryption later
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * Peter Schwabe & Ko Stoffelen @2016
@@ -9,8 +11,8 @@
  * \date 1 aug 2018
  */
 
-// counter mode, SP 800-38A compliant (32bit, big endian ctr), can start from any counter value
-// counter is written back and can be used to continue encryption later
+// compile for compatible targets only
+#if __ARM_EABI__ && __thumb2__
 
 .syntax unified
 .thumb
@@ -21,7 +23,6 @@
 .global CM3_1T_AES_CTR32_enc
 .type   CM3_1T_AES_CTR32_enc,%function
 CM3_1T_AES_CTR32_enc:
-#if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
 	mov r12, r0
 	//use this value to reload context pointer before next block encryption
 	adds r0, #64 // 3rd round as common reload point
@@ -440,6 +441,5 @@ ctr_encrypt_first:
 ctr_exit:
 	add sp, #20+16
 	pop {r4-r11,pc}
-#else
-	b . //crash in case the function was called on thumb1 core
+
 #endif

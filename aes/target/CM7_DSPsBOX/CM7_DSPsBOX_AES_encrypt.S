@@ -8,6 +8,9 @@
  * \date 24 Feb 2019
  */
 
+// compile for compatible targets only
+#if __ARM_EABI__ && __thumb2__ && __ARM_FEATURE_DSP
+
 .syntax unified
 .thumb
 .text
@@ -17,8 +20,6 @@
 .global CM7_DSPsBOX_AES_encrypt
 .type   CM7_DSPsBOX_AES_encrypt,%function
 CM7_DSPsBOX_AES_encrypt:
-#if __ARM_ARCH_7EM__
-	//pld here at +1 cycle?
 	push {r2,r4-r11,lr} //stack out
 
 	mov r12, r0
@@ -553,6 +554,5 @@ CM7_DSPsBOX_AES_encrypt:
 	stmia r6!, {r0-r3}
 
 	pop {r5-r11,pc}
-#else
-	b . //crash in case the function was called on non dsp core
+
 #endif

@@ -8,6 +8,9 @@
  * \date 25 oct 2021
  */
 
+// compile for compatible targets only
+#if __ARM_EABI__
+
 .syntax unified
 .thumb
 .text
@@ -645,3 +648,5 @@ CM0_FASTMULsBOX_AES_encrypt:
 	stmia r4!, {r3,r5-r7}
 
 	pop {r4-r7, pc}
+
+#endif

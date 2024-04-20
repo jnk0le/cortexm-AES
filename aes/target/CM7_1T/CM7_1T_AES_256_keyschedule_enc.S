@@ -8,6 +8,9 @@
  * \date 17 Jun 2018
  */
 
+// compile for compatible targets only
+#if __ARM_EABI__ && __thumb2__ && __ARM_FEATURE_DSP
+
 // 7 rounds of rcon can be computed as left shift only
 
 .syntax unified
@@ -20,7 +23,6 @@
 .global CM7_1T_AES_256_keyschedule_enc
 .type   CM7_1T_AES_256_keyschedule_enc,%function
 CM7_1T_AES_256_keyschedule_enc:
-#if __ARM_ARCH_7EM__
 	push {r4-r11, lr}
 
 	//load key
@@ -108,6 +110,5 @@ CM7_1T_AES_256_keyschedule_enc:
 2:
 	stmia r0!, {r2-r5}
 	pop {r4-r11, pc}
-#else
-	b . //crash in case the function was called on thumb1 core
+
 #endif

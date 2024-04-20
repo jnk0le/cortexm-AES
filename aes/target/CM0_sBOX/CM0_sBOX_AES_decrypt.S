@@ -2,13 +2,15 @@
  * \file CM0_sBOX_AES_decrypt.S
  * \brief
  *
+ * key goes backward
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
  * \date 2 nov 2021
  */
 
-//key goes backward
+// compile for compatible targets only
+#if __ARM_EABI__
 
 .syntax unified
 .thumb
@@ -787,3 +789,5 @@ aes_dec_constants:
 	.long AES_inv_sbox
 	.long 0x80808080
 	.long 0x1b1b1b1b
+
+#endif

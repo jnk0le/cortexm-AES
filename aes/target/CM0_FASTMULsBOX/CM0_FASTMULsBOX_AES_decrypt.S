@@ -2,13 +2,15 @@
  * \file CM0_FASTMULsBOX_AES_decrypt.S
  * \brief faster than standard version, only when running on core with 1 cycle multiplier
  *
+ * key goes backward
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
  * \date 10 nov 2021
  */
 
-//key goes backward
+// compile for compatible targets only
+#if __ARM_EABI__
 
 .syntax unified
 .thumb
@@ -772,3 +774,5 @@ aes_dec_constants:
 	.long AES_inv_sbox
 	.long 0x01010101
 	.long 0x80808080
+
+#endif

@@ -2,14 +2,16 @@
  * \file CM7_1T_AES_keyschedule_dec_noTe.S
  * \brief
  *
+ * performs equivalent inverse cipher transformation on expanded encryption key
+ * order of round keys is not inverted - decryption will read it in reverse
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
  * \date 9 feb 2019
  */
 
-// performs perform equivalent inverse cipher transformation on expanded encryption key
-// order of round keys is not inverted - decryption will read it in reverse
+// compile for compatible targets only
+#if __ARM_EABI__ && __thumb2__ && __ARM_FEATURE_DSP
 
 .syntax unified
 .thumb
@@ -21,7 +23,6 @@
 .global CM7_1T_AES_keyschedule_dec_noTe
 .type   CM7_1T_AES_keyschedule_dec_noTe,%function
 CM7_1T_AES_keyschedule_dec_noTe:
-#if __ARM_ARCH_7EM__
 	push {r4-r10, lr}
 
 	//first and last block are ommited
@@ -116,6 +117,5 @@ CM7_1T_AES_keyschedule_dec_noTe:
 	str.w r2, [r0, #4] // if everything is .w, +1 cycle here
 
 	pop {r4-r10, pc}
-#else
-	b . //crash in case the function was called on non dsp core
+
 #endif

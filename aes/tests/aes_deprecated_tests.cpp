@@ -1,6 +1,8 @@
 //This api is unversioned
 //will be replaced by proper implementation
 
+#ifdef __arm__
+
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -474,3 +476,5 @@ void aes_ctr_perf_test(void)
 
 }
 #endif
+
+#endif //__arm__

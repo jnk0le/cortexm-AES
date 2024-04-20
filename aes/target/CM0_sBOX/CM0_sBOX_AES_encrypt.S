@@ -7,6 +7,9 @@
  * \date 24 oct 2021
  */
 
+// compile for compatible targets only
+#if __ARM_EABI__
+
 .syntax unified
 .thumb
 .text
@@ -672,3 +675,5 @@ aes_enc_constants:
 	.long AES_sbox
 	.long 0x80808080
 	.long 0x1b1b1b1b
+
+#endif

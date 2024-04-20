@@ -8,6 +8,9 @@
  * \date 28 oct 2021
  */
 
+// compile for compatible targets only
+#if __ARM_EABI__
+
  // 8 rounds of rcon can be computed as left shift only
 
 .syntax unified
@@ -76,3 +79,5 @@ CM0_sBOX_AES_192_keyschedule_enc:
 2:	stmia r1!, {r2-r5} // only 4 entries have to be written
 
 	pop {r4-r7, pc}
+
+#endif

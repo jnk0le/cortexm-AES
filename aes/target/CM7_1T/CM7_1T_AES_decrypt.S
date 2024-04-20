@@ -2,13 +2,15 @@
  * \file CM7_1T_AES_decrypt.S
  * \brief
  *
+ *  uses backward expanded round key
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
  * \date 17 jun 2018
  */
 
-// uses backward expanded round key
+// compile for compatible targets only
+#if __ARM_EABI__ && __thumb2__ && __ARM_FEATURE_DSP
 
 .syntax unified
 .thumb
@@ -22,8 +24,6 @@
 	nop // align loop entry
 	nop // align loop entry
 CM7_1T_AES_decrypt:
-#if __ARM_ARCH_7EM__
-	//pld here at +1 cycle?
 	push {r2, r4-r11,lr} // stack out
 
 	movw r14, #:lower16:AES_Td2
@@ -520,6 +520,5 @@ CM7_1T_AES_decrypt:
 	stmia r5!, {r0-r3}
 
 	pop {r5-r11, pc}
-#else
-	b . //crash in case the function was called on thumb1 core
+
 #endif

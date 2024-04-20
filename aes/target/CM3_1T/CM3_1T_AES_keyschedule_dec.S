@@ -2,14 +2,16 @@
  * \file CM3_1T_AES_keyschedule_dec.S
  * \brief
  *
+ * performs equivalent inverse cipher transformation on expanded encryption key
+ * order of round keys is not inverted - decryption will read it in reverse
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
  * \date 9 jun 2018
  */
 
-// performs perform equivalent inverse cipher transformation on expanded encryption key
-// order of round keys is not inverted - decryption will read it in reverse
+// compile for compatible targets only
+#if __ARM_EABI__ && __thumb2__
 
 .syntax unified
 .thumb
@@ -20,7 +22,6 @@
 .global CM3_1T_AES_keyschedule_dec
 .type   CM3_1T_AES_keyschedule_dec,%function
 CM3_1T_AES_keyschedule_dec:
-#if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
 	push {r4-r5, lr}
 
 	//first and last block is ommited
@@ -62,6 +63,5 @@ CM3_1T_AES_keyschedule_dec:
 	bne 1b
 
 	pop {r4-r5, pc}
-#else
-	b . //crash in case the function was called on thumb1 core
+
 #endif

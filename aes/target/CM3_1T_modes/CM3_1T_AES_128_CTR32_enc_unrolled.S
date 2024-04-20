@@ -2,6 +2,8 @@
  * \file CM3_1T_AES_128_CTR32_enc_unrolled.S
  * \brief
  *
+ * counter mode, SP 800-38A compliant (32bit, big endian ctr), can start from any counter value
+ * counter is written back and can be used to continue encryption later
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * Peter Schwabe & Ko Stoffelen @2016
@@ -9,8 +11,8 @@
  * \date 21 sep 2018
  */
 
-// counter mode, SP 800-38A compliant (32bit, big endian ctr), can start from any counter value
-// counter is written back and can be used to continue encryption later
+// compile for compatible targets only
+#if __ARM_EABI__ && __thumb2__
 
 .include "aes/target/CM3_1T/CM3_1T_AES_common.inc"
 
@@ -23,7 +25,6 @@
 .global CM3_1T_AES_128_CTR32_enc_unrolled
 .type   CM3_1T_AES_128_CTR32_enc_unrolled,%function
 CM3_1T_AES_128_CTR32_enc_unrolled:
-#if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
 	add r3, r1, r3, lsl #4 // in_p + cnt*16
 
 	push {r1-r11,lr} // push data_in, data_out, data_end
@@ -359,6 +360,5 @@ ctr_encrypt_first:
 ctr_exit:
 	add sp, #20+12
 	pop {r4-r11,pc}
-#else
-	b . //crash in case the function was called on thumb1 core
+
 #endif

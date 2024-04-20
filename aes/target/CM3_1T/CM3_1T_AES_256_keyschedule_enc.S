@@ -8,6 +8,9 @@
  * \date 9 jun 2018
  */
 
+// compile for compatible targets only
+#if __ARM_EABI__ && __thumb2__
+
 // 7 rounds of rcon can be computed as left shift only
 
 .syntax unified
@@ -19,7 +22,6 @@
 .global CM3_1T_AES_256_keyschedule_enc
 .type   CM3_1T_AES_256_keyschedule_enc,%function
 CM3_1T_AES_256_keyschedule_enc:
-#if __ARM_ARCH_7M__ || __ARM_ARCH_7EM__
 	push {r4-r11, lr}
 
 	ldmia r1!, {r2-r9} // load key
@@ -92,6 +94,5 @@ CM3_1T_AES_256_keyschedule_enc:
 
 	add sp, #8 // faster than dummy pops
 	pop {r4-r11, pc}
-#else
-	b . // crash in case the function was called on thumb1 core
+
 #endif

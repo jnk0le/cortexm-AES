@@ -8,6 +8,9 @@
  * \date 17 oct 2021
  */
 
+// compile for compatible targets only
+#if __ARM_EABI__
+
 // 10 rounds of rcon can be computed as left shift + conditional reload of rcon to 0x1b after 0x80
 // it can also serve as loop counter to reduce register pressure
 
@@ -70,3 +73,5 @@ CM0_sBOX_AES_128_keyschedule_enc:
 
 2:	pop {r4-r7}
 	bx lr
+
+#endif

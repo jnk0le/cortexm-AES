@@ -17,6 +17,9 @@
 //    uint8_t rk[(n+1)*16];
 //} ctx;
 
+// compile for compatible targets only
+#if __ARM_EABI__ && __thumb2__ && __ARM_FEATURE_DSP
+
 .syntax unified
 .thumb
 .text
@@ -26,7 +29,6 @@
 .global CM7_1T_AES_CTR32_enc
 .type   CM7_1T_AES_CTR32_enc,%function
 CM7_1T_AES_CTR32_enc:
-#if __ARM_ARCH_7EM__
 	mov r12, r0
 	adds r0, #64 // 3rd round as common reload point
 
@@ -1047,6 +1049,5 @@ ctr_encrypt_block:
 ctr_exit:
 	add sp, #24+12
 	pop {r4-r11,pc}
-#else
-	b . //crash in case the function was called on thumb1 core
+
 #endif
