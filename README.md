@@ -396,7 +396,7 @@ implemented similarly to cm0
 
 #### performance
 
-| Cipher function  | ch32v003 (0ws/1ws) - QKv2 |
+| Cipher function  | ch32v003 (0ws/1ws) - QKv2sBOX |
 |------------------|------------------|
 | `setEncKey<128>` | 462/510 |
 | `setEncKey<192>` |  |
