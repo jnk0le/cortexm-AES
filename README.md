@@ -95,7 +95,7 @@ out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 #### performance
 
 | Cipher function  | STM32F0 (0ws/1ws) - CM0_sBOX | STM32F0 (0ws/1ws) - CM0_FASTMULsBOX | STM32L0 (0ws/1ws) - CM0_sBOX | STM32L0 (0ws/1ws) - CM0_FASTMULsBOX |
-|------------------|------------------------------|-------------------------------------|------------------------------|-------------------------------------|
+|------------------|------------------------------|-------------------------------------|------------------------------|-------------------------------|
 | `setEncKey<128>` | 399/415 | (sBOX) |  |  |
 | `setEncKey<192>` | 375/389 | (sBOX) |  |  |
 | `setEncKey<256>` | 568/586 | (sBOX) |  |  |
@@ -382,10 +382,41 @@ no other code in loop)
 
 extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
 
-### ch32v003
+### "QingKeV2" (ch32v003)
 
+ilp32e
+xw extension
+no multiplier
 
+#### QKv2_sBOX
 
+implemented similarly to cm0
+
+#### denser??
+
+#### performance
+
+| Cipher function  | ch32v003 (0ws/1ws) - QKv2 |
+|------------------|------------------|
+| `setEncKey<128>` | 462/510 |
+| `setEncKey<192>` |  |
+| `setEncKey<256>` |  |
+| `encrypt<128>`   | 1853/2115 |
+| `encrypt<192>`   |  |
+| `encrypt<256>`   |  |
+| `setDecKey<128>` |  |
+| `setDecKey<192>` |  |
+| `setDecKey<256>` |  |
+| `decrypt<128>`   |  |
+| `decrypt<192>`   |  |
+| `decrypt<256>`   |  |
+
+#### specific function sizes
+
+| Function | code size in bytes | stack usage in bytes | notes |
+|----------|--------------------|----------------------|-------|
+| `QKv2_AES_128_keyschedule_enc` | 82 | 4 | uses sbox |
+| `QKv2_sBOX_AES_encrypt` | 738 | 16 | uses sbox |
 
 ## modes implementations
 
