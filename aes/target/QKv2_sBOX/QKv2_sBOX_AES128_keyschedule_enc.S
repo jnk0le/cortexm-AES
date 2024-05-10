@@ -14,10 +14,10 @@
 
 .text
 
-// void QKv2_sBOX_AES_128_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
-.global QKv2_sBOX_AES_128_keyschedule_enc
-.type   QKv2_sBOX_AES_128_keyschedule_enc,%function
-QKv2_sBOX_AES_128_keyschedule_enc:
+// void QKv2_sBOX_AES128_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
+.global QKv2_sBOX_AES128_keyschedule_enc
+.type   QKv2_sBOX_AES128_keyschedule_enc,%function
+QKv2_sBOX_AES128_keyschedule_enc:
 	c.addi sp, -4
 	c.swsp s0, 0(sp)
 

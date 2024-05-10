@@ -1,5 +1,5 @@
 /*!
- * \file CM3_1T_AES_256_decrypt_unrolled.S
+ * \file CM3_1T_AES_128_decrypt_unrolled.S
  * \brief
  *
  *
@@ -19,13 +19,13 @@
 .text
 
 .align 3
-// void CM3_1T_AES_256_decrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out) {
-.global CM3_1T_AES_256_decrypt_unrolled
-.type   CM3_1T_AES_256_decrypt_unrolled,%function
-CM3_1T_AES_256_decrypt_unrolled:
+// void CM3_1T_AES128_decrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out) {
+.global CM3_1T_AES128_decrypt_unrolled
+.type   CM3_1T_AES128_decrypt_unrolled,%function
+CM3_1T_AES128_decrypt_unrolled:
 	push {r2, r4-r11, lr} //stack output pointer
 
-	add r12, r0, #224 // 14 rounds * 16
+	add r12, r0, #160 // 10 rounds * 16
 
 	movw r14, #:lower16:AES_Td2
 	movt r14, #:upper16:AES_Td2
@@ -59,10 +59,6 @@ CM3_1T_AES_256_decrypt_unrolled:
 	CM3_1T_unrolled_dec_round // 7
 	CM3_1T_unrolled_dec_round // 8
 	CM3_1T_unrolled_dec_round // 9
-	CM3_1T_unrolled_dec_round // 10
-	CM3_1T_unrolled_dec_round // 11
-	CM3_1T_unrolled_dec_round // 12
-	CM3_1T_unrolled_dec_round // 13
 
 	// final round
 	movw r14, #:lower16:AES_inv_sbox

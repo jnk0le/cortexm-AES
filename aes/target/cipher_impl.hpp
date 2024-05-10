@@ -31,13 +31,13 @@ namespace target
 			switch(key_length)
 			{
 			case 128:
-				CM0_sBOX_AES_128_keyschedule_enc(rk, key);
+				CM0_sBOX_AES128_keyschedule_enc(rk, key);
 				break;
 			case 192:
-				CM0_sBOX_AES_192_keyschedule_enc(rk, key);
+				CM0_sBOX_AES192_keyschedule_enc(rk, key);
 				break;
 			case 256:
-				CM0_sBOX_AES_256_keyschedule_enc(rk, key);
+				CM0_sBOX_AES256_keyschedule_enc(rk, key);
 				break;
 			}
 		}
@@ -66,13 +66,13 @@ namespace target
 			switch(key_length)
 			{
 			case 128:
-				CM0_sBOX_AES_128_keyschedule_enc(rk, key);
+				CM0_sBOX_AES128_keyschedule_enc(rk, key);
 				break;
 			case 192:
-				CM0_sBOX_AES_192_keyschedule_enc(rk, key);
+				CM0_sBOX_AES192_keyschedule_enc(rk, key);
 				break;
 			case 256:
-				CM0_sBOX_AES_256_keyschedule_enc(rk, key);
+				CM0_sBOX_AES256_keyschedule_enc(rk, key);
 				break;
 			}
 		}
@@ -101,13 +101,13 @@ namespace target
 			switch(key_length)
 			{
 			case 128:
-				CM3_1T_AES_128_keyschedule_enc(rk, key);
+				CM3_1T_AES128_keyschedule_enc(rk, key);
 				break;
 			case 192:
-				CM3_1T_AES_192_keyschedule_enc(rk, key);
+				CM3_1T_AES192_keyschedule_enc(rk, key);
 				break;
 			case 256:
-				CM3_1T_AES_256_keyschedule_enc(rk, key);
+				CM3_1T_AES256_keyschedule_enc(rk, key);
 				break;
 			}
 		}
@@ -136,13 +136,13 @@ namespace target
 			switch(key_length)
 			{
 			case 128:
-				CM3_sBOX_AES_128_keyschedule_enc(rk, key);
+				CM3_sBOX_AES128_keyschedule_enc(rk, key);
 				break;
 			case 192:
-				CM3_sBOX_AES_192_keyschedule_enc(rk, key);
+				CM3_sBOX_AES192_keyschedule_enc(rk, key);
 				break;
 			case 256:
-				CM3_sBOX_AES_256_keyschedule_enc(rk, key);
+				CM3_sBOX_AES256_keyschedule_enc(rk, key);
 				break;
 			}
 		}
@@ -161,13 +161,13 @@ namespace target
 			switch(key_length)
 			{
 			case 128:
-				CM3_1T_AES_128_encrypt_unrolled(rk, data_in, data_out);
+				CM3_1T_AES128_encrypt_unrolled(rk, data_in, data_out);
 				break;
 			case 192:
-				CM3_1T_AES_192_encrypt_unrolled(rk, data_in, data_out);
+				CM3_1T_AES192_encrypt_unrolled(rk, data_in, data_out);
 				break;
 			case 256:
-				CM3_1T_AES_256_encrypt_unrolled(rk, data_in, data_out);
+				CM3_1T_AES256_encrypt_unrolled(rk, data_in, data_out);
 				break;
 			}
 		}
@@ -177,13 +177,13 @@ namespace target
 			switch(key_length)
 			{
 			case 128:
-				CM3_1T_AES_128_decrypt_unrolled(rk, data_in, data_out);
+				CM3_1T_AES128_decrypt_unrolled(rk, data_in, data_out);
 				break;
 			case 192:
-				CM3_1T_AES_192_decrypt_unrolled(rk, data_in, data_out);
+				CM3_1T_AES192_decrypt_unrolled(rk, data_in, data_out);
 				break;
 			case 256:
-				CM3_1T_AES_256_decrypt_unrolled(rk, data_in, data_out);
+				CM3_1T_AES256_decrypt_unrolled(rk, data_in, data_out);
 				break;
 			}
 		}
@@ -197,13 +197,13 @@ namespace target
 			switch(key_length)
 			{
 			case 128:
-				CM3_sBOX_AES_128_keyschedule_enc(rk, key);
+				CM3_sBOX_AES128_keyschedule_enc(rk, key);
 				break;
 			case 192:
-				CM3_sBOX_AES_192_keyschedule_enc(rk, key);
+				CM3_sBOX_AES192_keyschedule_enc(rk, key);
 				break;
 			case 256:
-				CM3_sBOX_AES_256_keyschedule_enc(rk, key);
+				CM3_sBOX_AES256_keyschedule_enc(rk, key);
 				break;
 			}
 		}
@@ -221,13 +221,13 @@ namespace target
 			switch(key_length)
 			{
 			case 128:
-				CM3_sBOX_AES_128_keyschedule_enc(rk, key);
+				CM3_sBOX_AES128_keyschedule_enc(rk, key);
 				break;
 			case 192:
-				CM3_sBOX_AES_192_keyschedule_enc(rk, key);
+				CM3_sBOX_AES192_keyschedule_enc(rk, key);
 				break;
 			case 256:
-				CM3_sBOX_AES_256_keyschedule_enc(rk, key);
+				CM3_sBOX_AES256_keyschedule_enc(rk, key);
 				break;
 			}
 		}
@@ -256,13 +256,13 @@ namespace target
 			switch(key_length)
 			{
 			case 128:
-				CM7_1T_AES_128_keyschedule_enc(rk, key);
+				CM7_1T_AES128_keyschedule_enc(rk, key);
 				break;
 			case 192:
-				CM7_1T_AES_192_keyschedule_enc(rk, key);
+				CM7_1T_AES192_keyschedule_enc(rk, key);
 				break;
 			case 256:
-				CM7_1T_AES_256_keyschedule_enc(rk, key);
+				CM7_1T_AES256_keyschedule_enc(rk, key);
 				break;
 			}
 		}
@@ -291,13 +291,13 @@ namespace target
 			switch(key_length)
 			{
 			case 128:
-				CM7_sBOX_AES_128_keyschedule_enc(rk, key);
+				CM7_sBOX_AES128_keyschedule_enc(rk, key);
 				break;
 			case 192:
-				CM7_sBOX_AES_192_keyschedule_enc(rk, key);
+				CM7_sBOX_AES192_keyschedule_enc(rk, key);
 				break;
 			case 256:
-				CM7_sBOX_AES_256_keyschedule_enc(rk, key);
+				CM7_sBOX_AES256_keyschedule_enc(rk, key);
 				break;
 			}
 		}
@@ -315,13 +315,13 @@ namespace target
 			switch(key_length)
 			{
 			case 128:
-				CM7_sBOX_AES_128_keyschedule_enc(rk, key);
+				CM7_sBOX_AES128_keyschedule_enc(rk, key);
 				break;
 			case 192:
-				CM7_sBOX_AES_192_keyschedule_enc(rk, key);
+				CM7_sBOX_AES192_keyschedule_enc(rk, key);
 				break;
 			case 256:
-				CM7_sBOX_AES_256_keyschedule_enc(rk, key);
+				CM7_sBOX_AES256_keyschedule_enc(rk, key);
 				break;
 			}
 		}
@@ -350,13 +350,13 @@ namespace target
 			switch(key_length)
 			{
 			case 128:
-				QKv2_sBOX_AES_128_keyschedule_enc(rk, key);
+				QKv2_sBOX_AES128_keyschedule_enc(rk, key);
 				break;
 			case 192:
-				QKv2_sBOX_AES_192_keyschedule_enc(rk, key);
+				QKv2_sBOX_AES192_keyschedule_enc(rk, key);
 				break;
 			case 256:
-				QKv2_sBOX_AES_256_keyschedule_enc(rk, key);
+				QKv2_sBOX_AES256_keyschedule_enc(rk, key);
 				break;
 			}
 		}

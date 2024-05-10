@@ -1,5 +1,5 @@
 /*!
- * \file CM3_1T_AES_128_CTR32_enc_unrolled.S
+ * \file CM3_1T_AES_256_CTR32_enc_unrolled.S
  * \brief
  *
  * counter mode, SP 800-38A compliant (32bit, big endian ctr), can start from any counter value
@@ -21,10 +21,10 @@
 .text
 
 .align 3
-// void CM3_1T_AES_128_CTR32_enc_unrolled(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt) {
-.global CM3_1T_AES_128_CTR32_enc_unrolled
-.type   CM3_1T_AES_128_CTR32_enc_unrolled,%function
-CM3_1T_AES_128_CTR32_enc_unrolled:
+// void CM3_1T_AES256_CTR32_enc_unrolled(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt) {
+.global CM3_1T_AES256_CTR32_enc_unrolled
+.type   CM3_1T_AES256_CTR32_enc_unrolled,%function
+CM3_1T_AES256_CTR32_enc_unrolled:
 	add r3, r1, r3, lsl #4 // in_p + cnt*16
 
 	push {r1-r11,lr} // push data_in, data_out, data_end
@@ -51,7 +51,7 @@ CM3_1T_AES_128_CTR32_enc_unrolled:
 ctr_partial_precompute:
 
 	//load from ctx nonce in r0-r3, key in r4-r7, next round in r8-r11
-	ldm r12, {r0-r11}
+	ldmia r12, {r0-r11}
 
 	//initial addroundkey
 	eors r4, r0
@@ -244,6 +244,10 @@ ctr_encrypt_first:
 	CM3_1T_unrolled_enc_round_n 7, 16
 	CM3_1T_unrolled_enc_round_n 8, 16
 	CM3_1T_unrolled_enc_round_n 9, 16
+	CM3_1T_unrolled_enc_round_n 10, 16
+	CM3_1T_unrolled_enc_round_n 11, 16
+	CM3_1T_unrolled_enc_round_n 12, 16
+	CM3_1T_unrolled_enc_round_n 13, 16
 
 	//final round
 	//row 3 - ST3x
@@ -302,10 +306,10 @@ ctr_encrypt_first:
 	orr r6, r6, r2, lsl #8
 	orr r7, r7, r3, lsl #8
 
-	ldr r0, [r12, #176]
-	ldr r1, [r12, #180]
-	ldr r2, [r12, #184]
-	ldr r3, [r12, #188]
+	ldr r0, [r12, #240]
+	ldr r1, [r12, #244]
+	ldr r2, [r12, #248]
+	ldr r3, [r12, #252]
 
 	eors r4, r0
 	eors r5, r1

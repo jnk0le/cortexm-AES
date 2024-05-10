@@ -1,5 +1,5 @@
 /*!
- * \file CM3_1T_AES_256_encrypt_unrolled.S
+ * \file CM3_1T_AES_128_encrypt_unrolled.S
  * \brief
  *
  *
@@ -19,10 +19,10 @@
 .text
 
 .align 3
-// void CM3_1T_AES_256_encrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out) {
-.global CM3_1T_AES_256_encrypt_unrolled
-.type   CM3_1T_AES_256_encrypt_unrolled,%function
-CM3_1T_AES_256_encrypt_unrolled:
+// void CM3_1T_AES128_encrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out) {
+.global CM3_1T_AES128_encrypt_unrolled
+.type   CM3_1T_AES128_encrypt_unrolled,%function
+CM3_1T_AES128_encrypt_unrolled:
 	push {r2,r4-r11,lr} // stack output pointer
 
 	mov.w r12, r0 // align following code to 4 bytes
@@ -59,10 +59,6 @@ CM3_1T_AES_256_encrypt_unrolled:
 	CM3_1T_unrolled_enc_round_n 7
 	CM3_1T_unrolled_enc_round_n 8
 	CM3_1T_unrolled_enc_round_n 9
-	CM3_1T_unrolled_enc_round_n 10
-	CM3_1T_unrolled_enc_round_n 11
-	CM3_1T_unrolled_enc_round_n 12
-	CM3_1T_unrolled_enc_round_n 13
 
 	//final round
 	//row 3 - ST3x
@@ -128,10 +124,10 @@ CM3_1T_AES_256_encrypt_unrolled:
 	orr r8, r7, r11, lsl #16 // unstack into r7
 
 	ldr r7, [sp], #4 // load output pointer and clear stack
-	ldr r0, [r12, #224]
-	ldr r1, [r12, #228]
-	ldr r2, [r12, #232]
-	ldr r3, [r12, #236]
+	ldr r0, [r12, #160]
+	ldr r1, [r12, #164]
+	ldr r2, [r12, #168]
+	ldr r3, [r12, #172]
 
 	eors r0, r4
 	eors r1, r5

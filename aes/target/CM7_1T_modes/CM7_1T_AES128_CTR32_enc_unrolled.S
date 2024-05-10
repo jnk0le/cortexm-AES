@@ -1,5 +1,5 @@
 /*!
- * \file CM7_1T_AES_256_CTR32_enc_unrolled.S
+ * \file CM7_1T_AES_128_CTR32_enc_unrolled.S
  * \brief
  *
  *
@@ -27,10 +27,10 @@
 .text
 
 .balign 8
-// void CM7_1T_AES_256_CTR32_enc_unrolled(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt) {
-.global CM7_1T_AES_256_CTR32_enc_unrolled
-.type   CM7_1T_AES_256_CTR32_enc_unrolled,%function
-CM7_1T_AES_256_CTR32_enc_unrolled:
+// void CM7_1T_AES128_CTR32_enc_unrolled(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt) {
+.global CM7_1T_AES128_CTR32_enc_unrolled
+.type   CM7_1T_AES128_CTR32_enc_unrolled,%function
+CM7_1T_AES128_CTR32_enc_unrolled:
 	mov.w r12, r0 // align
 	add r3, r1, r3, lsl #4 // in_p + cnt*16
 
@@ -556,10 +556,6 @@ ctr_encrypt_block:
 	CM7_1T_unrolled_enc_round_n 7, 16
 	CM7_1T_unrolled_enc_round_n 8, 16
 	CM7_1T_unrolled_enc_round_n 9, 16
-	CM7_1T_unrolled_enc_round_n 10, 16
-	CM7_1T_unrolled_enc_round_n 11, 16
-	CM7_1T_unrolled_enc_round_n 12, 16
-	CM7_1T_unrolled_enc_round_n 13, 16
 
 	//final round
 	// r0 - s00 | s10 | s20 | s30
@@ -751,7 +747,7 @@ ctr_encrypt_block:
 	uxtb.w r3, r0, ror #8
 	orr.w r10, r7, r10, lsl #8
 
-	ldrd r0,r1, [r12, #240]
+	ldrd r0,r1, [r12, #176]
 
 	//current alloctaion
 	// r0 - rk[0]
@@ -772,7 +768,7 @@ ctr_encrypt_block:
 	orr.w r4, r10, r9, lsl #16
 	eors r5, r1
 
-	ldrd r1,r2, [r12, #248]
+	ldrd r1,r2, [r12, #184]
 
 	//current alloctaion
 	// r0 - rk[0] ^ col 0

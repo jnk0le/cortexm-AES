@@ -18,10 +18,10 @@
 .text
 
 .align 3
-// void CM3_1T_AES_256_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
-.global CM3_1T_AES_256_keyschedule_enc
-.type   CM3_1T_AES_256_keyschedule_enc,%function
-CM3_1T_AES_256_keyschedule_enc:
+// void CM3_1T_AES256_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
+.global CM3_1T_AES256_keyschedule_enc
+.type   CM3_1T_AES256_keyschedule_enc,%function
+CM3_1T_AES256_keyschedule_enc:
 	push {r4-r11, lr}
 
 	ldmia r1!, {r2-r9} // load key

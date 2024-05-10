@@ -117,9 +117,9 @@ STM32L0 is cortex-m0+ (prefetch enabled for 1ws)
 
 | Function | code size in bytes | stack usage in bytes | notes |
 |----------|--------------------|----------------------|-------| 
-| `CM0_sBOX_AES_128_keyschedule_enc` | 80 | 16 | uses sbox table |
-| `CM0_sBOX_AES_192_keyschedule_enc` | 88 | 20(24) | uses sbox table |
-| `CM0_sBOX_AES_256_keyschedule_enc` | 164 | 32 | uses sbox table |
+| `CM0_sBOX_AES128_keyschedule_enc` | 80 | 16 | uses sbox table |
+| `CM0_sBOX_AES192_keyschedule_enc` | 88 | 20(24) | uses sbox table |
+| `CM0_sBOX_AES256_keyschedule_enc` | 164 | 32 | uses sbox table |
 | `CM0_sBOX_AES_encrypt` | 508 | 40 | uses sbox table |
 | `CM0_sBOX_AES_decrypt` | 712 | 40 | uses inv_sbox table |
 | `CM0_FASTMULsBOX_AES_encrypt` | 480 | 36(40) | uses sbox table, requires single cycle multiplier |
@@ -231,22 +231,22 @@ results assume that input, expanded round key and stack lie in the same memory b
 
 | Function | code size in bytes | stack usage in bytes | notes |
 |----------|--------------------|----------------------|-------|
-| `CM3_1T_AES_128_keyschedule_enc` | 100 | 24 | uses Te2 table |
-| `CM3_1T_AES_192_keyschedule_enc` | 100 | 32 | uses Te2 table |
-| `CM3_1T_AES_256_keyschedule_enc` | 178 | 44(48) | uses Te2 table |
+| `CM3_1T_AES128_keyschedule_enc` | 100 | 24 | uses Te2 table |
+| `CM3_1T_AES192_keyschedule_enc` | 100 | 32 | uses Te2 table |
+| `CM3_1T_AES256_keyschedule_enc` | 178 | 44(48) | uses Te2 table |
 | `CM3_1T_AES_keyschedule_dec` | 92 | 12(16) | uses Te2 and Td2 table |
 | `CM3_1T_AES_keyschedule_dec_noTe` | 86 | 12(16) | uses sbox and Td2 table |
 | `CM3_1T_AES_encrypt` | 434 | 44(48) | uses Te2 table |
 | `CM3_1T_AES_decrypt` | 450 | 44(48) | uses Td2 and inv_sbox table |
-| `CM3_1T_AES_128_encrypt_unrolled` | 1978 | 40 | uses Te2 table |
-| `CM3_1T_AES_128_decrypt_unrolled` | 1996 | 40 | uses Td2 and inv_sbox table |
-| `CM3_1T_AES_192_encrypt_unrolled` | 2362 | 40 | uses Te2 table |
-| `CM3_1T_AES_192_decrypt_unrolled` | 2380 | 40 | uses Td2 and inv_sbox table |
-| `CM3_1T_AES_256_encrypt_unrolled` | 2746 | 40 | uses Te2 table |
-| `CM3_1T_AES_256_decrypt_unrolled` | 2764 | 40 | uses Td2 and inv_sbox table |
-| `CM3_sBOX_AES_128_keyschedule_enc` | 100 | 24 | uses sbox table |
-| `CM3_sBOX_AES_192_keyschedule_enc` | 100 | 32 | uses sbox table |
-| `CM3_sBOX_AES_256_keyschedule_enc` | 178 | 44(48) | uses sbox table |
+| `CM3_1T_AES128_encrypt_unrolled` | 1978 | 40 | uses Te2 table |
+| `CM3_1T_AES128_decrypt_unrolled` | 1996 | 40 | uses Td2 and inv_sbox table |
+| `CM3_1T_AES192_encrypt_unrolled` | 2362 | 40 | uses Te2 table |
+| `CM3_1T_AES192_decrypt_unrolled` | 2380 | 40 | uses Td2 and inv_sbox table |
+| `CM3_1T_AES256_encrypt_unrolled` | 2746 | 40 | uses Te2 table |
+| `CM3_1T_AES256_decrypt_unrolled` | 2764 | 40 | uses Td2 and inv_sbox table |
+| `CM3_sBOX_AES128_keyschedule_enc` | 100 | 24 | uses sbox table |
+| `CM3_sBOX_AES192_keyschedule_enc` | 100 | 32 | uses sbox table |
+| `CM3_sBOX_AES256_keyschedule_enc` | 178 | 44(48) | uses sbox table |
 | `CM4_DSPsBOX_AES_encrypt` | 494 | 44(48) | uses sbox table |
 | `CM4_DSPsBOX_AES_decrypt` | 630 | 44(48) | uses inv_sbox table |
 
@@ -368,16 +368,16 @@ no other code in loop)
 
 | Function | code size in bytes | stack usage in bytes | notes |
 |----------|--------------------|----------------------|-------|
-| `CM7_1T_AES_128_keyschedule_enc` | 132 | 24 | uses Te2 table |
-| `CM7_1T_AES_192_keyschedule_enc` | 124 | 32 | uses Te2 table |
-| `CM7_1T_AES_256_keyschedule_enc` | 208 | 36(40) | uses Te2 table |
+| `CM7_1T_AES128_keyschedule_enc` | 132 | 24 | uses Te2 table |
+| `CM7_1T_AES192_keyschedule_enc` | 124 | 32 | uses Te2 table |
+| `CM7_1T_AES256_keyschedule_enc` | 208 | 36(40) | uses Te2 table |
 | `CM7_1T_AES_keyschedule_dec` | 180 | 32 | uses Te2 and Td2 table |
 | `CM7_1T_AES_keyschedule_dec_noTe` | 180 | 32 | uses sbox and Td2 table |
 | `CM7_1T_AES_encrypt` | 408 | 40 | uses Te2 table |
 | `CM7_1T_AES_decrypt` | 400 | 40 | uses Td2 and inv_sbox table |
-| `CM7_sBOX_AES_128_keyschedule_enc` | 132 | 24 | uses sbox table |
-| `CM7_sBOX_AES_192_keyschedule_enc` | 124 | 32 | uses sbox table |
-| `CM7_sBOX_AES_256_keyschedule_enc` | 208 | 36(40) | uses sbox table |
+| `CM7_sBOX_AES128_keyschedule_enc` | 132 | 24 | uses sbox table |
+| `CM7_sBOX_AES192_keyschedule_enc` | 124 | 32 | uses sbox table |
+| `CM7_sBOX_AES256_keyschedule_enc` | 208 | 36(40) | uses sbox table |
 | `CM7_DSPsBOX_AES_encrypt` | 466 | 40 | uses sbox table |
 
 extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
@@ -415,7 +415,7 @@ implemented similarly to cm0
 
 | Function | code size in bytes | stack usage in bytes | notes |
 |----------|--------------------|----------------------|-------|
-| `QKv2_AES_128_keyschedule_enc` | 82 | 4 | uses sbox |
+| `QKv2_AES128_keyschedule_enc` | 82 | 4 | uses sbox |
 | `QKv2_sBOX_AES_encrypt` | 738 | 16 | uses sbox |
 
 ## modes implementations
@@ -458,6 +458,6 @@ unrolled version of CTR32_CM7_1T, doesn't preload input data except first cachel
 | Function | code size in bytes | stack usage in bytes | notes |
 |----------|--------------------|----------------------|-------|
 | `CM7_1T_AES_CTR32_enc` | 860 | 72 (+1 arg passed on stack) | uses Te2 table |
-| `CM7_1T_AES_128_CTR32_enc_unrolled` | | | uses Te2 table |
-| `CM7_1T_AES_192_CTR32_enc_unrolled` | | | uses Te2 table |
-| `CM7_1T_AES_256_CTR32_enc_unrolled` | | | uses Te2 table |
+| `CM7_1T_AES128_CTR32_enc_unrolled` | | | uses Te2 table |
+| `CM7_1T_AES192_CTR32_enc_unrolled` | | | uses Te2 table |
+| `CM7_1T_AES256_CTR32_enc_unrolled` | | | uses Te2 table |

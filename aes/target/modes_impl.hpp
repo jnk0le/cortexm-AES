@@ -137,13 +137,13 @@ namespace target
 			switch(key_length)
 			{
 			case 128:
-				CM3_1T_AES_128_CTR32_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
+				CM3_1T_AES128_CTR32_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
 				break;
 			case 192:
-				CM3_1T_AES_192_CTR32_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
+				CM3_1T_AES192_CTR32_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
 				break;
 			case 256:
-				CM3_1T_AES_256_CTR32_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
+				CM3_1T_AES256_CTR32_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
 				break;
 			}
 		}
@@ -175,13 +175,13 @@ namespace target
 			switch(key_length)
 			{
 			case 128:
-				CM7_1T_AES_128_CTR32_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
+				CM7_1T_AES128_CTR32_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
 				break;
 			case 192:
-				CM7_1T_AES_192_CTR32_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
+				CM7_1T_AES192_CTR32_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
 				break;
 			case 256:
-				CM7_1T_AES_256_CTR32_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
+				CM7_1T_AES256_CTR32_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
 				break;
 			}
 		}

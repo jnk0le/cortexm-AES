@@ -18,10 +18,10 @@
 .text
 
 .align 3
-// void CM3_sBOX_AES_192_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
-.global CM3_sBOX_AES_192_keyschedule_enc
-.type   CM3_sBOX_AES_192_keyschedule_enc,%function
-CM3_sBOX_AES_192_keyschedule_enc:
+// void CM3_sBOX_AES192_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
+.global CM3_sBOX_AES192_keyschedule_enc
+.type   CM3_sBOX_AES192_keyschedule_enc,%function
+CM3_sBOX_AES192_keyschedule_enc:
 	push {r4-r10, lr}
 
 	movw r14, #:lower16:AES_sbox

@@ -19,11 +19,11 @@
 .text
 
 .align 2
-// void CM0_sBOX_AES_128_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
-.global CM0_sBOX_AES_128_keyschedule_enc
-.type   CM0_sBOX_AES_128_keyschedule_enc,%function
+// void CM0_sBOX_AES128_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
+.global CM0_sBOX_AES128_keyschedule_enc
+.type   CM0_sBOX_AES128_keyschedule_enc,%function
 	nop // align loop entry
-CM0_sBOX_AES_128_keyschedule_enc:
+CM0_sBOX_AES128_keyschedule_enc:
 	push {r4-r7}
 
 	ldmia r1!, {r4-r7} // load key

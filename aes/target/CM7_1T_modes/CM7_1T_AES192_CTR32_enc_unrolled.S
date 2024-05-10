@@ -27,10 +27,10 @@
 .text
 
 .balign 8
-// void CM7_1T_AES_192_CTR32_enc_unrolled(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt) {
-.global CM7_1T_AES_192_CTR32_enc_unrolled
-.type   CM7_1T_AES_192_CTR32_enc_unrolled,%function
-CM7_1T_AES_192_CTR32_enc_unrolled:
+// void CM7_1T_AES192_CTR32_enc_unrolled(void* ctx, uint8_t* data_in, uint8_t* data_out, uint32_t blocks_cnt) {
+.global CM7_1T_AES192_CTR32_enc_unrolled
+.type   CM7_1T_AES192_CTR32_enc_unrolled,%function
+CM7_1T_AES192_CTR32_enc_unrolled:
 	mov.w r12, r0 // align
 	add r3, r1, r3, lsl #4 // in_p + cnt*16
 
