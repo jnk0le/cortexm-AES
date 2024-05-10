@@ -4,13 +4,13 @@
  *
  * If something is unused it will not waste memory.
  *
- * Alignment is required to avoid crossing 2 different memory busses. (minimum AHB granularity for bus slave in cortex-m is 1kB)
+ * Alignment is required to avoid crossing 2 different memory busses. (minimum AHB granularity for bus slave in cortex-m is 1kiB)
  *
  * To avoid data dependent load time differences, those tables have to be placed in deterministic memory section. (usually TCM/SRAM)
  * You might want to create dedicated section in linker script for those, to make sure that the correct memory block is used.
  *
  * `const` specifier cannot be used since it will move tables to flash memory that is not only non-deterministic, but it also
- *  beats the main purpose of using large lookup tables. (errors when trying to put in SRAM by section attribute anyway)
+ *  defeats the main purpose of using large lookup tables. (errors out, when trying to put in SRAM by section attribute anyway)
  *
  * \todo runtime gen at startup instead of storage
  *
