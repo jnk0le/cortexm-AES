@@ -4,7 +4,6 @@
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
- * \date 26 Dec 2018
  */
 
 #ifndef AES_VERSION_HPP
@@ -18,7 +17,7 @@ namespace version
 
 	constexpr int major = 0;
 	constexpr int minor = 29;
-	constexpr int patch = 2;
+	constexpr int patch = 3;
 }
 }
 
