@@ -1,5 +1,5 @@
 /*!
- * \file CM3_sBOX_AES_256_keyshedule_enc.S
+ * \file CM3_sBOX_AES256_keyshedule_enc.S
  * \brief
  *
  *

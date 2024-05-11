@@ -1,5 +1,5 @@
 /*!
- * \file CM3_1T_AES_192_CTR32_enc_unrolled.S
+ * \file CM3_1T_AES192_CTR32_enc_unrolled.S
  * \brief
  *
  * counter mode, SP 800-38A compliant (32bit, big endian ctr), can start from any counter value

@@ -1,5 +1,5 @@
 /*!
- * \file CM3_1T_AES_192_keyschedule_enc.S
+ * \file CM3_1T_AES192_keyschedule_enc.S
  * \brief
  *
  *

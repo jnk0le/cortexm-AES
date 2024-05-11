@@ -1,5 +1,5 @@
 /*!
- * \file CM7_1T_AES_256_keyschedule_enc.S
+ * \file CM7_1T_AES256_keyschedule_enc.S
  * \brief
  *
  *

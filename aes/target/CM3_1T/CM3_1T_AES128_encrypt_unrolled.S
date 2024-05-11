@@ -1,5 +1,5 @@
 /*!
- * \file CM3_1T_AES_128_encrypt_unrolled.S
+ * \file CM3_1T_AES128_encrypt_unrolled.S
  * \brief
  *
  *

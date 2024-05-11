@@ -1,5 +1,5 @@
 /*!
- * \file CM7_1T_AES_256_CTR32_enc_unrolled.S
+ * \file CM7_1T_AES256_CTR32_enc_unrolled.S
  * \brief
  *
  *

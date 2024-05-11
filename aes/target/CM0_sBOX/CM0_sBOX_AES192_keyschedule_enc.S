@@ -1,5 +1,5 @@
 /*!
- * \file CM0_sBOX_AES_192_keyschedule_enc.S
+ * \file CM0_sBOX_AESs192_keyschedule_enc.S
  * \brief
  *
  *

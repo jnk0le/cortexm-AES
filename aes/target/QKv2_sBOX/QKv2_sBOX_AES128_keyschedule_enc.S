@@ -1,5 +1,5 @@
 /*!
- * \file QKv2_sBOX_AES_128_keyschedule_enc.S
+ * \file QKv2_sBOX_AES128_keyschedule_enc.S
  * \brief
  *
  *

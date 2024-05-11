@@ -1,5 +1,5 @@
 /*!
- * \file CM7_sBOX_AES_192_keyshedule_enc.S
+ * \file CM7_sBOX_AES192_keyshedule_enc.S
  * \brief
  *
  *
