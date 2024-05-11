@@ -24,26 +24,22 @@ QKv2_sBOX_AES128_keyschedule_enc:
 	// a0 - rk
 	// a1 = key
 
+	li t1, 0x36
+
 	// load key
 	c.lw a2, 0(a1)
 	c.lw a3, 4(a1)
+
+	li t2, 0x100
+
 	c.lw a4, 8(a1)
 	c.lw a5, 12(a1)
-
-	// copy key
-	c.sw a2, 0(a0)
-	c.sw a3, 4(a0)
-	c.sw a4, 8(a0)
-	c.sw a5, 12(a0)
-	c.addi a0, 16
 
 	lui a1, %hi(AES_sbox)
 	addi a1, a1, %lo(AES_sbox)
 
+	c.sw a2, 0(a0) // store rk, rest is skewed into the round
 	c.li t0, 1
-
-	li t1, 0x36
-	li t2, 0x100
 
 	// register allocation
 	// s0 - tmp
@@ -60,11 +56,16 @@ QKv2_sBOX_AES128_keyschedule_enc:
 	// t2 - 0x100 // rcon reload condition
 .balign 4
 1:
+	c.sw a3, 4(a0) // store rk from prev round
+	c.sw a4, 8(a0)
+
 	srli s0, a5, 8
 	zext.b s0, s0
 	c.add s0, a1
 	xw_.c.lbu s0, s0
 	c.xor a2, s0
+
+	c.sw a5, 12(a0) // store rk from prev round
 
 	srli s0, a5, 16
 	zext.b s0, s0
@@ -90,21 +91,23 @@ QKv2_sBOX_AES128_keyschedule_enc:
 	c.xor a4, a3
 	c.xor a5, a4
 
-	c.sw a2, 0(a0)
-	c.sw a3, 4(a0)
-	c.sw a4, 8(a0)
-	c.sw a5, 12(a0)
+	c.sw a2, 16(a0) // rk was not incremented yet
 
 	beq t0, t1, 2f // final condition
 
-	c.addi a0, 16
+	c.addi a0, 16 // next rk
 	c.slli t0, 1 // next rcon
 	bne t0, t2, 1b // rcon is not secret
 
 	c.li t0, 0x1b
 	c.j 1b
 
-2:
+2:	// store remaining rk
+	// rk was not incremented in final round
+	c.sw a3, 20(a0)
+	c.sw a4, 24(a0)
+	c.sw a5, 28(a0)
+
 	c.lwsp s0, 0(sp)
 	c.addi sp, 4
 	ret
