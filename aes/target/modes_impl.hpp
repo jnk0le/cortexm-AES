@@ -4,7 +4,6 @@
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
- * \date 10 Jul 2018
  */
 
 #ifndef AES_MODES_IMPL_HPP

@@ -6,7 +6,6 @@
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * Peter Schwabe & Ko Stoffelen @2016
  * \license SPDX-License-Identifier: MIT
- * \date 18 jul 2018
  */
 
 // compile for compatible targets only

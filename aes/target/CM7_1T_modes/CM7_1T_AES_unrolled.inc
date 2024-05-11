@@ -5,7 +5,6 @@
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
- * \date 14 may 2020
  */
 
 //common stuff for unrolling etc.

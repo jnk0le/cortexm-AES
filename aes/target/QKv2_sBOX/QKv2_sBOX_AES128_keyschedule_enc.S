@@ -5,7 +5,6 @@
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
- * \date 27 Apr 2024
  */
 
 #if __riscv && (__riscv_xlen == 32)

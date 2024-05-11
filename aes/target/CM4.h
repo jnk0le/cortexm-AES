@@ -4,7 +4,6 @@
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
- * \date 28 Dec 2018
  */
 
 #ifndef AES_CM4_H

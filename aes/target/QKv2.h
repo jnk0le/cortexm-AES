@@ -3,8 +3,7 @@
  * \brief FIPS 197 compliant software AES implementations optimized for QingKe v2 core (ch32v003)
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
- * \license SPDX-License-Identifier: MIT
- * \date 24 Apr 2024
+ * \license SPDX-License-Identifier: MITs
  */
 
 #ifndef AES_QKV2_H

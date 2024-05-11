@@ -6,7 +6,6 @@
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
- * \date 9 Jun 2018
  */
 
 #ifndef AES_CIPHER_HPP

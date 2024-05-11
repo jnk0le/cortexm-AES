@@ -5,7 +5,6 @@
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
- * \date 9 jan 2019
  */
 
 // compile for compatible targets only

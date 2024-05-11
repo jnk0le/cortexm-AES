@@ -5,7 +5,6 @@
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
- * \date 28 sep 2018
  */
 
 // counter mode, SP 800-38A compliant (32bit, big endian ctr), can start from any counter value

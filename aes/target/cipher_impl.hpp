@@ -4,7 +4,6 @@
  *
  * \author jnk0le <jnk0le@hotmail.com>
  * \copyright MIT License
- * \date 17 Jun 2018
  */
 
 #ifndef AES_CIPHER_IMPL_HPP
