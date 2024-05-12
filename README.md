@@ -401,7 +401,7 @@ implemented similarly to cm0
 | `setEncKey<128>` | 461/478 |
 | `setEncKey<192>` |  |
 | `setEncKey<256>` |  |
-| `encrypt<128>`   | 1853/2115 |
+| `encrypt<128>`   | 1852/2109 |
 | `encrypt<192>`   |  |
 | `encrypt<256>`   |  |
 | `setDecKey<128>` |  |
