@@ -40,13 +40,13 @@ QKv2_sBOX_AES_encrypt:
 
 	c.lw a4, 8(a0)
 	c.lw a5, 12(a0)
-	addi t0, a0, 16
+	addi s0, a0, 16
 
 	// load input
 	c.lw s1, 0(a1)
 	c.lw a0, 4(a1)
 
-	li s0, 0x1b1b1b1b
+	li t0, 0x1b1b1b1b
 
 	c.xor a2, s1
 	c.xor a3, a0
@@ -56,20 +56,20 @@ QKv2_sBOX_AES_encrypt:
 	lui ra, %hi(AES_sbox)
 	addi ra, ra, %lo(AES_sbox)
 
+	c.xor a4, a0
+	c.xor a5, a1
+
 	// global allocation
 	// ra - sbox
-	// t0 - current rk ptrn // swap with s0 ??
+	// t0 - 0x1b1b1b1b
 	// t1 - final rk ptr
 	// t2 - 0x80808080
-	// s0 - 0x1b1b1b1b // loses 8 bytes but uncompressed loads are more efficient
+	// s0 - current rk ptr
 
 	// sp
 	// +12 - out ptr
 .balign 4
 1:  // shiftrows and subbytes
-
-	c.xor a4, a0 // skewed
-	c.xor a5, a1
 
 	//columns are kept as little endian so right/left in shifts is in reverse wrt transposed canonical state representation
 	// a2 - s00 | s10 | s20 | s30
@@ -316,10 +316,14 @@ QKv2_sBOX_AES_encrypt:
 
 	srli s1, a0, 7
 	c.sub a0, s1
-	c.and a0, s0 // do predicated reduction
+	and a0, a0, t0 // do predicated reduction
 
 	c.xor a1, a0
 	c.xor a2, a1
+
+
+	c.lw a0, 0(s0) // rk[0]
+	c.xor a2, a0
 
 	//col 1
 	srli a1, a3, 8
@@ -340,9 +344,12 @@ QKv2_sBOX_AES_encrypt:
 
 	srli s1, a0, 7
 	c.sub a0, s1
-	c.and a0, s0 // do predicated reduction
+	and a0, a0, t0 // do predicated reduction
 
 	c.xor a1, a0
+	c.xor a3, a1
+
+	c.lw a1, 4(s0) // rk[1]
 	c.xor a3, a1
 
 	//col 2
@@ -364,10 +371,13 @@ QKv2_sBOX_AES_encrypt:
 
 	srli s1, a0, 7
 	c.sub a0, s1
-	c.and a0, s0 // do predicated reduction
+	and a0, a0, t0 // do predicated reduction
 
 	c.xor a1, a0
 	c.xor a4, a1
+
+	c.lw a0, 8(s0) // rk[2]
+	c.xor a4, a0
 
 	//col 3
 	srli a1, a5, 8
@@ -388,26 +398,16 @@ QKv2_sBOX_AES_encrypt:
 
 	srli s1, a0, 7
 	c.sub a0, s1
-	c.and a0, s0 // do predicated reduction
+	and a0, a0, t0 // do predicated reduction
 
 	c.xor a1, a0
 	c.xor a5, a1
 
-	lw a0, 0(t0)
-	lw a1, 4(t0)
-
-	c.xor a2, a0
-	c.xor a3, a1
-
-	lw a0, 8(t0)
-	lw a1, 12(t0)
-	c.addi t0, 16
-
-	bne t0, t1, 1b
-
-	// skewed
-	c.xor a4, a0
+	c.lw a1, 12(s0) // rk[3]
+	c.addi s0, 16
 	c.xor a5, a1
+
+	bne s0, t1, 1b
 
 	// final round
 	srli s1, a2, 8
@@ -601,13 +601,13 @@ QKv2_sBOX_AES_encrypt:
 
 	c.or a3, a1
 
-	lw a0, 0(t0)
-	lw a1, 4(t0)
+	c.lw a0, 0(s0)
 	c.xor a2, a0
+	c.lw a1, 4(s0)
 	c.xor a3, a1
-	lw a0, 8(t0)
-	lw a1, 12(t0)
+	c.lw a0, 8(s0)
 	c.xor a4, a0
+	c.lw a1, 12(s0)
 	c.xor a5, a1
 
 	c.lwsp a0, 12(sp) // get out ptr
