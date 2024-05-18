@@ -11,7 +11,7 @@
 // compile for compatible targets only
 #if __ARM_EABI__ && __thumb2__
 
-.include "aes/target/CM3_1T/CM3_1T_AES_common.inc"
+#include "aes/target/CM3_1T/CM3_1T_AES_common.inc"
 
 .syntax unified
 .thumb
