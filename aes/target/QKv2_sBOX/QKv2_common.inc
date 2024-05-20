@@ -10,6 +10,6 @@
  */
 
 .macro xw_.c.lbu rd, rs, uimm=0
-	# rotate uimm5 right by 1 to match encoding
+	// rotate uimm5 right by 1 to match encoding
 	.insn cl C0, 0b001, \rd, ((\uimm>>1) | ((\uimm & 1) << 4))(\rs)
 .endm

@@ -9,13 +9,108 @@
 
 #if __riscv && (__riscv_xlen == 32)
 
+#include "aes/target/QKv2_sBOX/QKv2_common.inc"
+
 .text
 
 // void QKv2_sBOX_AES192_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
 .global QKv2_sBOX_AES192_keyschedule_enc
 .type   QKv2_sBOX_AES192_keyschedule_enc,%function
 QKv2_sBOX_AES192_keyschedule_enc:
-	ret
+	c.addi sp, -8
+	c.swsp s0, 0(sp)
+	c.swsp s1, 4(sp)
 
+	// load key
+	c.lw s1, 0(a1)
+	c.lw a2, 8(a1)
+	c.lw a3, 12(a1)
+	c.lw a4, 16(a1)
+	c.lw a5, 20(a1)
+	c.lw a1, 4(a1) // a1 as last
+
+	// store rk
+	c.sw s1, 0(a0)
+	c.sw a1, 4(a0)
+	c.sw a2, 8(a0)
+	c.sw a3, 12(a0)
+	c.sw a4, 16(a0)
+	c.sw a5, 20(a0)
+	c.addi a0, 24
+
+	lui t2, %hi(AES_sbox)
+	addi t2, t2, %lo(AES_sbox)
+
+	li t1, 0x80
+
+	c.li t0, 1
+
+	// register allocation
+	// s0 - tmp
+	// s1 - k0
+	// a0 - rk
+	// a1 - k1
+	// a2 - k2
+	// a3 - k3
+	// a4 - k4
+	// a5 - k5
+
+	// t0 - rcon
+	// t1 - 0x80 // final condition
+	// t2 - sbox
+
+.balign 4
+1:
+	srli s0, a5, 8
+	zext.b s0, s0
+	c.add s0, t2
+	xw_.c.lbu s0, s0
+	c.xor s1, s0
+
+	srli s0, a5, 16
+	zext.b s0, s0
+	c.add s0, t2
+	xw_.c.lbu s0, s0
+	c.slli s0, 8
+	c.xor s1, s0
+
+	srli s0, a5, 24
+	c.add s0, t2
+	xw_.c.lbu s0, s0
+	c.slli s0, 16
+	c.xor s1, s0
+
+	zext.b s0, a5
+	c.add s0, t2
+	xw_.c.lbu s0, s0
+	c.slli s0, 24
+	c.xor s1, s0
+
+	xor s1, s1, t0 // apply rcon
+	c.xor a1, s1
+	c.xor a2, a1
+	c.xor a3, a2
+	c.xor a4, a3
+	c.xor a5, a4
+
+	// store rk
+	c.sw s1, 0(a0)
+	c.sw a1, 4(a0)
+	c.sw a2, 8(a0)
+	c.sw a3, 12(a0)
+	c.sw a4, 16(a0)
+	c.sw a5, 20(a0)
+
+	beq t0, t1, 2f // final condition
+
+	c.addi a0, 24 // next rk
+	c.slli t0, 1 // next rcon
+	c.j 1b
+
+2:
+	c.lwsp s1, 4(sp)
+	c.lwsp s0, 0(sp)
+	c.addi sp, 8
+	ret
 
 #endif

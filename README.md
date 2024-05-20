@@ -399,10 +399,10 @@ implemented similarly to cm0
 | Cipher function  | ch32v003 (0ws/1ws) - QKv2sBOX |
 |------------------|------------------|
 | `setEncKey<128>` | 461/478 |
-| `setEncKey<192>` |  |
+| `setEncKey<192>` | 435/470 |
 | `setEncKey<256>` |  |
 | `encrypt<128>`   | 1834/2109 |
-| `encrypt<192>`   |  |
+| `encrypt<192>`   | 2202/2537 |
 | `encrypt<256>`   |  |
 | `setDecKey<128>` |  |
 | `setDecKey<192>` |  |
@@ -415,8 +415,11 @@ implemented similarly to cm0
 
 | Function | code size in bytes | stack usage in bytes | notes |
 |----------|--------------------|----------------------|-------|
-| `QKv2_AES128_keyschedule_enc` | 82 | 4 | uses sbox |
-| `QKv2_sBOX_AES_encrypt` | 730 | 16 | uses sbox |
+| `QKv2_AES128_keyschedule_enc` | 82 | 4 | uses sbox table |
+| `QKv2_AES192_keyschedule_enc` | 144 | 8 | uses sbox table |
+| `QKv2_AES256_keyschedule_enc` |  |  | uses sbox table |
+| `QKv2_sBOX_AES_encrypt` | 730 | 16 | uses sbox table |
+| `QKv2_sBOX_AES_decrypt` |  |  | uses inv_sbox table |
 
 ## modes implementations
 

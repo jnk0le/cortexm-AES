@@ -9,7 +9,7 @@
 
 #if __riscv && (__riscv_xlen == 32)
 
-.include "aes/target/QKv2_sBOX/QKv2_common.inc"
+#include "aes/target/QKv2_sBOX/QKv2_common.inc"
 
 .text
 
