@@ -23,27 +23,22 @@ QKv2_sBOX_AES192_keyschedule_enc:
 
 	// load key
 	c.lw s1, 0(a1)
-	c.lw a2, 8(a1)
-	c.lw a3, 12(a1)
-	c.lw a4, 16(a1)
-	c.lw a5, 20(a1)
-	c.lw a1, 4(a1) // a1 as last
-
-	// store rk
-	c.sw s1, 0(a0)
-	c.sw a1, 4(a0)
-	c.sw a2, 8(a0)
-	c.sw a3, 12(a0)
-	c.sw a4, 16(a0)
-	c.sw a5, 20(a0)
-	c.addi a0, 24
 
 	lui t2, %hi(AES_sbox)
 	addi t2, t2, %lo(AES_sbox)
 
+	c.lw a2, 8(a1)
+	c.lw a3, 12(a1)
+
 	li t1, 0x80
 
+	c.lw a4, 16(a1)
+	c.lw a5, 20(a1)
+
 	c.li t0, 1
+	c.lw a1, 4(a1) // a1 as last
+
+	// rk store is skewed into the round
 
 	// register allocation
 	// s0 - tmp
@@ -61,13 +56,20 @@ QKv2_sBOX_AES192_keyschedule_enc:
 
 .balign 4
 1:
+	c.sw s1, 0(a0) // store rk from prev round
+	c.sw a1, 4(a0)
+
 	srli s0, a5, 8
+	c.sw a2, 8(a0) // store rk from prev round
+	c.sw a3, 12(a0)
 	zext.b s0, s0
 	c.add s0, t2
 	xw_.c.lbu s0, s0
 	c.xor s1, s0
 
 	srli s0, a5, 16
+	c.sw a4, 16(a0) // store rk from prev round
+	c.sw a5, 20(a0)
 	zext.b s0, s0
 	c.add s0, t2
 	xw_.c.lbu s0, s0
@@ -93,14 +95,6 @@ QKv2_sBOX_AES192_keyschedule_enc:
 	c.xor a4, a3
 	c.xor a5, a4
 
-	// store rk
-	c.sw s1, 0(a0)
-	c.sw a1, 4(a0)
-	c.sw a2, 8(a0)
-	c.sw a3, 12(a0)
-	c.sw a4, 16(a0)
-	c.sw a5, 20(a0)
-
 	beq t0, t1, 2f // final condition
 
 	c.addi a0, 24 // next rk
@@ -108,6 +102,15 @@ QKv2_sBOX_AES192_keyschedule_enc:
 	c.j 1b
 
 2:
+	// store remaining rk
+	// rk was not incremented in final round
+	c.sw s1, 24(a0)
+	c.sw a1, 28(a0)
+	c.sw a2, 32(a0)
+	c.sw a3, 36(a0)
+	c.sw a4, 40(a0)
+	c.sw a5, 44(a0)
+
 	c.lwsp s1, 4(sp)
 	c.lwsp s0, 0(sp)
 	c.addi sp, 8

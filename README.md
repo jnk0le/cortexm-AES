@@ -399,7 +399,7 @@ implemented similarly to cm0
 | Cipher function  | ch32v003 (0ws/1ws) - QKv2sBOX |
 |------------------|------------------|
 | `setEncKey<128>` | 461/478 |
-| `setEncKey<192>` | 435/470 |
+| `setEncKey<192>` | 432/444 |
 | `setEncKey<256>` |  |
 | `encrypt<128>`   | 1834/2109 |
 | `encrypt<192>`   | 2202/2537 |
