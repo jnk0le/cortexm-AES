@@ -400,10 +400,10 @@ implemented similarly to cm0
 |------------------|------------------|
 | `setEncKey<128>` | 461/478 |
 | `setEncKey<192>` | 432/444 |
-| `setEncKey<256>` |  |
+| `setEncKey<256>` | 587/637 |
 | `encrypt<128>`   | 1834/2109 |
 | `encrypt<192>`   | 2202/2537 |
-| `encrypt<256>`   |  |
+| `encrypt<256>`   | 2570/2965 |
 | `setDecKey<128>` |  |
 | `setDecKey<192>` |  |
 | `setDecKey<256>` |  |
@@ -417,7 +417,7 @@ implemented similarly to cm0
 |----------|--------------------|----------------------|-------|
 | `QKv2_AES128_keyschedule_enc` | 82 | 4 | uses sbox table |
 | `QKv2_AES192_keyschedule_enc` | 144 | 8 | uses sbox table |
-| `QKv2_AES256_keyschedule_enc` |  |  | uses sbox table |
+| `QKv2_AES256_keyschedule_enc` | 232 | 12 | uses sbox table |
 | `QKv2_sBOX_AES_encrypt` | 730 | 16 | uses sbox table |
 | `QKv2_sBOX_AES_decrypt` |  |  | uses inv_sbox table |
 
