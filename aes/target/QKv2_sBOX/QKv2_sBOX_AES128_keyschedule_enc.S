@@ -9,6 +9,10 @@
 
 #if __riscv && (__riscv_xlen == 32)
 
+// 10 rounds of rcon can be computed as left shift + conditional reload of rcon to 0x1b after 0x80
+// it can also serve as loop counter to reduce register pressure
+
+
 #include "aes/target/QKv2_sBOX/QKv2_common.inc"
 
 .text
@@ -21,7 +25,7 @@ QKv2_sBOX_AES128_keyschedule_enc:
 	c.swsp s0, 0(sp)
 
 	// a0 - rk
-	// a1 = key
+	// a1 - key
 
 	li t1, 0x36
 

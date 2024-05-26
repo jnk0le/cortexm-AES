@@ -9,6 +9,8 @@
 
 #if __riscv && (__riscv_xlen == 32)
 
+// 7 rounds of rcon can be computed as left shift only
+
 #include "aes/target/QKv2_sBOX/QKv2_common.inc"
 
 .text

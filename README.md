@@ -415,8 +415,8 @@ implemented similarly to cm0
 
 | Function | code size in bytes | stack usage in bytes | notes |
 |----------|--------------------|----------------------|-------|
-| `QKv2_AES128_keyschedule_enc` | 82 | 4 | uses sbox table |
-| `QKv2_AES192_keyschedule_enc` | 144 | 8 | uses sbox table |
+| `QKv2_AES128_keyschedule_enc` | 80 | 4 | uses sbox table |
+| `QKv2_AES192_keyschedule_enc` | 138 | 8 | uses sbox table |
 | `QKv2_AES256_keyschedule_enc` | 232 | 12 | uses sbox table |
 | `QKv2_sBOX_AES_encrypt` | 730 | 16 | uses sbox table |
 | `QKv2_sBOX_AES_decrypt` |  |  | uses inv_sbox table |

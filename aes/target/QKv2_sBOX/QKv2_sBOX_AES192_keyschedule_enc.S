@@ -9,6 +9,8 @@
 
 #if __riscv && (__riscv_xlen == 32)
 
+ // 8 rounds of rcon can be computed as left shift only
+
 #include "aes/target/QKv2_sBOX/QKv2_common.inc"
 
 .text
@@ -20,6 +22,9 @@ QKv2_sBOX_AES192_keyschedule_enc:
 	c.addi sp, -8
 	c.swsp s0, 0(sp)
 	c.swsp s1, 4(sp)
+
+	// a0 - rk
+	// a1 - key
 
 	// load key
 	c.lw s1, 0(a1)
