@@ -27,6 +27,9 @@ QKv2_sBOX_AES256_keyschedule_enc:
 	// a0 - rk
 	// a1 - key
 
+	lui ra, %hi(AES_sbox)
+	addi ra, ra, %lo(AES_sbox)
+
 	// load key
 	c.lw s1, 0(a1)
 	c.lw a2, 8(a1)
@@ -42,14 +45,7 @@ QKv2_sBOX_AES256_keyschedule_enc:
 	c.sw a1, 4(a0)
 	c.sw a2, 8(a0)
 	c.sw a3, 12(a0)
-	c.sw a4, 16(a0)
-	c.sw a5, 20(a0)
-	sw t1, 24(a0)
-	sw t2, 28(a0)
-	addi a0, a0, 32
-
-	lui ra, %hi(AES_sbox)
-	addi ra, ra, %lo(AES_sbox)
+	//2nd part skewed into loop
 
 	c.li t0, 1
 
@@ -68,6 +64,12 @@ QKv2_sBOX_AES256_keyschedule_enc:
 	// ra - sbox
 .balign 4
 1:
+	// store rk from prev round
+	c.sw a4, 16(a0)
+	c.sw a5, 20(a0)
+	sw t1, 24(a0)
+	sw t2, 28(a0)
+
 	srli s0, t2, 8
 	zext.b s0, s0
 	c.add s0, ra
@@ -98,14 +100,14 @@ QKv2_sBOX_AES256_keyschedule_enc:
 	c.xor a2, a1
 	c.xor a3, a2
 
-	//store rk
-	c.sw s1, 0(a0)
-	c.sw a1, 4(a0)
-	c.sw a2, 8(a0)
-	c.sw a3, 12(a0)
+	// rk has not been incremented yet
+	c.sw s1, 32(a0)
+	c.sw a1, 36(a0)
+	c.sw a2, 40(a0)
+	c.sw a3, 44(a0)
 
 	slli s0, t0, 26 // shift out rcon if 0x40 reached
-	c.beqz s0, 2f
+	c.beqz s0, 2f // final condition reached
 
 	//g transform // just sbox
 	zext.b s0, a3
@@ -137,14 +139,8 @@ QKv2_sBOX_AES256_keyschedule_enc:
 	xor t1, t1, a5
 	xor t2, t2, t1
 
-	//store rk
-	c.sw a4, 16(a0)
-	c.sw a5, 20(a0)
-	sw t1, 24(a0)
-	sw t2, 28(a0)
-	addi a0, a0, 32
-
 	c.slli t0, 1 // next rcon
+	addi a0, a0, 32 // incr rk
 	c.j 1b
 
 2:
