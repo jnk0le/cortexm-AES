@@ -13,6 +13,7 @@
 
 .text
 
+.balign 4
 // void QKv2_sBOX_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
 .global QKv2_sBOX_AES_encrypt
 .type   QKv2_sBOX_AES_encrypt,%function
