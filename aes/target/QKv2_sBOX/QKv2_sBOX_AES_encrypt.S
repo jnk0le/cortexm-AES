@@ -49,6 +49,7 @@ QKv2_sBOX_AES_encrypt:
 
 	li t0, 0x1b1b1b1b
 
+	// initial addroundkey
 	c.xor a2, s1
 	c.xor a3, a0
 	c.lw a0, 8(a1)
@@ -185,7 +186,7 @@ QKv2_sBOX_AES_encrypt:
 	c.or s1, a0
 
 	// current allocation
-	// s1 - s20 | s30 | s13 | s23      //col 1 shifted #16 //col 3 shifted #-8
+	// s1 - s20 | s30 | s13 | s23 //col 0 shifted #16 //col 3 shifted #-8
 	// a0 -
 	// a1 -
 	// a2 - s00`| s11`| s22`| s33`
@@ -204,7 +205,7 @@ QKv2_sBOX_AES_encrypt:
 	xw_.c.lbu a3, a0
 
 	// current allocation
-	// s1 - s20 | s30 | s13 | s23      //col 1 shifted #16 //col 3 shifted #-8
+	// s1 - s20 | s30 | s13 | s23 //col 0 shifted #16 //col 3 shifted #-8
 	// a0 -
 	// a1 -     |     |     | s31`
 	// a2 - s00`| s11`| s22`| s33`
@@ -226,7 +227,7 @@ QKv2_sBOX_AES_encrypt:
 	xw_.c.lbu a4, a0
 
 	// current allocation
-	// s1 - s20 | s30 | s13 | s23      //col 1 shifted #16 //col 3 shifted #-8
+	// s1 - s20 | s30 | s13 | s23 //col 0 shifted #16 //col 3 shifted #-8
 	// a0 -
 	// a1 -     |     |     | s31`
 	// a2 - s00`| s11`| s22`| s33`
@@ -243,7 +244,7 @@ QKv2_sBOX_AES_encrypt:
 	c.or a4, a1 // can do later
 
 	// current allocation
-	// s1 -  -  | s30 | s13 | s23      //col 1 shifted #16 //col 3 shifted #-8
+	// s1 -  -  | s30 | s13 | s23 //col 0 shifted #16 //col 3 shifted #-8
 	// a0 -
 	// a1 -
 	// a2 - s00`| s11`| s22`| s33`
@@ -512,7 +513,7 @@ QKv2_sBOX_AES_encrypt:
 	c.or s1, a0
 
 	// current allocation
-	// s1 - s20 | s30 | s13 | s23      //col 1 shifted #16 //col 3 shifted #-8
+	// s1 - s20 | s30 | s13 | s23 //col 0 shifted #16 //col 3 shifted #-8
 	// a0 -
 	// a1 -
 	// a2 - s00`| s11`| s22`| s33`
@@ -531,7 +532,7 @@ QKv2_sBOX_AES_encrypt:
 	xw_.c.lbu a3, a0
 
 	// current allocation
-	// s1 - s20 | s30 | s13 | s23      //col 1 shifted #16 //col 3 shifted #-8
+	// s1 - s20 | s30 | s13 | s23 //col 0 shifted #16 //col 3 shifted #-8
 	// a0 -
 	// a1 -     |     |     | s31`
 	// a2 - s00`| s11`| s22`| s33`
@@ -553,7 +554,7 @@ QKv2_sBOX_AES_encrypt:
 	xw_.c.lbu a4, a0
 
 	// current allocation
-	// s1 - s20 | s30 | s13 | s23      //col 1 shifted #16 //col 3 shifted #-8
+	// s1 - s20 | s30 | s13 | s23 //col 0 shifted #16 //col 3 shifted #-8
 	// a0 -
 	// a1 -     |     |     | s31`
 	// a2 - s00`| s11`| s22`| s33`
@@ -570,7 +571,7 @@ QKv2_sBOX_AES_encrypt:
 	c.or a4, a1 // can do later
 
 	// current allocation
-	// s1 -  -  | s30 | s13 | s23      //col 1 shifted #16 //col 3 shifted #-8
+	// s1 -  -  | s30 | s13 | s23 //col 0 shifted #16 //col 3 shifted #-8
 	// a0 -
 	// a1 -
 	// a2 - s00`| s11`| s22`| s33`

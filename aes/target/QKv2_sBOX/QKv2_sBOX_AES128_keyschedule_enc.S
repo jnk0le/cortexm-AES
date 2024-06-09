@@ -115,4 +115,5 @@ QKv2_sBOX_AES128_keyschedule_enc:
 	c.lwsp s0, 0(sp)
 	c.addi sp, 4
 	ret
+
 #endif

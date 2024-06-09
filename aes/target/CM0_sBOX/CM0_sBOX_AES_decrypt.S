@@ -41,7 +41,7 @@ CM0_sBOX_AES_decrypt:
 	adds r2, r0 // rk+16
 	mov r12, r2 // final rk
 
-	//create end rk+0 + rounds * 16
+	//create end, rk+0 + rounds * 16
 	lsls r3, #4
 	adds r0, r3
 	mov r14, r0
