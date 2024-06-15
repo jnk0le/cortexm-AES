@@ -179,7 +179,7 @@ QKv2_sBOX_AES_encrypt:
 	// a5 - s03`| s10`| s21`| s32`
 
 	// pack 2 coulumns to reduce pressure
-	// adds 2 instructions overhead but gets rid of some stacking (+frees s0 for constant)
+	// adds 2 instructions overhead but gets rid of spills (+frees s0 for constant)
 
 	c.srli s1, 8
 	c.slli a0, 16
