@@ -19,7 +19,7 @@
 .global QKv2_sBOX_AES_decrypt
 .type   QKv2_sBOX_AES_decrypt,%function
 QKv2_sBOX_AES_decrypt:
-	c.addi sp, -16
+	c.addi sp, -20
 	c.swsp s0, 0(sp)
 	c.swsp s1, 4(sp)
 	c.swsp ra, 8(sp)
@@ -31,19 +31,20 @@ QKv2_sBOX_AES_decrypt:
 	// a3 - rounds
 
 	addi t1, a0, 16 // final rk
+	c.swsp t1, 16(sp)
 
 	//create end, rk+0 + rounds * 16
 	c.slli a3, 4
-	c.add a0, a3
+	add t1, a0, a3
 
 	lui ra, %hi(AES_inv_sbox)
 	addi ra, ra, %lo(AES_inv_sbox)
 
 	// load key
-	c.lw a2, 0(a0)
-	c.lw a3, 4(a0)
-	c.lw a4, 8(a0)
-	c.lw a5, 12(a0)
+	lw a2, 0(t1)
+	lw a3, 4(t1)
+	lw a4, 8(t1)
+	lw a5, 12(t1)
 
 	// load input
 	c.lw s0, 0(a1)
@@ -63,12 +64,13 @@ QKv2_sBOX_AES_decrypt:
 	// global allocation
 	// ra - inv_sbox
 	// t0 - 0x1b1b1b1b
-	// t1 - final rk ptr
+	// t1 - current rk ptr
 	// t2 - 0x80808080
-	// a0 - current rk ptr
+	// a0 -
 
 	// sp
 	// +12 - out ptr
+	// +16 - final rk ptr
 
 .balign 4
 1:	//inv shiftrows and invsubbytes
@@ -283,16 +285,16 @@ QKv2_sBOX_AES_decrypt:
 	// a4 - s02`| s11`| s20`| s33`
 	// a5 - s03`| s12`| s21`| s30`
 
-	c.addi a0, -16
+	c.addi t1, -16
 
 	//addroundkey
-	c.lw s0, 0(a0)
-	c.lw s1, 4(a0)
+	lw s0, 0(t1)
+	lw s1, 4(t1)
 	c.xor a2, s0
 	c.xor a3, s1
 
-	c.lw s0, 8(a0)
-	c.lw s1, 12(a0)
+	lw s0, 8(t1)
+	lw s1, 12(t1)
 	c.xor a4, s0
 	c.xor a5, s1
 
@@ -307,10 +309,6 @@ QKv2_sBOX_AES_decrypt:
 
 	(in & 0x7f7f7f7f) - can be gotten in 2 ways - andn from 0x80808080 or xor with `mask`
 	*/
-
-	//xxx
-	c.addi sp, -4
-	c.swsp a0, 0(sp)
 
 	//col 0
 	and a1, a2, t2 // mask
@@ -378,7 +376,7 @@ QKv2_sBOX_AES_decrypt:
 	c.xor a2, a0 // ror16(S{d})
 
 	//col 1
-		and a1, a3, t2 // mask
+	and a1, a3, t2 // mask
 	xor a0, a3, a1 // equivalent to & 0x7f
 
 	srli s1, a1, 7
@@ -443,7 +441,7 @@ QKv2_sBOX_AES_decrypt:
 	c.xor a3, a0 // ror16(S{d})
 
 	//col 2
-		and a1, a4, t2 // mask
+	and a1, a4, t2 // mask
 	xor a0, a4, a1 // equivalent to & 0x7f
 
 	srli s1, a1, 7
@@ -508,7 +506,7 @@ QKv2_sBOX_AES_decrypt:
 	c.xor a4, a0 // ror16(S{d})
 
 	//col 3
-		and a1, a5, t2 // mask
+	and a1, a5, t2 // mask
 	xor a0, a5, a1 // equivalent to & 0x7f
 
 	srli s1, a1, 7
@@ -572,15 +570,8 @@ QKv2_sBOX_AES_decrypt:
 
 	c.xor a5, a0 // ror16(S{d})
 
-	//xxx
-	c.lwsp a0, 0(sp)
-	c.addi sp, 4
-
-
-
-
+	c.lwsp a0, 16(sp) // final rk
 	bne a0, t1, 1b
-
 
 	srli s0, a2, 8
 
@@ -780,21 +771,16 @@ QKv2_sBOX_AES_decrypt:
 	// a4 - s02`| s11`| s20`| s33`
 	// a5 - s03`| s12`| s21`| s30`
 
-	c.addi a0, -16
-
 	//addroundkey
-	c.lw s0, 0(a0)
-	c.lw s1, 4(a0)
+	lw s0, -16(t1)
+	lw s1, -12(t1)
 	c.xor a2, s0
 	c.xor a3, s1
 
-	c.lw s0, 8(a0)
-	c.lw s1, 12(a0)
+	lw s0, -8(t1)
+	lw s1, -4(t1)
 	c.xor a4, s0
 	c.xor a5, s1
-
-
-
 
 	c.lwsp a0, 12(sp) // get out ptr
 	c.sw a2, 0(a0)
@@ -802,11 +788,10 @@ QKv2_sBOX_AES_decrypt:
 	c.sw a4, 8(a0)
 	c.sw a5, 12(a0)
 
-
 	c.lwsp s0, 0(sp)
 	c.lwsp s1, 4(sp)
 	c.lwsp ra, 8(sp)
-	c.addi sp, 16
+	c.addi sp, 20
 	ret
 
 #endif
