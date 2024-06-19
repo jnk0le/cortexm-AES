@@ -21,24 +21,27 @@
 QKv2_sBOX_AES_decrypt:
 	c.addi sp, -20
 	c.swsp s0, 0(sp)
+
+	addi t1, a0, 16 // final rk
+
 	c.swsp s1, 4(sp)
 	c.swsp ra, 8(sp)
-	c.swsp a2, 12(sp) // stack out
+
+	lui ra, %hi(AES_inv_sbox)
+	addi ra, ra, %lo(AES_inv_sbox)
 
 	// a0 - rk ptr
 	// a1 - in ptr
 	// a2 - out ptr
 	// a3 - rounds
 
-	addi t1, a0, 16 // final rk
 	c.swsp t1, 16(sp)
 
 	//create end, rk+0 + rounds * 16
 	c.slli a3, 4
 	add t1, a0, a3
 
-	lui ra, %hi(AES_inv_sbox)
-	addi ra, ra, %lo(AES_inv_sbox)
+	c.swsp a2, 12(sp) // stack out
 
 	// load key
 	lw a2, 0(t1)
@@ -49,24 +52,26 @@ QKv2_sBOX_AES_decrypt:
 	// load input
 	c.lw s0, 0(a1)
 	c.lw s1, 4(a1)
+
+	li t0, 0x1b1b1b1b
+
 	// initial addroundkey
 	c.xor a2, s0
 	c.xor a3, s1
 
 	c.lw s0, 8(a1)
 	c.lw s1, 12(a1)
+
+	li t2, 0x80808080
+
 	c.xor a4, s0
 	c.xor a5, s1
-
-	li t0, 0x1b1b1b1b
-	li t2, 0x80808080
 
 	// global allocation
 	// ra - inv_sbox
 	// t0 - 0x1b1b1b1b
 	// t1 - current rk ptr
 	// t2 - 0x80808080
-	// a0 -
 
 	// sp
 	// +12 - out ptr
@@ -96,6 +101,7 @@ QKv2_sBOX_AES_decrypt:
 	// current allocation
 	// s0 - s10 | s20 | s30       //shifted #8
 	// s1 -
+	// a0 -
 	// a1 -
 	// a2 - s00`|     |     |
 	// a3 - s01 | s11 | s21 | s31
@@ -129,13 +135,14 @@ QKv2_sBOX_AES_decrypt:
 	// current allocation
 	// s0 - s10 | s20 | s30       //shifted #8
 	// s1 -
+	// a0 -
 	// a1 -
 	// a2 - s00`| s13`| s22`| s31`
 	// a3 - s01 | s11 | s21 |  -
 	// a4 - s02 | s12 |  -  | s32
 	// a5 - s03 |  -  | s23 | s33
 
-	srli s1, a3, 8
+	srli a0, a3, 8
 
 	zext.b a1, s0
 	c.add a1, ra
@@ -150,29 +157,13 @@ QKv2_sBOX_AES_decrypt:
 
 	// current allocation
 	// s0 -  -  | s20 | s30       //shifted #8
-	// s1 - s11 | s21 |  -        //shifted #8
-	// a1 -
-	// a2 - s00`| s13`| s22`| s31`
-	// a3 - s01`| s10`|     |
-	// a4 - s02 | s12 |  -  | s32
-	// a5 - s03 |  -  | s23 | s33
-
-	// pack 2 coulumns to reduce pressure
-	// adds 2 instructions overhead but gets rid of spills (+frees s0 for constant)
-
-	c.srli s0, 8
-	c.slli s1, 16
-	c.or s0, s1
-
-	// current allocation
-	// s0 - s20 | s30 | s11 | s21 //col 0 shifted #16 //col 1 shifted #-8
 	// s1 -
+	// a0 - s11 | s21 |  -        //shifted #8
 	// a1 -
 	// a2 - s00`| s13`| s22`| s31`
 	// a3 - s01`| s10`|     |
 	// a4 - s02 | s12 |  -  | s32
 	// a5 - s03 |  -  | s23 | s33
-
 
 	srli a1, a5, 16
 	zext.b a1, a1
@@ -183,8 +174,9 @@ QKv2_sBOX_AES_decrypt:
 	c.or a3, a1
 
 	// current allocation
-	// s0 - s20 | s30 | s11 | s21 //col 0 shifted #16 //col 1 shifted #-8
+	// s0 -  -  | s20 | s30       //shifted #8
 	// s1 -
+	// a0 - s11 | s21 |  -        //shifted #8
 	// a1 -
 	// a2 - s00`| s13`| s22`| s31`
 	// a3 - s01`| s10`| s23`|
@@ -202,8 +194,9 @@ QKv2_sBOX_AES_decrypt:
 	xw_.c.lbu a5, a1
 
 	// current allocation
-	// s0 - s20 | s30 | s11 | s21 //col 0 shifted #16 //col 1 shifted #-8
+	// s0 -  -  | s20 | s30       //shifted #8
 	// s1 -     |     |     | s33`
+	// a0 - s11 | s21 |  -        //shifted #8
 	// a1 -
 	// a2 - s00`| s13`| s22`| s31`
 	// a3 - s01`| s10`| s23`|
@@ -229,15 +222,17 @@ QKv2_sBOX_AES_decrypt:
 
 	c.or a3, a4
 
-	// current allocation
-	// s0 - s20 | s30 | s11 | s21 //col 0 shifted #16 //col 1 shifted #-8
+ 	// current allocation
+	// s0 -  -  | s20 | s30       //shifted #8
 	// s1 -     |     |     | s33`
+	// a0 - s11 | s21 |  -        //shifted #8
 	// a1 - s02`|     |     |
 	// a2 - s00`| s13`| s22`| s31`
 	// a3 - s01`| s10`| s23`| s32`
 	// a4 -
 	// a5 - s03`| s12`|     |
 
+	c.srli s0, 8
 	zext.b a4, s0
 	c.add a4, ra
 	xw_.c.lbu a4, a4
@@ -246,10 +241,11 @@ QKv2_sBOX_AES_decrypt:
 	c.or a4, a1
 	c.or a4, s1
 
-	// current allocation
-	// s0 -  -  | s30 | s11 | s21 //col 0 shifted #16 //col 1 shifted #-8
+ 	// current allocation
+	// s0 -  -  | s30             //shifted #16
 	// s1 -
-	// a1 -
+	// a0 - s11 | s21 |  -        //shifted #8
+	// a1 -     |     |
 	// a2 - s00`| s13`| s22`| s31`
 	// a3 - s01`| s10`| s23`| s32`
 	// a4 - s02`|     | s20`| s33`
@@ -263,21 +259,20 @@ QKv2_sBOX_AES_decrypt:
 
 	c.or a5, a1
 
-	c.srli s0, 8
-	zext.b a1, s0
+	zext.b a1, a0
 	c.add a1, ra
 	xw_.c.lbu a1, a1
 	c.slli a1, 8
 
 	c.or a4, a1
 
-	c.srli s0, 8
-	zext.b s0, s0
-	c.add s0, ra
-	xw_.c.lbu s0, s0
-	c.slli s0, 16
+	c.srli a0, 8
+	zext.b a0, a0
+	c.add a0, ra
+	xw_.c.lbu a0, a0
+	c.slli a0, 16
 
-	c.or a5, s0
+	c.or a5, a0
 
 	// current allocation
 	// a2 - s00`| s13`| s22`| s31`
@@ -573,6 +568,7 @@ QKv2_sBOX_AES_decrypt:
 	c.lwsp a0, 16(sp) // final rk
 	bne a0, t1, 1b
 
+	// final round
 	srli s0, a2, 8
 
 	zext.b a2, a2
@@ -582,6 +578,7 @@ QKv2_sBOX_AES_decrypt:
 	// current allocation
 	// s0 - s10 | s20 | s30       //shifted #8
 	// s1 -
+	// a0 -
 	// a1 -
 	// a2 - s00`|     |     |
 	// a3 - s01 | s11 | s21 | s31
@@ -615,13 +612,14 @@ QKv2_sBOX_AES_decrypt:
 	// current allocation
 	// s0 - s10 | s20 | s30       //shifted #8
 	// s1 -
+	// a0 -
 	// a1 -
 	// a2 - s00`| s13`| s22`| s31`
 	// a3 - s01 | s11 | s21 |  -
 	// a4 - s02 | s12 |  -  | s32
 	// a5 - s03 |  -  | s23 | s33
 
-	srli s1, a3, 8
+	srli a0, a3, 8
 
 	zext.b a1, s0
 	c.add a1, ra
@@ -636,29 +634,13 @@ QKv2_sBOX_AES_decrypt:
 
 	// current allocation
 	// s0 -  -  | s20 | s30       //shifted #8
-	// s1 - s11 | s21 |  -        //shifted #8
-	// a1 -
-	// a2 - s00`| s13`| s22`| s31`
-	// a3 - s01`| s10`|     |
-	// a4 - s02 | s12 |  -  | s32
-	// a5 - s03 |  -  | s23 | s33
-
-	// pack 2 coulumns to reduce pressure
-	// adds 2 instructions overhead but gets rid of spills (+frees s0 for constant)
-
-	c.srli s0, 8
-	c.slli s1, 16
-	c.or s0, s1
-
-	// current allocation
-	// s0 - s20 | s30 | s11 | s21 //col 0 shifted #16 //col 1 shifted #-8
 	// s1 -
+	// a0 - s11 | s21 |  -        //shifted #8
 	// a1 -
 	// a2 - s00`| s13`| s22`| s31`
 	// a3 - s01`| s10`|     |
 	// a4 - s02 | s12 |  -  | s32
 	// a5 - s03 |  -  | s23 | s33
-
 
 	srli a1, a5, 16
 	zext.b a1, a1
@@ -669,8 +651,9 @@ QKv2_sBOX_AES_decrypt:
 	c.or a3, a1
 
 	// current allocation
-	// s0 - s20 | s30 | s11 | s21 //col 0 shifted #16 //col 1 shifted #-8
+	// s0 -  -  | s20 | s30       //shifted #8
 	// s1 -
+	// a0 - s11 | s21 |  -        //shifted #8
 	// a1 -
 	// a2 - s00`| s13`| s22`| s31`
 	// a3 - s01`| s10`| s23`|
@@ -688,8 +671,9 @@ QKv2_sBOX_AES_decrypt:
 	xw_.c.lbu a5, a1
 
 	// current allocation
-	// s0 - s20 | s30 | s11 | s21 //col 0 shifted #16 //col 1 shifted #-8
+	// s0 -  -  | s20 | s30       //shifted #8
 	// s1 -     |     |     | s33`
+	// a0 - s11 | s21 |  -        //shifted #8
 	// a1 -
 	// a2 - s00`| s13`| s22`| s31`
 	// a3 - s01`| s10`| s23`|
@@ -715,15 +699,17 @@ QKv2_sBOX_AES_decrypt:
 
 	c.or a3, a4
 
-	// current allocation
-	// s0 - s20 | s30 | s11 | s21 //col 0 shifted #16 //col 1 shifted #-8
+ 	// current allocation
+	// s0 -  -  | s20 | s30       //shifted #8
 	// s1 -     |     |     | s33`
+	// a0 - s11 | s21 |  -        //shifted #8
 	// a1 - s02`|     |     |
 	// a2 - s00`| s13`| s22`| s31`
 	// a3 - s01`| s10`| s23`| s32`
 	// a4 -
 	// a5 - s03`| s12`|     |
 
+	c.srli s0, 8
 	zext.b a4, s0
 	c.add a4, ra
 	xw_.c.lbu a4, a4
@@ -732,10 +718,11 @@ QKv2_sBOX_AES_decrypt:
 	c.or a4, a1
 	c.or a4, s1
 
-	// current allocation
-	// s0 -  -  | s30 | s11 | s21 //col 0 shifted #16 //col 1 shifted #-8
+ 	// current allocation
+	// s0 -  -  | s30             //shifted #16
 	// s1 -
-	// a1 -
+	// a0 - s11 | s21 |  -        //shifted #8
+	// a1 -     |     |
 	// a2 - s00`| s13`| s22`| s31`
 	// a3 - s01`| s10`| s23`| s32`
 	// a4 - s02`|     | s20`| s33`
@@ -749,21 +736,20 @@ QKv2_sBOX_AES_decrypt:
 
 	c.or a5, a1
 
-	c.srli s0, 8
-	zext.b a1, s0
+	zext.b a1, a0
 	c.add a1, ra
 	xw_.c.lbu a1, a1
 	c.slli a1, 8
 
 	c.or a4, a1
 
-	c.srli s0, 8
-	zext.b s0, s0
-	c.add s0, ra
-	xw_.c.lbu s0, s0
-	c.slli s0, 16
+	c.srli a0, 8
+	zext.b a0, a0
+	c.add a0, ra
+	xw_.c.lbu a0, a0
+	c.slli a0, 16
 
-	c.or a5, s0
+	c.or a5, a0
 
 	// current allocation
 	// a2 - s00`| s13`| s22`| s31`

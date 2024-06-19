@@ -407,7 +407,7 @@ implemented similarly to cm0
 | `setDecKey<128>` | 0 |
 | `setDecKey<192>` | 0 |
 | `setDecKey<256>` | 0 |
-| `decrypt<128>`   | 2705/3276 |
+| `decrypt<128>`   | 2641/3235 |
 | `decrypt<192>`   |  |
 | `decrypt<256>`   |  |
 
@@ -419,7 +419,7 @@ implemented similarly to cm0
 | `QKv2_AES192_keyschedule_enc` | 138 | 8 | uses sbox table |
 | `QKv2_AES256_keyschedule_enc` | 216 | 12 | uses sbox table |
 | `QKv2_sBOX_AES_encrypt` | 730 | 16 | uses sbox table |
-| `QKv2_sBOX_AES_decrypt` | 1008 | 20 | uses inv_sbox table |
+| `QKv2_sBOX_AES_decrypt` | 996 | 20 | uses inv_sbox table |
 
 ## modes implementations
 
