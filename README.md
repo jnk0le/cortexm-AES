@@ -401,15 +401,15 @@ implemented similarly to cm0
 | `setEncKey<128>` | 461/478 |
 | `setEncKey<192>` | 432/444 |
 | `setEncKey<256>` | 582/622 |
-| `encrypt<128>`   | 1834/2109 |
-| `encrypt<192>`   | 2202/2537 |
-| `encrypt<256>`   | 2570/2965 |
+| `encrypt<128>`   | 1835/2109 |
+| `encrypt<192>`   | 2203/2537 |
+| `encrypt<256>`   | 2571/2965 |
 | `setDecKey<128>` | 0 |
 | `setDecKey<192>` | 0 |
 | `setDecKey<256>` | 0 |
 | `decrypt<128>`   | 2641/3235 |
-| `decrypt<192>`   |  |
-| `decrypt<256>`   |  |
+| `decrypt<192>`   | 3187/3911 |
+| `decrypt<256>`   | 3733/4587 |
 
 #### specific function sizes
 
