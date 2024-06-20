@@ -1,7 +1,7 @@
 # "QingKeV2" (ch32v003)
 
-optimized for ilp32e ABI
-exploits WCH "xw" extension without the need for compiler support.
+Optimized for ilp32e ABI\
+Exploits WCH "xw" extension without the need for compiler support.
 
 ## base impl
 
