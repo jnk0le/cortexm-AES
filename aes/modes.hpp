@@ -14,7 +14,7 @@
 #include <string.h>
 
 #include "cipher.hpp"
-#include "target/modes_impl.hpp"
+#include "target_modes/modes_impl.hpp"
 
 namespace aes
 {

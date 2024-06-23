@@ -14,6 +14,7 @@
 
 #include "CM3_modes.h"
 #include "CM7_modes.h"
+#include "../cipher.hpp"
 
 namespace aes
 {
