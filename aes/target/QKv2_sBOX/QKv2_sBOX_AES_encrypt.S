@@ -7,6 +7,7 @@
  * \license SPDX-License-Identifier: MIT
  */
 
+// compile for compatible targets only
 #if __riscv && (__riscv_xlen == 32)
 
 #include "aes/target/QKv2_sBOX/QKv2_common.inc"

@@ -7,6 +7,7 @@
  * \license SPDX-License-Identifier: MIT
  */
 
+// compile for compatible targets only
 #if __riscv && (__riscv_xlen == 32)
 
 // 7 rounds of rcon can be computed as left shift only

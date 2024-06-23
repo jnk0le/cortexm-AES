@@ -7,6 +7,7 @@
  * \license SPDX-License-Identifier: MIT
  */
 
+// compile for compatible targets only
 #if __riscv && (__riscv_xlen == 32)
 
 // 10 rounds of rcon can be computed as left shift + conditional reload of rcon to 0x1b after 0x80
