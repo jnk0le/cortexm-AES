@@ -32,7 +32,7 @@ section).
 
 some of the cryptoanalysis works/papers, that tested one or more of the provided implementations.
 
-https://webthesis.biblio.polito.it/secure/26870/1/tesi.pdf - (CM3_1T on cortex-m4 @ https://github.com/jnk0le/cortexm-AES/commit/1871e94c9c74e95fbfd9a5682b14941878ca2adb)
+https://webthesis.biblio.polito.it/secure/26870/1/tesi.pdf - (CM3_1T on cortex-m4 @ [1871e94](https://github.com/jnk0le/cortexm-AES/commit/1871e94c9c74e95fbfd9a5682b14941878ca2adb))
 
 ## base implementations
 
