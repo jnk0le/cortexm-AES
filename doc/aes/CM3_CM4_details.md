@@ -78,9 +78,9 @@ s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3
 | `setEncKey<128>`        | 302/358  |  | 302 | 302 |
 | `setEncKey<192>`        | 276/311  |  | 276 | 277 |
 | `setEncKey<256>`        | 378/485  |  | 379 | 381 |
-| `encrypt<128>`          | 646/884  |  | 645 | 852 |
-| `encrypt<192>`          | 766/1049 |  | 765 | 1020 |
-| `encrypt<256>`          | 886/1217 |  | 887 | 1188 |
+| `encrypt<128>`          | 627/842  |  | 626 | 852 |
+| `encrypt<192>`          | 743/997 |  | 742 | 1020 |
+| `encrypt<256>`          | 859/1158 |  | 858 | 1188 |
 | `encrypt_unrolled<128>` | 603/836  |   | 602/779 | - |
 | `encrypt_unrolled<192>` | 713/990  |   | 712/922 | - |
 | `encrypt_unrolled<256>` | 823/1148 |   | 822/1067 | - |
@@ -105,7 +105,7 @@ results assume that input, expanded round key and stack lie in the same memory b
 | `CM3_1T_AES256_keyschedule_enc` | 178 | 44(48) | uses Te2 table |
 | `CM3_1T_AES_keyschedule_dec` | 92 | 12(16) | uses Te2 and Td2 table |
 | `CM3_1T_AES_keyschedule_dec_noTe` | 86 | 12(16) | uses sbox and Td2 table |
-| `CM3_1T_AES_encrypt` | 434 | 44(48) | uses Te2 table |
+| `CM3_1T_AES_encrypt` | 410 | 40 | uses Te2 table |
 | `CM3_1T_AES_decrypt` | 450 | 44(48) | uses Td2 and inv_sbox table |
 | `CM3_1T_AES128_encrypt_unrolled` | 1978 | 40 | uses Te2 table |
 | `CM3_1T_AES128_decrypt_unrolled` | 1996 | 40 | uses Td2 and inv_sbox table |
