@@ -50,8 +50,6 @@ CM3_1T_AES_keyschedule_dec_noTe:
 	ldr r2, [r12, r2, lsl #2]
 	ldr r5, [r12, r5, lsl #2]
 
-	// set flags early to optimize speculative fetches in cm3
-	// cmp have to be close to branch, otherwise speculative code loads doesn't work
 	cmp r1, r14
 
 	eor r2, r2, r3, ror #16

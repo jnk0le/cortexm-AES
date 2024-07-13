@@ -308,8 +308,6 @@ ctr_encrypt_first:
 	eor r0, r0, r7, ror #24
 	eor r1, r1, r4, ror #24
 
-	// set flags early to optimize speculative fetches in cm3
-	// cmp have to be close to branch, otherwise speculative code loads doesn't work
 	ldr r7, [sp, #32]
 	cmp r7, r12
 

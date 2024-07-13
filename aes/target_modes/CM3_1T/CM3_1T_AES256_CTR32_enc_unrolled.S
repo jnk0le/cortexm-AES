@@ -341,7 +341,7 @@ ctr_encrypt_first:
 	eor r6, r10
 	eor r7, r11
 
-	cmp r3, r0 // set flags early to optimize speculative fetches in cm3
+	cmp r3, r0
 
 	str r5, [r2, #4]
 	str r6, [r2, #8]
@@ -353,7 +353,7 @@ ctr_encrypt_first:
 	ldr r1, [r12, #12] // ctr, incremented at the beginning of the loop
 	str r0, [sp, #20+0] // in p
 
-	tst r1, #0xff000000 // set flags early to optimize speculative fetches in cm3
+	tst r1, #0xff000000
 	str r2, [sp, #20+4] // out p
 
 	bne ctr_encrypt_block //if (BE)ctr%256!=0

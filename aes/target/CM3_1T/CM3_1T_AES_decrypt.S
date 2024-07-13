@@ -109,8 +109,6 @@ CM3_1T_AES_decrypt:
 	eor r0, r0, r5, ror #24
 	eor r1, r1, r6, ror #24
 
-	// set flags early to optimize speculative fetches in cm3
-	// cmp have to be close to branch, otherwise speculative code loads doesn't work
 	ldr r5, [sp]
 	cmp r5, r12
 
