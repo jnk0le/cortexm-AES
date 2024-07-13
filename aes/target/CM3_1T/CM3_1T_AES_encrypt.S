@@ -15,7 +15,7 @@
 .thumb
 .text
 
-.align 3
+.balign 8
 // void CM3_1T_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
 .global CM3_1T_AES_encrypt
 .type   CM3_1T_AES_encrypt,%function
@@ -269,10 +269,7 @@ CM3_1T_AES_encrypt:
 	eors r2, r6
 	eor.w r3, r8
 
-	str r0, [r7, #0]
-	str r1, [r7, #4]
-	str r2, [r7, #8]
-	str r3, [r7, #12]
+	stmia r7!, {r0-r3}
 
 	pop {r4-r11,pc}
 

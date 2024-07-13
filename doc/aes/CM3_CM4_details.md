@@ -105,7 +105,7 @@ results assume that input, expanded round key and stack lie in the same memory b
 | `CM3_1T_AES256_keyschedule_enc` | 178 | 44(48) | uses Te2 table |
 | `CM3_1T_AES_keyschedule_dec` | 92 | 12(16) | uses Te2 and Td2 table |
 | `CM3_1T_AES_keyschedule_dec_noTe` | 86 | 12(16) | uses sbox and Td2 table |
-| `CM3_1T_AES_encrypt` | 410 | 40 | uses Te2 table |
+| `CM3_1T_AES_encrypt` | 404 | 40 | uses Te2 table |
 | `CM3_1T_AES_decrypt` | 450 | 44(48) | uses Td2 and inv_sbox table |
 | `CM3_1T_AES128_encrypt_unrolled` | 1978 | 40 | uses Te2 table |
 | `CM3_1T_AES128_decrypt_unrolled` | 1996 | 40 | uses Td2 and inv_sbox table |
