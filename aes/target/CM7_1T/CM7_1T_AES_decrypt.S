@@ -40,7 +40,7 @@ CM7_1T_AES_decrypt:
 	//initial addroundkey in loop
 
 	// global allocation
-	// r11 - rk + 16
+	// r11 - rk + 16 (final)
 	// r12 - current rk ptr
 	// r14 - Td2
 
