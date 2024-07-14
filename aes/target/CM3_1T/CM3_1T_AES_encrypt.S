@@ -133,11 +133,13 @@ CM3_1T_AES_encrypt:
 	eor.w r6, r6, r1, ror #24
 	eor.w r7, r7, r2, ror #24
 
+	ldmia.w r12!, {r0-r3} // load rk
+
 	//current allocation
-	// r0 -
-	// r1 -
-	// r2 -
-	// r3 -
+	// r0 - rk[0]
+	// r1 - rk[1]
+	// r2 - rk[2]
+	// r3 - rk[3]
 	// r4 - s00T ^ s11T ^ s22T ^ s33T // c0
 	// r5 - s01T ^ s12T ^ s23T ^ s30T // c1
 	// r6 - s02T ^ s13T ^ s20T ^ s31T // c2
@@ -145,8 +147,6 @@ CM3_1T_AES_encrypt:
 	// r8 -
 	// r9 -
 	// r10 -
-
-	ldmia.w r12!, {r0-r3} // load rk
 
 	eors r0, r4
 	eors r1, r5
@@ -243,33 +243,33 @@ CM3_1T_AES_encrypt:
 	orr.w r6, r6, r3, lsl #8
 	orr.w r7, r7, r0, lsl #8
 	orr.w r6, r6, r1, lsl #24
-	orr.w r8, r7, r2, lsl #24 // will unstack into r7
+	orr.w r7, r7, r2, lsl #24
 
-	//current allocation
-	// r0 -
-	// r1 -
-	// r2 -
-	// r3 -
-	// r4 - s00`| s11`| s22`| s33`
-	// r5 - s01`| s12`| s23`| s30`
-	// r6 - s02`| s13`| s20`| s31`
-	// r7 -
-	// r8 - s03`| s10`| s21`| s32`
-	// r9 -
-	// r10 -
-
-	ldr r7, [sp], #4 // load output pointer and clear stack
+	ldr r8, [sp], #4 // load output pointer and clear stack
 	ldr r0, [r12, #0]
 	ldr r1, [r12, #4]
 	ldr r2, [r12, #8]
 	ldr r3, [r12, #12]
 
+	//current allocation
+	// r0 - rk[0]
+	// r1 - rk[1]
+	// r2 - rk[2]
+	// r3 - rk[3]
+	// r4 - s00`| s11`| s22`| s33`
+	// r5 - s01`| s12`| s23`| s30`
+	// r6 - s02`| s13`| s20`| s31`
+	// r7 - s03`| s10`| s21`| s32`
+	// r8 - out p
+	// r9 -
+	// r10 -
+
 	eors r0, r4
 	eors r1, r5
 	eors r2, r6
-	eor.w r3, r8
+	eors r3, r7
 
-	stmia r7!, {r0-r3}
+	stmia.w r8!, {r0-r3}
 
 	pop {r4-r11,pc}
 

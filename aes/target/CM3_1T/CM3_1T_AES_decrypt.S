@@ -136,11 +136,13 @@ CM3_1T_AES_decrypt:
 	eor.w r6, r6, r3, ror #24
 	eor.w r7, r7, r0, ror #24
 
+	ldmdb r12!, {r0-r3} // laod rk
+
 	//current allocation
-	// r0 -
-	// r1 -
-	// r2 -
-	// r3 -
+	// r0 - rk[0]
+	// r1 - rk[1]
+	// r2 - rk[2]
+	// r3 - rk[3]
 	// r4 - s00T ^ s13T ^ s22T ^ s31T // c0
 	// r5 - s01T ^ s10T ^ s23T ^ s32T // c1
 	// r6 - s02T ^ s11T ^ s20T ^ s33T // c2
@@ -148,8 +150,6 @@ CM3_1T_AES_decrypt:
 	// r8 -
 	// r9 -
 	// r10 -
-
-	ldmdb r12!, {r0-r3}
 
 	eors r0, r4
 	eors r1, r5
@@ -248,33 +248,33 @@ CM3_1T_AES_decrypt:
 	orr.w r6, r6, r1, lsl #8
 	orr.w r7, r7, r2, lsl #8
 	orr.w r6, r6, r3, lsl #24
-	orr.w r8, r7, r0, lsl #24 // will unstack into r7
+	orr.w r7, r7, r0, lsl #24
 
-	//current allocation
-	// r0 -
-	// r1 -
-	// r2 -
-	// r3 -
-	// r4 - s00`| s13`| s22`| s31`
-	// r5 - s01`| s10`| s23`| s32`
-	// r6 - s02`| s11`| s20`| s33`
-	// r7 -
-	// r8 - s03`| s12`| s21`| s30`
-	// r9 -
-	// r10 -
-
-	ldr r7, [sp], #4 // load output pointer and clear stack
+	ldr r8, [sp], #4 // load output pointer and clear stack
 	ldr r0, [r12, #-16]
 	ldr r1, [r12, #-12]
 	ldr r2, [r12, #-8]
 	ldr r3, [r12, #-4]
 
+	//current allocation
+	// r0 - rk[0]
+	// r1 - rk[1]
+	// r2 - rk[2]
+	// r3 - rk[3]
+	// r4 - s00`| s13`| s22`| s31`
+	// r5 - s01`| s10`| s23`| s32`
+	// r6 - s02`| s11`| s20`| s33`
+	// r7 - s03`| s12`| s21`| s30`
+	// r8 - out p
+	// r9 -
+	// r10 -
+
 	eors r0, r4
 	eors r1, r5
 	eors r2, r6
-	eor.w r3, r8
+	eors r3, r7
 
-	stmia r7!, {r0-r3}
+	stmia r8!, {r0-r3}
 
 	pop {r4-r11, pc}
 
