@@ -15,7 +15,7 @@
 .thumb
 .text
 
-.balign 8
+.balign 4
 // void CM3_1T_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
 .global CM3_1T_AES_encrypt
 .type   CM3_1T_AES_encrypt,%function
