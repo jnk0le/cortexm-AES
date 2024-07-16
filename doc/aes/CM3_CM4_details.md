@@ -75,24 +75,24 @@ s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3
 
 | Cipher function  | STM32F1 (0ws/2ws) - CM3_1T | STM32F1 (0ws/2ws) - CM3_sBOX | STM32F4 (0ws/5ws) - CM3_1T | STM32F4 - CM4_DSPsBOX |
 |------------------|----------------------------|------------------------------|----------------------------|-----------------------|
-| `setEncKey<128>`        | 302/358  |  | 302 | 302 |
-| `setEncKey<192>`        | 276/311  |  | 276 | 277 |
+| `setEncKey<128>`        | 302/358  |  | 303 | 302 |
+| `setEncKey<192>`        | 276/311  |  | 277 | 277 |
 | `setEncKey<256>`        | 378/485  |  | 379 | 381 |
 | `encrypt<128>`          | 627/841  |  | 626 | 852 |
 | `encrypt<192>`          | 743/996 |  | 742 | 1020 |
 | `encrypt<256>`          | 859/1157 |  | 858 | 1188 |
-| `encrypt_unrolled<128>` | 603/836  |   | 602/779 | - |
-| `encrypt_unrolled<192>` | 713/990  |   | 712/922 | - |
-| `encrypt_unrolled<256>` | 823/1148 |   | 822/1067 | - |
+| `encrypt_unrolled<128>` | 599/769 |   | 601/715 | - |
+| `encrypt_unrolled<192>` | 709/916 |   | 711/844 | - |
+| `encrypt_unrolled<256>` | 819/1058 |   | 821/975 | - |
 | `setDecKey<128>`        | 813/1101 | 0 | 811 | 0 |
 | `setDecKey<192>`        | 987/1341 | 0 | 987 | 0 |
 | `setDecKey<256>`        | 1163/1580 | 0 | 1164 | 0 |
 | `decrypt<128>`          | 629/843 |   | 629 | 1249 |
 | `decrypt<192>`          | 745/1001 |   | 745 | 1505 |
 | `decrypt<256>`          | 861/1159 |   | 863 | 1759 |
-| `decrypt_unrolled<128>` | 606/847  |   | 604/785 | - |
-| `decrypt_unrolled<192>` | 716/1003 |   | 714/928 | - |
-| `decrypt_unrolled<256>` | 826/1159 |   | 824/1073 | - |
+| `decrypt_unrolled<128>` | 600/772  |   | 602/716 | - |
+| `decrypt_unrolled<192>` | 710/918 |   | 712/845 | - |
+| `decrypt_unrolled<256>` | 820/1061  |   | 822/978 | - |
 
 results assume that input, expanded round key and stack lie in the same memory block (e.g. SRAM1 vs SRAM2 and CCM on f407)
 
@@ -107,12 +107,12 @@ results assume that input, expanded round key and stack lie in the same memory b
 | `CM3_1T_AES_keyschedule_dec_noTe` | 86 | 12(16) | uses sbox and Td2 table |
 | `CM3_1T_AES_encrypt` | 404 | 40 | uses Te2 table |
 | `CM3_1T_AES_decrypt` | 416 | 40 | uses Td2 and inv_sbox table |
-| `CM3_1T_AES128_encrypt_unrolled` | 1978 | 40 | uses Te2 table |
-| `CM3_1T_AES128_decrypt_unrolled` | 1996 | 40 | uses Td2 and inv_sbox table |
-| `CM3_1T_AES192_encrypt_unrolled` | 2362 | 40 | uses Te2 table |
-| `CM3_1T_AES192_decrypt_unrolled` | 2380 | 40 | uses Td2 and inv_sbox table |
-| `CM3_1T_AES256_encrypt_unrolled` | 2746 | 40 | uses Te2 table |
-| `CM3_1T_AES256_decrypt_unrolled` | 2764 | 40 | uses Td2 and inv_sbox table |
+| `CM3_1T_AES128_encrypt_unrolled` | 1760 | 36(40) | uses Te2 table |
+| `CM3_1T_AES128_decrypt_unrolled` | 1788 | 36(40) | uses Td2 and inv_sbox table |
+| `CM3_1T_AES192_encrypt_unrolled` | 2104 | 36(40) | uses Te2 table |
+| `CM3_1T_AES192_decrypt_unrolled` | 2136 | 36(40) | uses Td2 and inv_sbox table |
+| `CM3_1T_AES256_encrypt_unrolled` | 2448 | 36(40) | uses Te2 table |
+| `CM3_1T_AES256_decrypt_unrolled` | 2476 | 36(40) | uses Td2 and inv_sbox table |
 | `CM3_sBOX_AES128_keyschedule_enc` | 100 | 24 | uses sbox table |
 | `CM3_sBOX_AES192_keyschedule_enc` | 100 | 32 | uses sbox table |
 | `CM3_sBOX_AES256_keyschedule_enc` | 178 | 44(48) | uses sbox table |

@@ -17,130 +17,154 @@
 .thumb
 .text
 
-.align 3
+.balign 4
 // void CM3_1T_AES256_encrypt_unrolled(const uint8_t* rk, const uint8_t* in, uint8_t* out) {
 .global CM3_1T_AES256_encrypt_unrolled
 .type   CM3_1T_AES256_encrypt_unrolled,%function
 CM3_1T_AES256_encrypt_unrolled:
-	push {r2,r4-r11,lr} // stack output pointer
+	push {r4-r11,lr}
 
-	mov.w r12, r0 // align following code to 4 bytes
+	mov r12, r0 // rk
+	mov r11, r2 // out p
 
 	movw r14, #:lower16:AES_Te2
 	movt r14, #:upper16:AES_Te2
 
 	//load input
-	//ldmia r1!, {r4-r7}
-	ldr r4, [r1, #0]
-	ldr r5, [r1, #4]
-	ldr r6, [r1, #8]
-	ldr r7, [r1, #12]
-
+	ldmia.w r1!, {r4-r7}
 	//load key
-	//ldmia r12!, {r0-r3}
-	ldr r0, [r12, #0]
-	ldr r1, [r12, #4]
-	ldr r2, [r12, #8]
-	ldr r3, [r12, #12]
+	ldmia r12!, {r0-r3}
 
 	//initial addroundkey
-	eors r4, r0
-	eors r5, r1
-	eors r6, r2
-	eors r7, r3
+	eors r0, r4
+	eors r1, r5
+	eors r2, r6
+	eors r3, r7
 
-	CM3_1T_unrolled_enc_round_n 1
-	CM3_1T_unrolled_enc_round_n 2
-	CM3_1T_unrolled_enc_round_n 3
-	CM3_1T_unrolled_enc_round_n 4
-	CM3_1T_unrolled_enc_round_n 5
-	CM3_1T_unrolled_enc_round_n 6
-	CM3_1T_unrolled_enc_round_n 7
-	CM3_1T_unrolled_enc_round_n 8
-	CM3_1T_unrolled_enc_round_n 9
-	CM3_1T_unrolled_enc_round_n 10
-	CM3_1T_unrolled_enc_round_n 11
-	CM3_1T_unrolled_enc_round_n 12
-	CM3_1T_unrolled_enc_round_n 13
+	CM3_1T_unrolled_enc_round // 1
+	CM3_1T_unrolled_enc_round // 2
+	CM3_1T_unrolled_enc_round // 3
+	CM3_1T_unrolled_enc_round // 4
+	CM3_1T_unrolled_enc_round // 5
+	CM3_1T_unrolled_enc_round // 6
+	CM3_1T_unrolled_enc_round // 7
+	CM3_1T_unrolled_enc_round // 8
+	CM3_1T_unrolled_enc_round // 9
+	CM3_1T_unrolled_enc_round // 10
+	CM3_1T_unrolled_enc_round // 11
+	CM3_1T_unrolled_enc_round // 12
+	CM3_1T_unrolled_enc_round // 13
 
 	//final round
-	//row 3 - ST3x
-	lsrs r0, r7, #24
-	lsrs r1, r4, #24
-	lsrs r2, r5, #24
-	lsrs r3, r6, #24
 
-	//row 2 - ST2x
-	uxtb r8, r6, ror #16
-	uxtb r9, r7, ror #16
-	uxtb r10, r4, ror #16
-	uxtb r11, r5, ror #16
+	// r0 - s00 | s10 | s20 | s30
+	// r1 - s01 | s11 | s21 | s31
+	// r2 - s02 | s12 | s22 | s32
+	// r3 - s03 | s13 | s23 | s33
 
-	ldrb r0, [r14, r0, lsl #2]
-	ldrb r1, [r14, r1, lsl #2]
-	ldrb r2, [r14, r2, lsl #2]
-	ldrb r3, [r14, r3, lsl #2]
+	//final
+	// r4 - s00`| s11`| s22`| s33`
+	// r5 - s01`| s12`| s23`| s30`
+	// r6 - s02`| s13`| s20`| s31`
+	// r7 - s03`| s10`| s21`| s32`
 
-	ldrb r8, [r14, r8, lsl #2]
-	ldrb r9, [r14, r9, lsl #2]
-	ldrb r10, [r14, r10, lsl #2]
-	ldrb r11, [r14, r11, lsl #2]
+	uxtb r4, r0
+	lsrs r6, r3, #24
+	uxtb.w r9, r1, ror #8
+	uxtb.w r10, r2, ror #16
+	uxtb.w r8, r3, ror #16
+	uxtb r5, r1
+	lsrs r7, r0, #24
 
-	//repack upper part (keep in bottom half)
-	orr r8, r8, r0, lsl #8
-	orr r9, r9, r1, lsl #8
-	orr r10, r10, r2, lsl #8
-	orr r11, r11, r3, lsl #8
+	ldrb.w r4, [r14, r4, lsl #2]
+	ldrb.w r6, [r14, r6, lsl #2]
+	ldrb.w r9, [r14, r9, lsl #2]
+	ldrb.w r10, [r14, r10, lsl #2]
+	ldrb.w r8, [r14, r8, lsl #2]
+	ldrb.w r5, [r14, r5, lsl #2]
+	ldrb.w r7, [r14, r7, lsl #2]
 
-	//row 1 - ST1x
-	uxtb r0, r5, ror #8
-	uxtb r1, r6, ror #8
-	uxtb r2, r7, ror #8
-	uxtb r3, r4, ror #8
+	//current allocation
+	// r0 -  -  | s10 | s20 |  -
+	// r1 -  -  |  -  | s21 | s31
+	// r2 - s02 | s12 |  -  | s32
+	// r3 - s03 | s13 |  -  |  -
+	// r4 - s00` // c0r0
+	// r5 - s01` // c1r0
+	// r6 - s33` // c0r3
+	// r7 - s30` // c1r3
+	// r8 - s23` // c1r2
+	// r9 - s11` // c0r1
+	// r10 - s22` // c0r2
 
-	//row 0 - ST0x
-	uxtb r4, r4
-	uxtb r5, r5
-	uxtb r6, r6
-	uxtb r7, r7
+	orr.w r4, r4, r6, lsl #24
+	orr.w r4, r4, r9, lsl #8
+	orr.w r4, r4, r10, lsl #16
+	orr.w r5, r5, r8, lsl #16
+	orr.w r5, r5, r7, lsl #24
 
-	ldrb r0, [r14, r0, lsl #2]
-	ldrb r1, [r14, r1, lsl #2]
-	ldrb r2, [r14, r2, lsl #2]
-	ldrb r3, [r14, r3, lsl #2]
+	uxtb r6, r2
+	uxtb r7, r3
+	uxtb.w r8, r0, ror #16
+	uxtb.w r9, r2, ror #8
+	uxtb.w r10, r1, ror #16
+	uxtb.w r3, r3, ror #8
+	uxtb.w r0, r0, ror #8
+	lsrs r1, r1, #24
+	lsrs r2, r2, #24
 
-	ldrb r4, [r14, r4, lsl #2]
-	ldrb r5, [r14, r5, lsl #2]
-	ldrb r6, [r14, r6, lsl #2]
-	ldrb r7, [r14, r7, lsl #2]
+	ldrb.w r6, [r14, r6, lsl #2]
+	ldrb.w r7, [r14, r7, lsl #2]
+	ldrb.w r8, [r14, r8, lsl #2]
+	ldrb.w r9, [r14, r9, lsl #2]
+	ldrb.w r10, [r14, r10, lsl #2]
+	ldrb.w r3, [r14, r3, lsl #2]
+	ldrb.w r0, [r14, r0, lsl #2]
+	ldrb.w r1, [r14, r1, lsl #2]
+	ldrb.w r2, [r14, r2, lsl #2]
 
-	//repack bottom part
-	orr r4, r4, r0, lsl #8
-	orr r5, r5, r1, lsl #8
-	orr r6, r6, r2, lsl #8
-	orr r7, r7, r3, lsl #8
+	//current allocation
+	// r0 - s10` // c3r1
+	// r1 - s31` // c2r3
+	// r2 - s32` // c3r3
+	// r3 - s13` // c2r1
+	// r4 - s00`| s11`| s22`| s33`
+	// r5 - s01`|     | s23`| s30`
+	// r6 - s02` // c2r0
+	// r7 - s03` // c3r0
+	// r8 - s20` // c2r2
+	// r9 - s12` // c1r1
+	// r10 - s21` // c3r2
 
-	//repack wholly
-	orr r4, r4, r8, lsl #16
-	orr r5, r5, r9, lsl #16
-	orr r6, r6, r10, lsl #16
-	orr r8, r7, r11, lsl #16 // unstack into r7
+	orr.w r5, r5, r9, lsl #8
+	orr.w r6, r6, r8, lsl #16
+	orr.w r7, r7, r10, lsl #16
+	orr.w r6, r6, r3, lsl #8
+	orr.w r7, r7, r0, lsl #8
+	orr.w r6, r6, r1, lsl #24
+	orr.w r7, r7, r2, lsl #24
 
-	ldr r7, [sp], #4 // load output pointer and clear stack
-	ldr r0, [r12, #224]
-	ldr r1, [r12, #228]
-	ldr r2, [r12, #232]
-	ldr r3, [r12, #236]
+	ldmia r12!, {r0-r3}
+
+	//current allocation
+	// r0 - rk[0]
+	// r1 - rk[1]
+	// r2 - rk[2]
+	// r3 - rk[3]
+	// r4 - s00`| s11`| s22`| s33`
+	// r5 - s01`| s12`| s23`| s30`
+	// r6 - s02`| s13`| s20`| s31`
+	// r7 - s03`| s10`| s21`| s32`
+	// r8 -
+	// r9 -
+	// r10 -
 
 	eors r0, r4
 	eors r1, r5
 	eors r2, r6
-	eor.w r3, r8
+	eors r3, r7
 
-	str r0, [r7, #0]
-	str r1, [r7, #4]
-	str r2, [r7, #8]
-	str r3, [r7, #12]
+	stmia.w r11!, {r0-r3}
 
 	pop {r4-r11,pc}
 
