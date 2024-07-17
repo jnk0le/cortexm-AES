@@ -1,6 +1,6 @@
 # cortexm AES
 
-FIPS 197 compliant software AES implementation optimized for real world cortex-m microcontrollers.
+Collection of software AES implementations optimized for real world microcontrollers.
 
 ## build
 
