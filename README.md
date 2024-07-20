@@ -71,10 +71,8 @@ unrolled version of CTR32_CM7_1T, doesn't preload input data except first cachel
 | Mode cipher function       | STM32H7 - CM7_1T |
 |----------------------------|------------------|
 | CTR32<128>                 | 15.21            |
-| CTR32<192>                 | 18.58            |
 | CTR32<256>                 | 21.96            |
 | CTR32_unrolled<128>        | 14.46            |
-| CTR32_unrolled<192>        | 17.70            |
 | CTR32_unrolled<256>        | 20.95            |
 
 #### specific function sizes
