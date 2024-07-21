@@ -37,8 +37,9 @@ The timmming issue can be visualized by following snippet (immediate vs register
 Only DTCM memory can be used for LUT tables, since everything else is cached through AXI bus.
 
 The AHBS interface has [configurable priorty](https://developer.arm.com/documentation/ddi0489/f/system-control/register-descriptions/ahb-slave-control-register). 
-By default AHBS interface has the lowest priority which means that DMA transfers through this interface can be timed
-to discover access pattern to DTCM banks.
+By default AHBS interface has the lowest priority which means that the DMA transfers through this interface can be timed
+to discover access pattern to DTCM banks. When configured to other arbitration modes then DMA contention 
+will lead to timming leaks through code execution.
 (there was also some changes in r1p0 revision: "Improved handling of simultaneous AHBS and 
 software activity relating to the same TCM", details are of course Proprietary&Confidential)
 
