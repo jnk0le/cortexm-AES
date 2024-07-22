@@ -60,7 +60,6 @@ CM3_1T_AES_CTR32_enc:
 	// r14 - Te2
 
 ctr_partial_precompute:
-
 	//load from ctx, nonce in r0-r3, key in r4-r7
 	ldmia r12!, {r0-r7}
 

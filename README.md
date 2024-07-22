@@ -69,8 +69,8 @@ unrolled version of CTR32_CM3_1T
 | CTR32_GENERIC<>            |                  |                  |
 | CTR32<128>                 | 32.09/43.79      | 32.09            |
 | CTR32<256>                 | 46.59/63.79      | 46.59            |
-| CTR32_unrolled<128>        |             |             |
-| CTR32_unrolled<256>        |             |             |
+| CTR32_unrolled<128>        | 30.59/41.60      | 30.59/38.48      |
+| CTR32_unrolled<256>        | 44.34/59.98      | 44.34/55.73      |
 
 results assume that input, expanded round key and stack lie in the same memory block (e.g. SRAM1 vs SRAM2 and CCM on f407)
 
@@ -78,12 +78,12 @@ results assume that input, expanded round key and stack lie in the same memory b
 
 | Function | code size in bytes | stack usage in bytes | notes |
 |----------|--------------------|----------------------|-------|
-| `CM3_1T_AES_CTR32_enc` | 862 | 68 (+1 arg passed on stack) | uses Te2 table |
-| `CM3_1T_AES128_CTR32_enc_unrolled` | | | uses Te2 table |
-| `CM3_1T_AES192_CTR32_enc_unrolled` | | | uses Te2 table |
-| `CM3_1T_AES256_CTR32_enc_unrolled` | | | uses Te2 table |
+| `CM3_1T_AES_CTR32_enc` | 862 | 68(72) (+1 arg passed on stack) | uses Te2 table |
+| `CM3_1T_AES128_CTR32_enc_unrolled` | 1996 | 64 | uses Te2 table |
+| `CM3_1T_AES192_CTR32_enc_unrolled` | 2366 | 64 | uses Te2 table |
+| `CM3_1T_AES256_CTR32_enc_unrolled` | 2734 | 64 | uses Te2 table |
 
-
+extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
 
 ### cortex-m7
 
