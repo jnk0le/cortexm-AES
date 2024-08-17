@@ -16,6 +16,7 @@
 #include "CM3.h"
 #include "CM4.h"
 #include "CM7.h"
+#include "CM85.h"
 #include "QKv2.h"
 
 namespace aes
@@ -337,6 +338,17 @@ namespace target
 			//CM7_DSPsBOX_AES_decrypt(rk, data_in, data_out, this->key_rounds);
 		//}
 
+	protected:
+		//static constexpr size_t key_rounds = (key_length == 128) ? 10 : ((key_length == 192) ? 12 : 14);
+	};
+
+	template<size_t key_length>
+	class CM85_held4T : public CM7_1T<key_length>  //reuse CM7 for now
+	{
+	public:
+		void encrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
+			CM85_held4T_AES_encrypt(rk, data_in, data_out, this->key_rounds);
+		}
 	protected:
 		//static constexpr size_t key_rounds = (key_length == 128) ? 10 : ((key_length == 192) ? 12 : 14);
 	};

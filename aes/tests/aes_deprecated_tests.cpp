@@ -27,11 +27,11 @@ uint8_t expected_ciphertext_256[16] = {0x8e, 0xa2, 0xb7, 0xca, 0x51, 0x67, 0x45,
 
 uint8_t tmp[16];
 
-aes::CipherContext<128, aes::target::CM7_1T> t128;
-aes::CipherContext<192, aes::target::CM7_1T> t192;
-aes::CipherContext<256, aes::target::CM7_1T> t256;
+aes::CipherContext<128, aes::target::CM85_held4T> t128;
+aes::CipherContext<192, aes::target::CM85_held4T> t192;
+aes::CipherContext<256, aes::target::CM85_held4T> t256;
 
-#if defined(__ARM_ARCH_7EM__)||defined(__ARM_ARCH_7M__)
+#if defined(__ARM_ARCH_7EM__)||defined(__ARM_ARCH_7M__)||defined(__ARM_ARCH_8M_MAIN__)||defined(__ARM_ARCH_8_1M_MAIN__)
 
 //__attribute__ ((section(".itcm.text"), noinline))
 void aes_ecb_test(void)
@@ -273,7 +273,7 @@ uint8_t cbc_expected_ciphertext[64] = {
 
 uint8_t cbc_tmp[64];
 
-aes::mode::CBC<256, aes::target::CM7_1T, aes::mode::target::CBC_GENERIC> tcbc;
+aes::mode::CBC<256, aes::target::CM3_1T_unrolled, aes::mode::target::CBC_GENERIC> tcbc;
 
 void aes_cbc_test(void)
 {
@@ -325,7 +325,7 @@ uint8_t ctr_expected_ciphertext[64] = {
 
 uint8_t ctr_tmp[64];
 
-aes::mode::CTR32<256, aes::target::CM7_1T, aes::mode::target::CTR32_CM7_1T_unrolled> tctr;
+aes::mode::CTR32<256, aes::target::CM3_1T, aes::mode::target::CTR32_CM3_1T_unrolled> tctr;
 
 void aes_ctr_nist_test(void)
 {
@@ -430,9 +430,9 @@ void aes_cbc_perf_test(void)
 
 }
 
-aes::mode::CTR32<128, aes::target::CM7_1T, aes::mode::target::CTR32_CM7_1T_unrolled> tctr128;
-aes::mode::CTR32<192, aes::target::CM7_1T, aes::mode::target::CTR32_CM7_1T_unrolled> tctr192;
-aes::mode::CTR32<256, aes::target::CM7_1T, aes::mode::target::CTR32_CM7_1T_unrolled> tctr256;
+aes::mode::CTR32<128, aes::target::CM3_1T, aes::mode::target::CTR32_CM3_1T_unrolled> tctr128;
+aes::mode::CTR32<192, aes::target::CM3_1T, aes::mode::target::CTR32_CM3_1T_unrolled> tctr192;
+aes::mode::CTR32<256, aes::target::CM3_1T, aes::mode::target::CTR32_CM3_1T_unrolled> tctr256;
 
 void aes_ctr_perf_test(void)
 {
