@@ -237,7 +237,7 @@ uint32_t AES_Td2[256] __attribute__((aligned(1024), section(".data.AES_Td2"))) =
 
 
 // The diffused 4 Te tables, designed for MVE gathers
-// requires constant increments and left shifts that are not supported natively by AGUs
+// requires left shifts that are not supported natively by AGUs
 //
 // starting at index i/4 we have:
 // Te0[i], Te1[i], Te2[i], Te3[i]
