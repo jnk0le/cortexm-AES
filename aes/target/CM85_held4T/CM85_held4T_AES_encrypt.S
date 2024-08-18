@@ -182,7 +182,7 @@ CM85_held4T_AES_encrypt:
 	// q2 - [] s21 [] s13 [] s01 [] s33 []
 	// q3 - [] s03 [] s31 [] s23 [] s11 []
 
-	//scale to 128 bit
+	//scale offsets to 128 bit
 	vshl.u32 q0, q0, #4
 	vshl.u32 q1, q1, #4
 	vshl.u32 q2, q2, #4
