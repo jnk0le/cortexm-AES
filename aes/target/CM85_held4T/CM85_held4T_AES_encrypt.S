@@ -10,7 +10,7 @@
 
 
 // compile for compatible targets only
-#if (__ARM_FEATURE_MVE & 0b01)
+#if __ARM_EABI__ && __thumb2__ && (__ARM_FEATURE_MVE & 0b01)
 
 .syntax unified
 .thumb

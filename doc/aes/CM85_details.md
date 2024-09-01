@@ -16,16 +16,27 @@ usues diffused 4 T tables
 
 not optimized yet
 
-shiftrows by MVE is not very efficient, probably needs to interleave 2 blocks and different approach
+shiftrows by MVE is not very efficient
 
 ## perfomance
 
-| Cipher function  |  | |
+| Cipher function  | RA8D1 - CM85_1T  | RA8D1 - CM85_held4T |
 |------------------|------------------|------------------|
-|  |  |  |
+| `setEncKey<128>` | 129 |  |
+| `setEncKey<192>` |  |  |
+| `setEncKey<256>` |  |  |
+| `encrypt<128>`   |  |  |
+| `encrypt<192>`   |  |  |
+| `encrypt<256>`   |  |  |
+| `setDecKey<128>` |  |  |
+| `setDecKey<192>` |  |  |
+| `setDecKey<256>` |  |  |
+| `decrypt<128>`   |  |  |
+| `decrypt<192>`   |  |  |
+| `decrypt<256>`   |  |  |
 
 ## specific function size
 
 | Function | code size in bytes | stack usage in bytes | notes |
 |----------|--------------------|----------------------|-------|
-|  |  |  |  |
+| `CM85_1T_AES128_keyschedule_enc` | 120 | 24 | uses Te2 table |

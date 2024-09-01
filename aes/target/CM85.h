@@ -16,12 +16,13 @@
 	extern "C" {
 #endif
 
-	//void CM85_1T_AES128_keyschedule_enc(uint8_t* rk, const uint8_t* key);
+	void CM85_1T_AES128_keyschedule_enc(uint8_t* rk, const uint8_t* key);
 	//void CM85_1T_AES192_keyschedule_enc(uint8_t* rk, const uint8_t* key);
 	//void CM85_1T_AES256_keyschedule_enc(uint8_t* rk, const uint8_t* key);
 
 	//void CM85_1T_AES_encrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
 
+	//void CM85_held4T_AES128_keyschedule_enc(uint8_t* rk, const uint8_t* key);
 
 	void CM85_held4T_AES_encrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
 
