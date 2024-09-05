@@ -22,7 +22,7 @@ shiftrows by MVE is not very efficient
 
 | Cipher function  | RA8D1 - CM85_1T  | RA8D1 - CM85_held4T |
 |------------------|------------------|------------------|
-| `setEncKey<128>` | 129 |  |
+| `setEncKey<128>` | 120 |  |
 | `setEncKey<192>` |  |  |
 | `setEncKey<256>` |  |  |
 | `encrypt<128>`   |  |  |
@@ -39,4 +39,4 @@ shiftrows by MVE is not very efficient
 
 | Function | code size in bytes | stack usage in bytes | notes |
 |----------|--------------------|----------------------|-------|
-| `CM85_1T_AES128_keyschedule_enc` | 120 | 24 | uses Te2 table |
+| `CM85_1T_AES128_keyschedule_enc` | 124 | 24 | uses Te2 table |
