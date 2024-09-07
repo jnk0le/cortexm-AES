@@ -17,7 +17,7 @@
 .thumb
 .text
 
-.align 3
+.balign 4
 // void CM3_sBOX_AES128_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
 .global CM3_sBOX_AES128_keyschedule_enc
 .type   CM3_sBOX_AES128_keyschedule_enc,%function

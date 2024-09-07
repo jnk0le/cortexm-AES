@@ -76,11 +76,11 @@ s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3
 | Cipher function  | STM32F1 (0ws/2ws) - CM3_1T | STM32F1 (0ws/2ws) - CM3_sBOX | STM32F4 (0ws/5ws) - CM3_1T | STM32F4 - CM4_DSPsBOX |
 |------------------|----------------------------|------------------------------|----------------------------|-----------------------|
 | `setEncKey<128>`        | 302/354  |  | 302 | 302 |
-| `setEncKey<192>`        | 276/312  |  | 276 | 277 |
-| `setEncKey<256>`        | 378/485  |  | 378 | 381 |
-| `encrypt<128>`          | 627/841  |  | 626 | 852 |
-| `encrypt<192>`          | 743/996 |  | 742 | 1020 |
-| `encrypt<256>`          | 859/1157 |  | 858 | 1188 |
+| `setEncKey<192>`        | 276/312  |  | 276 | 276 |
+| `setEncKey<256>`        | 378/485  |  | 378 | 378 |
+| `encrypt<128>`          | 627/841  |  | 626 | 844 |
+| `encrypt<192>`          | 743/996 |  | 742 | 1008 |
+| `encrypt<256>`          | 859/1157 |  | 858 | 1172 |
 | `encrypt_unrolled<128>` | 599/769 |   | 601/715 | - |
 | `encrypt_unrolled<192>` | 709/916 |   | 711/844 | - |
 | `encrypt_unrolled<256>` | 819/1058 |   | 821/975 | - |
@@ -116,7 +116,7 @@ results assume that input, expanded round key and stack lie in the same memory b
 | `CM3_sBOX_AES128_keyschedule_enc` | 100 | 24 | uses sbox table |
 | `CM3_sBOX_AES192_keyschedule_enc` | 100 | 32 | uses sbox table |
 | `CM3_sBOX_AES256_keyschedule_enc` | 178 | 44(48) | uses sbox table |
-| `CM4_DSPsBOX_AES_encrypt` | 494 | 44(48) | uses sbox table |
+| `CM4_DSPsBOX_AES_encrypt` | 470 | 40 | uses sbox table |
 | `CM4_DSPsBOX_AES_decrypt` | 630 | 44(48) | uses inv_sbox table |
 
 extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
