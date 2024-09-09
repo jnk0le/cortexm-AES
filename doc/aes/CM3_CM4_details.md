@@ -87,9 +87,9 @@ s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3
 | `setDecKey<128>`        | 813/1101 | 0 | 811 | 0 |
 | `setDecKey<192>`        | 987/1341 | 0 | 987 | 0 |
 | `setDecKey<256>`        | 1163/1580 | 0 | 1164 | 0 |
-| `decrypt<128>`          | 629/843 |   | 629 | 1249 |
-| `decrypt<192>`          | 745/1001 |   | 745 | 1505 |
-| `decrypt<256>`          | 861/1159 |   | 863 | 1759 |
+| `decrypt<128>`          | 629/843 |   | 629 | 1240 |
+| `decrypt<192>`          | 745/1001 |   | 745 | 1492 |
+| `decrypt<256>`          | 861/1159 |   | 863 | 1744 |
 | `decrypt_unrolled<128>` | 600/772  |   | 602/716 | - |
 | `decrypt_unrolled<192>` | 710/918 |   | 712/845 | - |
 | `decrypt_unrolled<256>` | 820/1061  |   | 822/978 | - |
@@ -117,6 +117,6 @@ results assume that input, expanded round key and stack lie in the same memory b
 | `CM3_sBOX_AES192_keyschedule_enc` | 100 | 32 | uses sbox table |
 | `CM3_sBOX_AES256_keyschedule_enc` | 178 | 44(48) | uses sbox table |
 | `CM4_DSPsBOX_AES_encrypt` | 470 | 40 | uses sbox table |
-| `CM4_DSPsBOX_AES_decrypt` | 630 | 44(48) | uses inv_sbox table |
+| `CM4_DSPsBOX_AES_decrypt` | 606 | 40 | uses inv_sbox table |
 
 extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.

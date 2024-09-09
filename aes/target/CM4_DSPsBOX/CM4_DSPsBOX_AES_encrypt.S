@@ -20,7 +20,7 @@
 CM4_DSPsBOX_AES_encrypt:
 	push {r2,r4-r11,lr} //stack out
 
-	add r11, r0, r3, lsl #4 //rk_end-16 = rk + rounds * 16
+	add r11, r0, r3, lsl #4 // rk_end-16 = rk + rounds * 16
 	mov r12, r0
 
 	//load input
@@ -38,9 +38,9 @@ CM4_DSPsBOX_AES_encrypt:
 	movt r7, #:upper16:AES_sbox
 
 	// global allocation
+	// r7 - sbox
 	// r11 - final ptr
 	// r12 - current rk ptr
-	// r?? - sbox
 
 	// r0 - s00 | s10 | s20 | s30
 	// r1 - s01 | s11 | s21 | s31
@@ -53,7 +53,7 @@ CM4_DSPsBOX_AES_encrypt:
 	// r6 - s02`| s13`| s20`| s31`
 	// r7 - s03`| s10`| s21`| s32`
 
-1:
+1: // shiftrows and subbytes
 	uxtb r4, r0
 	lsrs r6, r3, #24
 	uxtb.w r9, r1, ror #8
@@ -75,13 +75,13 @@ CM4_DSPsBOX_AES_encrypt:
 	// r1 -  -  |  -  | s21 | s31
 	// r2 - s02 |  -  |  -  | s32
 	// r3 - s03 | s13 |  -  |  -
-	// r4 - s00` // r0c0
-	// r5 - s01` // r0c1
-	// r6 - s33` // r3c0
-	// r8 - s12` // r1c1
-	// r9 - s11` // r1c0
-	// r10 - s22` // r2c0
-	// r14 - s23` // r2c1
+	// r4 - s00` // c0r0
+	// r5 - s01` // c1r0
+	// r6 - s33` // c0r3
+	// r8 - s12` // c1r1
+	// r9 - s11` // c0r1
+	// r10 - s22` // c0r2
+	// r14 - s23` // c1r2
 
 	orr.w r4, r4, r6, lsl #24
 	orr.w r4, r4, r9, lsl #8
@@ -123,15 +123,15 @@ CM4_DSPsBOX_AES_encrypt:
 	ldrb.w r9, [r7, r9]
 
 	//current allocation
-	// r0 - s10` // r1c3
-	// r1 - s30` // r3c1
-	// r2 - s02` // r0c2
-	// r3 - s03` // r0c3
-	// r4 - s31` // r3c2
-	// r5 - s32` // r3c3
-	// r6 - s20` // r2c2
-	// r8 - s21` // r2c3
-	// r9 - s13` // r1c2
+	// r0 - s10` // c3r1
+	// r1 - s30` // c1r3
+	// r2 - s02` // c2r0
+	// r3 - s03` // c3r0
+	// r4 - s31` // c2r3
+	// r5 - s32` // c3r3
+	// r6 - s20` // c2r2
+	// r8 - s21` // c3r2
+	// r9 - s13` // c2r1
 	// r10 - s00`| s11`| s22`| s33`
 	// r14 - s01`| s12`| s23`|
 
@@ -243,13 +243,13 @@ CM4_DSPsBOX_AES_encrypt:
 	// r1 -  -  |  -  | s21 | s31
 	// r2 - s02 |  -  |  -  | s32
 	// r3 - s03 | s13 |  -  |  -
-	// r4 - s00` // r0c0
-	// r5 - s01` // r0c1
-	// r6 - s33` // r3c0
-	// r8 - s12` // r1c1
-	// r9 - s11` // r1c0
-	// r10 - s22` // r2c0
-	// r14 - s23` // r2c1
+	// r4 - s00` // c0r0
+	// r5 - s01` // c1r0
+	// r6 - s33` // c0r3
+	// r8 - s12` // c1r1
+	// r9 - s11` // c0r1
+	// r10 - s22` // c0r2
+	// r14 - s23` // c1r2
 
 	orr.w r4, r4, r6, lsl #24
 	orr.w r4, r4, r9, lsl #8
@@ -291,15 +291,15 @@ CM4_DSPsBOX_AES_encrypt:
 	ldrb.w r9, [r7, r9]
 
 	//current allocation
-	// r0 - s10` // r1c3
-	// r1 - s30` // r3c1
-	// r2 - s02` // r0c2
-	// r3 - s03` // r0c3
-	// r4 - s31` // r3c2
-	// r5 - s32` // r3c3
-	// r6 - s20` // r2c2
-	// r8 - s21` // r2c3
-	// r9 - s13` // r1c2
+	// r0 - s10` // c3r1
+	// r1 - s30` // c1r3
+	// r2 - s02` // c2r0
+	// r3 - s03` // c3r0
+	// r4 - s31` // c2r3
+	// r5 - s32` // c3r3
+	// r6 - s20` // c2r2
+	// r8 - s21` // c3r2
+	// r9 - s13` // c2r1
 	// r10 - s00`| s11`| s22`| s33`
 	// r14 - s01`| s12`| s23`|
 
@@ -337,10 +337,12 @@ CM4_DSPsBOX_AES_encrypt:
 	eors r2, r5
 	eors r3, r6
 
+	// for some reason stmia is +1 cycle here
 	str r0, [r7]
 	str r1, [r7, #4]
 	str r2, [r7, #8]
 	str r3, [r7, #12]
+	//stmia r7!, {r0-r3}
 
 	pop {r4-r11,pc}
 
