@@ -367,7 +367,7 @@ namespace target
 		}
 
 		void encrypt(uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
-			CM7_1T_AES_encrypt(rk, data_in, data_out, this->key_rounds);
+			CM85_1T_AES_encrypt(rk, data_in, data_out, this->key_rounds);
 		}
 
 		void decrypt(uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
