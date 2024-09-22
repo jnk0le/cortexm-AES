@@ -22,9 +22,9 @@
 
 	void CM85_1T_AES_encrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
 
-	//void CM85_held4T_AES128_keyschedule_enc(uint8_t* rk, const uint8_t* key);
+	//void CM85_d4T_AES128_keyschedule_enc(uint8_t* rk, const uint8_t* key);
 
-	void CM85_held4T_AES_encrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
+	void CM85_d4T_AES_encrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
 
 #ifdef __cplusplus
 	}

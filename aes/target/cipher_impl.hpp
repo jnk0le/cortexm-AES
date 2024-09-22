@@ -378,11 +378,11 @@ namespace target
 	};
 
 	template<size_t key_length>
-	class CM85_held4T : public CM85_1T<key_length>  //reuse
+	class CM85_d4T : public CM85_1T<key_length>  //reuse
 	{
 	public:
 		void encrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
-			CM85_held4T_AES_encrypt(rk, data_in, data_out, this->key_rounds);
+			CM85_d4T_AES_encrypt(rk, data_in, data_out, this->key_rounds);
 		}
 	protected:
 		//static constexpr size_t key_rounds = (key_length == 128) ? 10 : ((key_length == 192) ? 12 : 14);

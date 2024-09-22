@@ -27,7 +27,7 @@ uint8_t expected_ciphertext_256[16] = {0x8e, 0xa2, 0xb7, 0xca, 0x51, 0x67, 0x45,
 
 uint8_t tmp[16];
 
-aes::CipherContext<128, aes::target::CM85_1T> t128;
+aes::CipherContext<128, aes::target::CM85_d4T> t128;
 aes::CipherContext<192, aes::target::CM85_1T> t192;
 aes::CipherContext<256, aes::target::CM85_1T> t256;
 

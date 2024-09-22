@@ -1,5 +1,5 @@
 /*!
- * \file CM85_held4T_AES_encrypt.S
+ * \file CM85_d4T_AES_encrypt.S
  * \brief
  *
  * not optimized yet
@@ -17,10 +17,10 @@
 .text
 
 .balign 4
-// void CM85_held4T_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
-.global CM85_held4T_AES_encrypt
-.type   CM85_held4T_AES_encrypt,%function
-CM85_held4T_AES_encrypt:
+// void CM85_d4T_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
+.global CM85_d4T_AES_encrypt
+.type   CM85_d4T_AES_encrypt,%function
+CM85_d4T_AES_encrypt:
 	push {r2,r4-r11,lr} //stack out
 	vpush {s16-s31}
 

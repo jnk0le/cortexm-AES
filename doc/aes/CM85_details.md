@@ -6,11 +6,11 @@
 
 ### CM85_1T
 
-scalar only, potential for opt
+scalar only
 
 similarly to CM7, dtcm access pattern can be timed by DMA
 
-### CM85_held4T
+### CM85_d4T
 
 usues diffused 4 T tables
 
@@ -20,7 +20,7 @@ shiftrows by MVE is not very efficient
 
 ## perfomance
 
-| Cipher function  | RA8D1 - CM85_1T  | RA8D1 - CM85_held4T |
+| Cipher function  | RA8D1 - CM85_1T  | RA8D1 - CM85_d4T |
 |------------------|------------------|------------------|
 | `setEncKey<128>` | 120 |  |
 | `setEncKey<192>` |  |  |
