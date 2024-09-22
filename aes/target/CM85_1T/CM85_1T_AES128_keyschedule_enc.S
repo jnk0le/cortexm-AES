@@ -52,7 +52,6 @@ CM85_1T_AES128_keyschedule_enc:
 	// r14 -
 
 1:
-	// r5 must be available in EX2
 	lsrs r1, r5, #24 // lsl 16
 	ubfx r14, r5, #0, #8 // lsl 24
 
@@ -65,27 +64,27 @@ CM85_1T_AES128_keyschedule_enc:
 	ubfx r6, r5, #8, #8 // lsl 0
 	ldrb.w r8, [r12, r8, lsl #2]
 
-	eor.w r2, r2, r1, lsl #16 // EX2 EX3
+	eor.w r2, r2, r1, lsl #16
 	ldrb.w r6, [r12, r6, lsl #2]
 
-	eor.w r2, r2, r14, lsl #24 // EX2 EX3
-	orr.w r6, r6, r8, lsl #8 // EX3 EX4 // xor both later
+	eor.w r2, r2, r14, lsl #24
+	orr.w r6, r6, r8, lsl #8 // xor both later
 
 	lsls r7, #1 // next rcon
 	it cs // 0x1b reduction when carry set
 	movcs r7, #0x1b000000
 
-	eors r3, r2 // EX2 // r6 will be applied later, cannot use it in EX2 now
-	eors r3, r6 // EX3
+	eors r3, r2 // r6 will be applied later, cannot use it now
+	eors r3, r6
 
-	eors r4, r3 // EX3
-	eors r5, r4 // EX4
+	eors r4, r3
+	eors r5, r4
 
 	cmp r7, #0x6c000000
 	eor.w r2, r2, r6 // apply skipped r6, due to latency pressure
 
-	strd r2,r3, [r0], #8 // can dual issue due to skewed pipe
-	strd r4,r5, [r0], #8
+	strd r2,r3, [r0], #8
+	strd r4,r5, [r0], #8 // runs on slippery condition anyway
 	bne 1b
 
 	pop {r4-r8, pc}

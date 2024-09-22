@@ -72,7 +72,7 @@ CM85_1T_AES_encrypt:
 	lsrs r5, r0, #24
 
 	ubfx r8, r3, #16, #8
-	ldr r5, [r11, r5, lsl #2] // can't use r4 (slippery condition)
+	ldr r5, [r11, r5, lsl #2]
 
 	// current allocation
 	// r0 -  -  | s10 | s20 |  -
