@@ -27,7 +27,7 @@ uint8_t expected_ciphertext_256[16] = {0x8e, 0xa2, 0xb7, 0xca, 0x51, 0x67, 0x45,
 
 uint8_t tmp[16];
 
-aes::CipherContext<128, aes::target::CM85_d4T> t128;
+aes::CipherContext<128, aes::target::CM85_1T> t128;
 aes::CipherContext<192, aes::target::CM85_1T> t192;
 aes::CipherContext<256, aes::target::CM85_1T> t256;
 
@@ -255,7 +255,7 @@ void aes_ecb_test(void)
     }
 }
 
-uint8_t cbc_iv[16] = {0x69, 0xc4, 0xe0, 0xd8, 0x6a, 0x7b, 0x04, 0x30, 0xd8, 0xcd, 0xb7, 0x80, 0x70, 0xb4, 0xc5, 0x5a};
+/*uint8_t cbc_iv[16] = {0x69, 0xc4, 0xe0, 0xd8, 0x6a, 0x7b, 0x04, 0x30, 0xd8, 0xcd, 0xb7, 0x80, 0x70, 0xb4, 0xc5, 0x5a};
 
 uint8_t cbc_expected_plaintext[64] = {
 		0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
@@ -300,7 +300,91 @@ void aes_cbc_test(void)
 	else {
 		printf("cbc dec ok\n");
 	}
+}*/
+
+uint8_t cbc_iv[16] = {0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22};
+
+uint8_t cbc_expected_plaintext[16] = {
+		0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33
+};
+
+uint8_t cbc_expected_ciphertext[32] = {
+		0x35, 0xd1, 0x4e, 0x6d, 0x3e, 0x3a, 0x27, 0x9c, 0xf0, 0x1e, 0x34, 0x3e, 0x34, 0xe7, 0xde, 0xd3,
+		0x62, 0xc8, 0xb7, 0x5b, 0x73, 0x6c, 0xcc, 0x4a, 0x58, 0x85, 0x32, 0x2a, 0xb9, 0x27, 0x31, 0x9e
+};
+
+uint8_t cbc_expected_plaintext2[5] = {
+		0x11, 0x22, 0x33, 0x44, 0x55
+};
+
+uint8_t cbc_expected_ciphertext2[16] = {
+		0xeb, 0x56, 0xe6, 0xf3, 0x58, 0x62, 0x66, 0xcd, 0x57, 0xb4, 0x3f, 0x02, 0x1f, 0xdf, 0xea, 0xa3
+};
+
+aes::mode::CBC_PKCS7<128, aes::target::CM85_1T, aes::mode::target::CBC_GENERIC> tcbc;
+uint8_t cbc_tmp[64];
+
+void aes_cbc_test(void)
+{
+	tcbc.setEncKey(key_128);
+	tcbc.setIv(cbc_iv);
+
+	int enc_len = tcbc.encryptAppendFinalize(cbc_expected_plaintext, cbc_tmp, 16);
+
+	if(memcmp(cbc_expected_ciphertext, cbc_tmp, 32) != 0)
+		printf("cbc enc incorrect\n");
+	else {
+		if(enc_len != 32)
+			printf("cbc enc len incorrect: %d\n", enc_len);
+		else
+			printf("cbc enc ok\n");
+	}
+
+	tcbc.setDecKey(key_128);
+	tcbc.setIv(cbc_iv);
+
+	int dec_len = tcbc.decryptAppendFinalize(cbc_expected_ciphertext, cbc_tmp, 32);
+
+	if(memcmp(cbc_expected_plaintext, cbc_tmp, 16) != 0)
+		printf("cbc dec incorrect\n");
+	else {
+		if(dec_len != 16)
+			printf("cbc dec len incorrect: %d\n", dec_len);
+		else
+			printf("cbc dec ok\n");
+	}
+
+	printf("cbc pad non power of 2\n");
+
+	tcbc.setEncKey(key_128);
+	tcbc.setIv(cbc_iv);
+
+	enc_len = tcbc.encryptAppendFinalize(cbc_expected_plaintext2, cbc_tmp, 5);
+
+	if(memcmp(cbc_expected_ciphertext2, cbc_tmp, 16) != 0)
+		printf("cbc2 enc incorrect\n");
+	else {
+		if(enc_len != 16)
+			printf("cbc2 enc len incorrect: %d\n", enc_len);
+		else
+			printf("cbc2 enc ok\n");
+	}
+
+	tcbc.setDecKey(key_128);
+	tcbc.setIv(cbc_iv);
+
+	dec_len = tcbc.decryptAppendFinalize(cbc_expected_ciphertext2, cbc_tmp, 16);
+
+	if(memcmp(cbc_expected_plaintext2, cbc_tmp, 5) != 0)
+		printf("cbc2 dec incorrect\n");
+	else {
+		if(dec_len != 5)
+			printf("cbc2 dec len incorrect: %d\n", dec_len);
+		else
+			printf("cbc2 dec ok\n");
+	}
 }
+
 
 uint8_t nist_256_key[32] = {
 		0x60, 0x3d, 0xeb, 0x10, 0x15, 0xca, 0x71, 0xbe, 0x2b, 0x73, 0xae, 0xf0, 0x85, 0x7d, 0x77, 0x81,
@@ -357,7 +441,7 @@ void aes_ctr_nist_test(void)
 
 uint8_t dummy_8k[8192]; // we don't care about content, just performance
 
-aes::mode::CBC<128, aes::target::CM3_1T, aes::mode::target::CBC_GENERIC> tcbc128;
+/*aes::mode::CBC<128, aes::target::CM3_1T, aes::mode::target::CBC_GENERIC> tcbc128;
 aes::mode::CBC<192, aes::target::CM3_1T, aes::mode::target::CBC_GENERIC> tcbc192;
 aes::mode::CBC<256, aes::target::CM3_1T, aes::mode::target::CBC_GENERIC> tcbc256;
 
@@ -428,7 +512,7 @@ void aes_cbc_perf_test(void)
 
 	printf("cbc dec 256: %f cycles per byte\n", (double)tock/8192.0);
 
-}
+}*/
 
 aes::mode::CTR32<128, aes::target::CM3_1T, aes::mode::target::CTR32_CM3_1T_unrolled> tctr128;
 aes::mode::CTR32<192, aes::target::CM3_1T, aes::mode::target::CTR32_CM3_1T_unrolled> tctr192;
