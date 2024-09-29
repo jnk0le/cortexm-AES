@@ -76,10 +76,10 @@ CM7_1T_AES256_keyschedule_enc:
 	uxtb.w r12, r5, ror #16
 	str.w r2, [r0], #4
 
-	nop
+	mov.n r3, r3 // nop
 	ldrb r11, [r14, r11, lsl #2] // load sbox from Te2
 
-	nop
+	mov.n r3, r3 // nop
 	ldrb r10, [r14, r10, lsl #2] // load sbox from Te2
 
 	eor.w r6, r11
