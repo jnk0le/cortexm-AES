@@ -1,5 +1,5 @@
 /*!
- * \file CM85_d4T_alt1_AES_encrypt.S
+ * \file CM85_d4T_alt2_AES_encrypt.S
  * \brief
  *
  * not optimized yet
@@ -9,8 +9,7 @@
  * \license SPDX-License-Identifier: MIT
  */
 
-// first alternative version of d4T, shiftrows by scatter store then loads
-// should fit in registers without spills (unlike store + gathers)
+// second alternative version of d4T, do indexes before scatter
 
 // compile for compatible targets only
 #if __ARM_EABI__ && __thumb2__ && (__ARM_FEATURE_MVE & 0b01)
@@ -21,12 +20,21 @@
 
 .balign 16
 shiftrows_d4T_scatter_perm:
-	.byte 0, 11, 2, 9, 13, 4, 15, 6, 10, 1, 8, 3, 7, 14, 5, 12
+	//.byte 0, 11, 2, 9, 13, 4, 15, 6, 10, 1, 8, 3, 7, 14, 5, 12
 
-// void CM85_d4T_alt1_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
-.global CM85_d4T_alt1_AES_encrypt
-.type   CM85_d4T_alt1_AES_encrypt,%function
-CM85_d4T_alt1_AES_encrypt:
+	// precomputed oeven/odd, 2 loads instead of 1 load + 2 shifts, but prologue might have enough loads/stores
+	// leftshift can also be done by scatters
+	//.short 2*0, 2*2, 2*13, 2*15, 2*10, 2*8, 2*7, 2*5
+	//.short 2*11, 2*9, 2*4, 2*6, 2*1, 2*3, 2*14, 2*12
+
+	// widen by loads, apply shift in scatters or here??
+	.byte 0, 2, 13, 15, 10, 8, 7, 5
+	.byte 11, 9, 4, 6, 1, 3, 14, 12
+
+// void CM85_d4T_alt2_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
+.global CM85_d4T_alt2_AES_encrypt
+.type   CM85_d4T_alt2_AES_encrypt,%function
+CM85_d4T_alt2_AES_encrypt:
 	push {r2,r4-r11,lr} //stack out
 	vpush {s16-s31}
 
@@ -38,81 +46,74 @@ CM85_d4T_alt1_AES_encrypt:
 
 	veor q0, q0, q1
 
-	subs sp, #16 // scatter area
+	subs sp, #32 // scatter area
 	adr r4, shiftrows_d4T_scatter_perm // cant vector load by pc
-	vldrb.8 q3, [r4]
+	vldrb.u16 q4, [r4, #0]
+	vldrb.u16 q5, [r4, #8]
 	mov r4, sp // can't do widening loads by high reg
 
-	movs r2, #0
-	movs r5, #16
-	viwdup.u32 q4, r2, r5, #4
+	vmov.i32 q6, #0x00080000 // prepare offsets for even rows
+
 	movs r2, #4
-	viwdup.u32 q5, r2, r5, #4
-	movs r2, #8
-	viwdup.u32 q6, r2, r5, #4
-	movs r2, #12
-	viwdup.u32 q7, r2, r5, #4
+	vadd.i16 q7, q6, r2
 
-
-	// all register will be represented with the proper little endian register representation
-	// (state is reversed wrt transposed canonical state representation)
+	// state and vector elements will be represented with the big endian representation
+	// (transposed canonical state representation)
 
 	// global allocation
 	// r0 - rk
 	// r4 - sp (due to widening loads)
 	// r12 - AES_d4Te
 	// r14 - hwloop
-	// q3 - shiftrows_scatter_perm
-	// q4 - [12 8 4 0]
-	// q5 - [0 12 8 4]
-	// q6 - [4 0 12 8]
-	// q7 - [8 4 0 12]
+	// q3 -
+	// q4 - [ 0, 2, 13, 15, 10, 8, 7, 5 ] * 2 : shiftrows_d4T_scatter_perm (even half)
+	// q5 - [ 11, 9, 4, 6, 1, 3, 14, 12 ] * 2 : shiftrows_d4T_scatter_perm (odd half)
+	// q6 - [ 0 8 0 8 0 8 0 8 ]
+	// q7 - [ 4 12 4 12 4 12 4 12]
 
-	// row  []  3     2     1     0  []  3     2     1     0  []  3     2     1     0  []  3     2     1     0  []
-	// column            3                        2                        1                        0
-	// q0 - [] s33 | s23 | s13 | s03 [] s32 | s22 | s12 | s02 [] s31 | s21 | s11 | s01 [] s30 | s20 | s10 | s00 []
-	//final []  s32T^s21T^s10T^s03T  []  s31T^s20T^s13T^s02T  []  s30T^s23T^s12T^s01T  []  s33T^s22T^s11T^s00T  []
+	// row  []  0     1     2     3  []  0     1     2     3  []  0     1     2     3  []  0     1     2     3  []
+	// column            0                        1                        2                        3
+	// q0 - [] s00 | s10 | s20 | s30 [] s01 | s11 | s21 | s31 [] s02 | s12 | s22 | s32 [] s03 | s13 | s23 | s33 []
+	//final []  s00T^s11T^s22T^s33T  []  s01T^s12T^s23T^s30T  []  s02T^s13T^s20T^s31T  []  s03T^s10T^s21T^s32T  []
+
 
 	subs r3, #1 // one less
 	dls lr, r3 // no skipping
 .balign 8
 1:
-	vstrb.8 q0, [r4, q3] // 8 cycles
+	// prepare for gathers
+	vshllt.u8 q1, q0, #4
+	vshllb.u8 q0, q0, #4
+
+	vadd.i16 q0, q0, q6
+	vadd.i16 q1, q1, q7
+
+	// current allocation
+	// q0 - [] s00 | s20 [] s01 | s21 [] s02 | s22 [] s03 | s23 []
+	// q1 - [] s10 | s30 [] s11 | s31 [] s12 | s32 [] s13 | s33 []
+
+	vstrh.16 q0, [r4, q4, uxtw #1] // 4 cycles ?????? permutation perf???
+	vstrh.16 q1, [r4, q5, uxtw #1] // 4 cycles
 
 	// in memory layout:
 	// sp + 0  : s00, s12, s20, s32
-	// sp + 4  : s11, s23, s31, s03
-	// sp + 8  : s22, s30, s02, s10
-	// sp + 12 : s33, s01, s13, s21
+	// sp + 8  : s11, s23, s31, s03
+	// sp + 16 : s22, s30, s02, s10
+	// sp + 24 : s33, s01, s13, s21
 
-	vldrb.u32 q0, [r4, #0]
-	vldrb.u32 q1, [r4, #4]
+	vldrh.u32 q1, [r4, #0]
+	vldrh.u32 q2, [r4, #8]
+	vldrh.u32 q3, [r4, #16]
 
-	//scale offsets to 128 bit
-	vshl.u32 q0, q0, #4
-	vshl.u32 q1, q1, #4
-
-	vadd.i32 q0, q0, q4
-	vadd.i32 q1, q1, q5
-
-	vldrw.u32 q2, [r12, q0] // 2 cycles
 	vldrw.u32 q0, [r12, q1] // 2 cycles
+	vldrw.u32 q1, [r12, q2] // 2 cycles
+	vldrw.u32 q2, [r12, q3] // 2 cycles
 
+	veor q0, q0, q1
 	veor q0, q0, q2
 
-	vldrb.u32 q1, [r4, #8]
-	vshl.u32 q1, q1, #4
-	vadd.i32 q1, q1, q6
-	vldrw.u32 q2, [r12, q1] // 2 cycles
-
-	veor q0, q0, q2
-
-
-	vldrb.u32 q1, [r4, #12]
-	vshl.u32 q1, q1, #4
-	vadd.i32 q1, q1, q7
-	vldrw.u32 q2, [r12, q1] // 2 cycles
-
+	vldrh.u32 q3, [r4, #24]
+	vldrw.u32 q2, [r12, q3] // 2 cycles
 	veor q0, q0, q2
 
 	//apply rk
@@ -121,7 +122,7 @@ CM85_d4T_alt1_AES_encrypt:
 
 	le lr, 1b
 
-	// 22 total insns, theoretical 33 total cycles (indexing by MLA requires index recreating by vidup)
+	// 19 insns total, theoretical 29 cycles, it's load intense in second part (loads after pipelineable loads)
 
 
 
@@ -328,7 +329,7 @@ CM85_d4T_alt1_AES_encrypt:
 	nop
 
 	orr.w r9, r3, r0, lsl #8 // col 3 bottom part
-	ldr r6, [sp, #64+16] // load output pointer, ignore stack opt
+	ldr r6, [sp, #64+32] // load output pointer, ignore stack opt
 
 	ldm r12, {r0-r3}
 
@@ -357,7 +358,7 @@ CM85_d4T_alt1_AES_encrypt:
 
 	stmia r6!, {r0-r3}
 
-	add sp, #16 // scatter area
+	add sp, #32 // scatter area
 
 	vpop {s16-s31}
 	pop {r2,r4-r11,pc}
