@@ -35,11 +35,9 @@ CM85_d4T_alt3_AES_encrypt:
 	veor q0, q0, q1
 
 
-
-	vmov.i32 q6, #0x00080000 // prepare offsets for even rows
-
-	movs r2, #4
-	vadd.i16 q7, q6, r2 // offsets for odd rows
+	// offsets for odd rows, even rows are don inline
+	vmov.i32 q7, #0x000C0000
+	vorr.i32 q7, #0x00000004
 
 	// state and vector elements will be represented with the big endian representation
 	// (as in transposed canonical state representation)
@@ -51,7 +49,7 @@ CM85_d4T_alt3_AES_encrypt:
 	// q3 -
 	// q4 -
 	// q5 -
-	// q6 - [ 0 8 0 8 0 8 0 8 ]
+	// q6 -
 	// q7 - [ 4 12 4 12 4 12 4 12]
 
 	// row  []  0     1     2     3  []  0     1     2     3  []  0     1     2     3  []  0     1     2     3  []
@@ -68,8 +66,9 @@ CM85_d4T_alt3_AES_encrypt:
 	vshllt.u8 q1, q0, #4
 	vshllb.u8 q0, q0, #4
 
-	vadd.i16 q0, q0, q6
-	vadd.i16 q1, q1, q7
+	// add offsets into diffusion
+	vorr.i32 q0, #0x00080000 // [ 0 8 0 8 0 8 0 8 ]
+	vorr q1, q1, q7 // immediate is out of range
 
 	// current allocation
 	// q0 - [] s00 | s20 [] s01 | s21 [] s02 | s22 [] s03 | s23 []
