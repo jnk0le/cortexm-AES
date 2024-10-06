@@ -1,5 +1,5 @@
 /*!
- * \file CM85_d4T_alt3_AES_encrypt.S
+ * \file CM85_d4T_alt3_opt1_AES_encrypt.S
  * \brief
  *
  * not optimized yet
@@ -10,6 +10,7 @@
  */
 
 // 3rd alternative version of d4T, vloating point moves instead of scatter/gather
+// loop optimized by f16 vloating point "moves" (`vmovx` and `vabs` for extracts, not affected by FPSCR.FZ16)
 
 // compile for compatible targets only
 #if __ARM_EABI__ && __thumb2__ && (__ARM_FEATURE_MVE & 0b01)
@@ -19,10 +20,10 @@
 .text
 
 .balign 8
-// void CM85_d4T_alt3_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
-.global CM85_d4T_alt3_AES_encrypt
-.type   CM85_d4T_alt3_AES_encrypt,%function
-CM85_d4T_alt3_AES_encrypt:
+// void CM85_d4T_alt3_opt1_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
+.global CM85_d4T_alt3_opt1_AES_encrypt
+.type   CM85_d4T_alt3_opt1_AES_encrypt,%function
+CM85_d4T_alt3_opt1_AES_encrypt:
 	push {r2,r4-r11,lr} //stack out
 	vpush {s16-s31}
 
@@ -62,160 +63,177 @@ CM85_d4T_alt3_AES_encrypt:
 	dls lr, r3 // no skipping
 .balign 8
 1:
-	// prepare for gathers
+	// prepare for gathers // shifts and offsets
 	vshllt.u8 q1, q0, #4
-	vshllb.u8 q0, q0, #4
-
-	// add offsets into diffusion
-	vorr.i32 q0, #0x00080000 // [ 0 8 0 8 0 8 0 8 ]
 	vorr q1, q1, q7 // immediate is out of range
+	vshllb.u8 q0, q0, #4
+	vorr.i32 q0, #0x00080000 // [ 0 8 0 8 0 8 0 8 ]
 
 	// current allocation
 	// q0 - [] s00 | s20 [] s01 | s21 [] s02 | s22 [] s03 | s23 []
 	// q1 - [] s10 | s30 [] s11 | s31 [] s12 | s32 [] s13 | s33 []
 
-	// there is no widening addition
+	// s0 - s00 | s20
+	// s1 - s01 | s21
+	// s2 - s02 | s22
+	// s3 - s03 | s23
 
-	vmovlb.u16 q2, q0
-	vmovlt.u16 q3, q0
-	vmovlb.u16 q4, q1
-	vmovlt.u16 q5, q1
-
-	// current allocation
-	// s0:s7 -
-
-	// s8 - s00 // ok
-	// s9 - s01
-	// s10 - s02
-	// s11 - s03
-
-	// s12 - s20
-	// s13 - s21
-	// s14 - s22
-	// s15 - s23
-
-	// s16 - s10
-	// s17 - s11
-	// s18 - s12
-	// s19 - s13
-
-	// s20 - s30
-	// s21 - s31
-	// s22 - s32
-	// s23 - s33
-
+	// s4 - s10 | s30
+	// s5 - s11 | s31
+	// s6 - s12 | s32
+	// s7 - s13 | s33
 
 	// required layout:
-	// q2 - [] s00 [] s12 [] s20 [] s32 []
-	// q0 - [] s11 [] s23 [] s31 [] s03 []
-	// q1 - [] s22 [] s30 [] s02 [] s10 []
-	// q3 - [] s33 [] s01 [] s13 [] s21 []
+	// q2 - [] s00 [] s12 [] s20 [] s32 [] // s8, s9, s10, s11
+	// q3 - [] s11 [] s23 [] s31 [] s03 [] // s12, s13, s14, s15
+	// q4 - [] s22 [] s30 [] s02 [] s10 [] // s16, s17, s18, s19
+	// q5 - [] s33 [] s01 [] s13 [] s21 [] // s20, s21, s22, s23
 
-	// 15 total moves
+	vmovx.f16 s11, s6 // no conflict // vabs can't be used at all here
+	//mov.n r11, r11
 
+	vabs.f16 s8, s0
+	//mov.n r11, r11
 
-	// half prec alu places zoros in top
-	// only if mve_f available ?
-	// FPSCR.FZ16 not used? // vmovx.f16 + vabs.f16 not affected
+	vmovx.f16 s10, s0
+	vldr.32 s24, [r0, #0] // load rk, nothing else dual issues with vloating point moves
 
-	vmov.f32 s0, s17
-	vmov.f32 s1, s15
-	vmov.f32 s2, s21
-	vmov.f32 s3, s11
-
-	vmov.f32 s4, s14
-	vmov.f32 s5, s20
-	vmov.f32 s6, s10
-	vmov.f32 s7, s16
+	vabs.f16 s9, s6
+	vldr.32 s25, [r0, #4]
 
 	// current allocation
-	// s0 - s11
-	// s1 - s23
-	// s2 - s31
-	// s3 - s03
+	// s0 -
+	// s1 - s01 | s21
+	// s2 - s02 | s22
+	// s3 - s03 | s23
 
-	// s4 - s22
-	// s5 - s30
-	// s6 - s02
-	// s7 - s10
+	// s4 - s10 | s30
+	// s5 - s11 | s31
+	// s6 -
+	// s7 - s13 | s33
 
-	// s8 - s00 // ok
-	// s9 - s01
-	// s10 -
-	// s11 -
+	// q2 - [] s00 [] s12 [] s20 [] s32 [] //  s8,  s9, s10, s11
+	// q3 - []     []     []     []     [] // s12, s13, s14, s15
+	// q4 - []     []     []     []     [] // s16, s17, s18, s19
+	// q5 - []     []     []     []     [] // s20, s21, s22, s23
+	// q6 - [] rk[0] [] rk[1] []    []    [] // s24, s25, s26, s27
 
-	// s12 - s20
-	// s13 - s21
-	// s14 -
-	// s15 -
 
-	// s16 -
-	// s17 -
-	// s18 - s12
-	// s19 - s13
+	vmovx.f16 s13, s3
+	vldr.32 s26, [r0, #8]
 
-	// s20 -
-	// s21 -
-	// s22 - s32
-	// s23 - s33
+	vabs.f16 s15, s3
+	vldr.32 s27, [r0, #12]
 
-	vmov.f32 s10, s12
-	vmov.f32 s11, s22
+	vmovx.f16 s14, s5
+	adds r0, #16
 
-	vmov.f32 s15, s13
-	vmov.f32 s13, s9
-
-	vmov.f32 s9, s18
-	vmov.f32 s12, s23
-	vmov.f32 s14, s19
+	vabs.f16 s12, s5
+	//mov.n r11, r11
 
 	// current allocation
-	// s0 - s11
-	// s1 - s23
-	// s2 - s31
-	// s3 - s03
+	// s0 -
+	// s1 - s01 | s21
+	// s2 - s02 | s22
+	// s3 -
 
-	// s4 - s22
-	// s5 - s30
-	// s6 - s02
-	// s7 - s10
+	// s4 - s10 | s30
+	// s5 -
+	// s6 -
+	// s7 - s13 | s33
 
-	// s8 - s00
-	// s9 - s12
-	// s10 - s20
-	// s11 - s32
+	// q2 - [] s00 [] s12 [] s20 [] s32 [] //  s8,  s9, s10, s11
+	// q3 - [] s11 [] s23 [] s31 [] s03 [] // s12, s13, s14, s15
+	// q4 - []     []     []     []     [] // s16, s17, s18, s19
+	// q5 - []     []     []     []     [] // s20, s21, s22, s23
+	// q6 - [] rk[0] [] rk[1] [] rk[2] [] rk[3] [] // s24, s25, s26, s27
 
-	// s12 - s33
-	// s13 - s01
-	// s14 - s13
-	// s15 - s21
+	vldrw.u32 q4, [r12, q2] // 2+1 cycles, 1 cycle lost due to conflict with vloating point use
 
-	// s16:s23 -
+	veor q6, q6, q4
 
-	// q2 - [] s00 [] s12 [] s20 [] s32 []
-	// q0 - [] s11 [] s23 [] s31 [] s03 []
-	// q1 - [] s22 [] s30 [] s02 [] s10 []
-	// q3 - [] s33 [] s01 [] s13 [] s21 []
+	vldrw.u32 q5, [r12, q3] // 2+1 cycles (4 above veor)
 
+	veor q6, q6, q5
 
-	vldrw.u32 q5, [r12, q0] // 2 cycles
-	vldrw.u32 q4, [r12, q1] // 2 cycles
-	vldrw.u32 q0, [r12, q2] // 2 cycles
-	vldrw.u32 q1, [r12, q3] // 2 cycles
+	// current allocation
+	// s0 -
+	// s1 - s01 | s21
+	// s2 - s02 | s22
+	// s3 -
 
-	veor q0, q0, q1
-	veor q0, q0, q5
-	veor q0, q0, q4
+	// s4 - s10 | s30
+	// s5 -
+	// s6 -
+	// s7 - s13 | s33
 
-	//apply rk
-	vldrw.u32 q1, [r0], #16
-	veor q0, q0, q1
+	// q2 -
+	// q3 -
+	// q4 - []     []     []     []     [] // s16, s17, s18, s19
+	// q5 - []     []     []     []     [] // s20, s21, s22, s23
+	// q6 - tmp
+
+	vmovx.f16 s16, s2
+	//mov.n r11, r11
+
+	vmovx.f16 s17, s4
+	//mov.n r11, r11
+
+	vabs.f16 s18, s2
+	//mov.n r11, r11
+
+	vabs.f16 s19, s4
+	//mov.n r11, r11
+
+	// current allocation
+	// s0 -
+	// s1 - s01 | s21
+	// s2 -
+	// s3 -
+
+	// s4 -
+	// s5 -
+	// s6 -
+	// s7 - s13 | s33
+
+	// q2 -
+	// q3 -
+	// q4 - [] s22 [] s30 [] s02 [] s10 [] // s16, s17, s18, s19
+	// q5 - []     []     []     []     [] // s20, s21, s22, s23
+	// q6 - tmp
+
+	vmovx.f16 s20, s7
+	//mov.n r11, r11
+
+	vabs.f16 s21, s1
+	//mov.n r11, r11
+
+	vabs.f16 s22, s7
+	//mov.n r11, r11
+
+	vmovx.f16 s23, s1
+	//mov.n r11, r11
+
+	// current allocation
+	// q2 -
+	// q3 -
+	// q4 - [] s22 [] s30 [] s02 [] s10 [] // s16, s17, s18, s19
+	// q5 - [] s33 [] s01 [] s13 [] s21 [] // s20, s21, s22, s23
+	// q6 - tmp
+
+	vldrw.u32 q2, [r12, q4] // 3 cycles again
+
+	veor q0, q6, q2
+
+	vldrw.u32 q3, [r12, q5] // 3 cycles again
+
+	veor q0, q0, q3
 
 	le lr, 1b
 
-	// 17 vector insns (21 vector cycles), 15 scalar fp moves (f16 "moves" will cut 4 vector insn and add 1 scalar move)
-
-	// 13 vector, 16 moves // 29 cycles
+	// 36 cycles total, 32 theoretical
+	// gathers are very sensitive to hazards with scalar vloating point, moves also cant dual issue
+	// otherwise it could be more efficient than scatter/gather
 
 	// final round
 

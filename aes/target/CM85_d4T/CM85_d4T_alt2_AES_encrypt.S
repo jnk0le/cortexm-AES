@@ -92,7 +92,7 @@ CM85_d4T_alt2_AES_encrypt:
 	// q0 - [] s00 | s20 [] s01 | s21 [] s02 | s22 [] s03 | s23 []
 	// q1 - [] s10 | s30 [] s11 | s31 [] s12 | s32 [] s13 | s33 []
 
-	vstrh.16 q0, [r4, q4, uxtw #1] // 4 cycles ?????? permutation perf???
+	vstrh.16 q0, [r4, q4, uxtw #1] // 4 cycles
 	vstrh.16 q1, [r4, q5, uxtw #1] // 4 cycles
 
 	// in memory layout:
