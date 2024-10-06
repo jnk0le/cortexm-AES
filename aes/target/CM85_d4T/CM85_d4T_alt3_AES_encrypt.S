@@ -1,5 +1,5 @@
 /*!
- * \file CM85_d4T_alt2_AES_encrypt.S
+ * \file CM85_d4T_alt3_AES_encrypt.S
  * \brief
  *
  * not optimized yet
@@ -9,7 +9,7 @@
  * \license SPDX-License-Identifier: MIT
  */
 
-// second alternative version of d4T, do indexes before scatter
+// 3rd alternative version of d4T, vloating point moves instead of scatter/gather
 
 // compile for compatible targets only
 #if __ARM_EABI__ && __thumb2__ && (__ARM_FEATURE_MVE & 0b01)
@@ -18,23 +18,11 @@
 .thumb
 .text
 
-.balign 16
-shiftrows_d4T_scatter_perm:
-	//.byte 0, 11, 2, 9, 13, 4, 15, 6, 10, 1, 8, 3, 7, 14, 5, 12
-
-	// precomputed oeven/odd, 2 loads instead of 1 load + 2 shifts, but prologue might have enough loads/stores
-	// leftshift can also be done by scatters
-	//.short 2*0, 2*2, 2*13, 2*15, 2*10, 2*8, 2*7, 2*5
-	//.short 2*11, 2*9, 2*4, 2*6, 2*1, 2*3, 2*14, 2*12
-
-	// widen by loads, apply shift in scatters or here??
-	.byte 0, 2, 13, 15, 10, 8, 7, 5
-	.byte 11, 9, 4, 6, 1, 3, 14, 12
-
-// void CM85_d4T_alt2_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
-.global CM85_d4T_alt2_AES_encrypt
-.type   CM85_d4T_alt2_AES_encrypt,%function
-CM85_d4T_alt2_AES_encrypt:
+.balign 8
+// void CM85_d4T_alt3_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
+.global CM85_d4T_alt3_AES_encrypt
+.type   CM85_d4T_alt3_AES_encrypt,%function
+CM85_d4T_alt3_AES_encrypt:
 	push {r2,r4-r11,lr} //stack out
 	vpush {s16-s31}
 
@@ -46,28 +34,23 @@ CM85_d4T_alt2_AES_encrypt:
 
 	veor q0, q0, q1
 
-	subs sp, #32 // scatter area
-	adr r4, shiftrows_d4T_scatter_perm // cant vector load by pc
-	vldrb.u16 q4, [r4, #0]
-	vldrb.u16 q5, [r4, #8]
-	mov r4, sp // can't do widening loads by high reg
+
 
 	vmov.i32 q6, #0x00080000 // prepare offsets for even rows
 
 	movs r2, #4
-	vadd.i16 q7, q6, r2
+	vadd.i16 q7, q6, r2 // offsets for odd rows
 
 	// state and vector elements will be represented with the big endian representation
-	// (transposed canonical state representation)
+	// (as in transposed canonical state representation)
 
 	// global allocation
 	// r0 - rk
-	// r4 - sp (due to widening loads)
 	// r12 - AES_d4Te
 	// r14 - hwloop
 	// q3 -
-	// q4 - [ 0, 2, 13, 15, 10, 8, 7, 5 ] * 2 : shiftrows_d4T_scatter_perm (even half)
-	// q5 - [ 11, 9, 4, 6, 1, 3, 14, 12 ] * 2 : shiftrows_d4T_scatter_perm (odd half)
+	// q4 -
+	// q5 -
 	// q6 - [ 0 8 0 8 0 8 0 8 ]
 	// q7 - [ 4 12 4 12 4 12 4 12]
 
@@ -92,29 +75,140 @@ CM85_d4T_alt2_AES_encrypt:
 	// q0 - [] s00 | s20 [] s01 | s21 [] s02 | s22 [] s03 | s23 []
 	// q1 - [] s10 | s30 [] s11 | s31 [] s12 | s32 [] s13 | s33 []
 
-	vstrh.16 q0, [r4, q4, uxtw #1] // 4 cycles ?????? permutation perf???
-	vstrh.16 q1, [r4, q5, uxtw #1] // 4 cycles
+	// there is no widening addition
 
-	// in memory layout:
-	// sp + 0  : s00, s12, s20, s32
-	// sp + 8  : s11, s23, s31, s03
-	// sp + 16 : s22, s30, s02, s10
-	// sp + 24 : s33, s01, s13, s21
+	vmovlb.u16 q2, q0
+	vmovlt.u16 q3, q0
+	vmovlb.u16 q4, q1
+	vmovlt.u16 q5, q1
 
-	vldrh.u32 q1, [r4, #0]
-	vldrh.u32 q2, [r4, #8]
-	vldrh.u32 q3, [r4, #16]
+	// current allocation
+	// s0:s7 -
 
-	vldrw.u32 q0, [r12, q1] // 2 cycles
-	vldrw.u32 q1, [r12, q2] // 2 cycles
-	vldrw.u32 q2, [r12, q3] // 2 cycles
+	// s8 - s00 // ok
+	// s9 - s01
+	// s10 - s02
+	// s11 - s03
+
+	// s12 - s20
+	// s13 - s21
+	// s14 - s22
+	// s15 - s23
+
+	// s16 - s10
+	// s17 - s11
+	// s18 - s12
+	// s19 - s13
+
+	// s20 - s30
+	// s21 - s31
+	// s22 - s32
+	// s23 - s33
+
+
+	// required layout:
+	// q2 - [] s00 [] s12 [] s20 [] s32 []
+	// q0 - [] s11 [] s23 [] s31 [] s03 []
+	// q1 - [] s22 [] s30 [] s02 [] s10 []
+	// q3 - [] s33 [] s01 [] s13 [] s21 []
+
+	// 15 total moves
+
+	// vmovx + vsel ??
+	// mov 2 regs ??
+	// half prec alu places zoros in top
+
+	// only if mve_f available ?
+	// FPSCR.FZ16 not used?
+
+	vmov.f32 s0, s17
+	vmov.f32 s1, s15
+	vmov.f32 s2, s21
+	vmov.f32 s3, s11
+
+	vmov.f32 s4, s14
+	vmov.f32 s5, s20
+	vmov.f32 s6, s10
+	vmov.f32 s7, s16
+
+	// current allocation
+	// s0 - s11
+	// s1 - s23
+	// s2 - s31
+	// s3 - s03
+
+	// s4 - s22
+	// s5 - s30
+	// s6 - s02
+	// s7 - s10
+
+	// s8 - s00 // ok
+	// s9 - s01
+	// s10 -
+	// s11 -
+
+	// s12 - s20
+	// s13 - s21
+	// s14 -
+	// s15 -
+
+	// s16 -
+	// s17 -
+	// s18 - s12
+	// s19 - s13
+
+	// s20 -
+	// s21 -
+	// s22 - s32
+	// s23 - s33
+
+	vmov.f32 s10, s12
+	vmov.f32 s11, s22
+
+	vmov.f32 s15, s13
+	vmov.f32 s13, s9
+
+	vmov.f32 s9, s18
+	vmov.f32 s12, s23
+	vmov.f32 s14, s19
+
+	// current allocation
+	// s0 - s11
+	// s1 - s23
+	// s2 - s31
+	// s3 - s03
+
+	// s4 - s22
+	// s5 - s30
+	// s6 - s02
+	// s7 - s10
+
+	// s8 - s00
+	// s9 - s12
+	// s10 - s20
+	// s11 - s32
+
+	// s12 - s33
+	// s13 - s01
+	// s14 - s13
+	// s15 - s21
+
+	// s16:s23 -
+
+	// q2 - [] s00 [] s12 [] s20 [] s32 []
+	// q0 - [] s11 [] s23 [] s31 [] s03 []
+	// q1 - [] s22 [] s30 [] s02 [] s10 []
+	// q3 - [] s33 [] s01 [] s13 [] s21 []
+
+
+	vldrw.u32 q5, [r12, q0] // 2 cycles
+	vldrw.u32 q4, [r12, q1] // 2 cycles
+	vldrw.u32 q0, [r12, q2] // 2 cycles
+	vldrw.u32 q1, [r12, q3] // 2 cycles
 
 	veor q0, q0, q1
-	veor q0, q0, q2
-
-	vldrh.u32 q3, [r4, #24]
-	vldrw.u32 q2, [r12, q3] // 2 cycles
-	veor q0, q0, q2
+	veor q0, q0, q5
+	veor q0, q0, q4
 
 	//apply rk
 	vldrw.u32 q1, [r0], #16
@@ -122,8 +216,7 @@ CM85_d4T_alt2_AES_encrypt:
 
 	le lr, 1b
 
-	// 19 insns total, theoretical 29 cycles, it's load intense in second part (loads after pipelineable loads)
-	// store then gather would be more efficient with same theoretical cycles at higher register pressure
+	// 17 vector insns (21 vector cycles), 15 scalar fp moves (f16 "moves" will cut 4 vector insn and add 1 scalar move)
 
 
 	// final round
@@ -329,7 +422,7 @@ CM85_d4T_alt2_AES_encrypt:
 	nop
 
 	orr.w r9, r3, r0, lsl #8 // col 3 bottom part
-	ldr r6, [sp, #64+32] // load output pointer, ignore stack opt
+	ldr r6, [sp, #64] // load output pointer, ignore stack opt
 
 	ldm r12, {r0-r3}
 
@@ -357,8 +450,6 @@ CM85_d4T_alt2_AES_encrypt:
 	eors r3, r5
 
 	stmia r6!, {r0-r3}
-
-	add sp, #32 // scatter area
 
 	vpop {s16-s31}
 	pop {r2,r4-r11,pc}
