@@ -1,5 +1,5 @@
 /*!
- * \file CM85_d4T_alt3_opt1_AES_encrypt.S
+ * \file CM85_d4T_alt4_AES_encrypt.S
  * \brief
  *
  * not optimized yet
@@ -9,8 +9,7 @@
  * \license SPDX-License-Identifier: MIT
  */
 
-// 3rd alternative version of d4T, vloating point moves instead of scatter/gather
-// loop optimized by f16 vloating point "moves" (`vmovx` and `vabs` for extracts, not affected by FPSCR.FZ16)
+// alt2, but shiftrows by store then gather
 
 // compile for compatible targets only
 #if __ARM_EABI__ && __thumb2__ && (__ARM_FEATURE_MVE & 0b01)
@@ -19,11 +18,29 @@
 .thumb
 .text
 
-.balign 8
-// void CM85_d4T_alt3_opt1_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
-.global CM85_d4T_alt3_opt1_AES_encrypt
-.type   CM85_d4T_alt3_opt1_AES_encrypt,%function
-CM85_d4T_alt3_opt1_AES_encrypt:
+.balign 16
+AES_shiftrows_d4T_gather_perm:
+.byte 0, 12, 1, 13
+.byte 10, 7, 11, 6
+.byte 5, 9, 4, 8
+.byte 15, 2, 14, 3
+
+	// in memory layout (16 bit elements)
+	// sp+0  - s00, s20, s01, s21, s02, s22, s03, s23 // even rows
+	// sp+16 - s10, s30, s11, s31, s12, s32, s13, s33 // odd rows
+
+	// required layout after gathers:
+	// q0 - [] s00 [] s12 [] s20 [] s32 []
+	// q1 - [] s11 [] s23 [] s31 [] s03 []
+	// q2 - [] s22 [] s30 [] s02 [] s10 []
+	// q3 - [] s33 [] s01 [] s13 [] s21 []
+
+	// 2-bank friendly pattern (for cached stack) ???
+
+// void CM85_d4T_alt4_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
+.global CM85_d4T_alt4_AES_encrypt
+.type   CM85_d4T_alt4_AES_encrypt,%function
+CM85_d4T_alt4_AES_encrypt:
 	push {r2,r4-r11,lr} //stack out
 	vpush {s16-s31}
 
@@ -35,22 +52,31 @@ CM85_d4T_alt3_opt1_AES_encrypt:
 
 	veor q0, q0, q1
 
+	subs sp, #32 // scatter area
+	adr r4, AES_shiftrows_d4T_gather_perm // cant vector load by pc
+	vldrb.u32 q3, [r4, #0]
+	vldrb.u32 q4, [r4, #4]
+	vldrb.u32 q5, [r4, #8]
+	vldrb.u32 q6, [r4, #12]
+	mov r4, sp // can't do widening loads by high reg
 
 	// offsets for odd rows, even rows are done inline
 	vmov.i32 q7, #0x000C0000
 	vorr.i32 q7, #0x00000004
 
-	// state and vector elements will be represented with the big endian representation
+	// state and vector elements will be represented as big endian
 	// (as in transposed canonical state representation)
 
 	// global allocation
 	// r0 - rk
+	// r2 -
+	// r4 - sp (due to widening loads)
 	// r12 - AES_d4Te
 	// r14 - hwloop
-	// q3 -
-	// q4 -
-	// q5 -
-	// q6 -
+	// q3 - [ 0 12 1 13 ] // shiftrows gather 1
+	// q4 - [ 10 7 11 6 ] // shiftrows gather 2
+	// q5 - [ 5 9 4 8 ]   // shiftrows gather 3
+	// q6 - [ 15 2 14 3 ] // shiftrows gather 4
 	// q7 - [ 4 12 4 12 4 12 4 12]
 
 	// row  []  0     1     2     3  []  0     1     2     3  []  0     1     2     3  []  0     1     2     3  []
@@ -64,176 +90,50 @@ CM85_d4T_alt3_opt1_AES_encrypt:
 .balign 8
 1:
 	// prepare for gathers // shifts and offsets
-	vshllt.u8 q1, q0, #4
-	vorr q1, q1, q7 // immediate is out of range
-	vshllb.u8 q0, q0, #4
-	vorr.i32 q0, #0x00080000 // [ 0 8 0 8 0 8 0 8 ]
+
+	vshllb.u8 q1, q0, #4
+	vorr.i32 q1, #0x00080000 // [ 0 8 0 8 0 8 0 8 ]
+	vstrh.16 q1, [r4, #0]
+
+	vshllt.u8 q0, q0, #4
+	vorr q0, q0, q7 // immediate is out of range
+	vstrh.16 q0, [r4, #16]
 
 	// current allocation
-	// q0 - [] s00 | s20 [] s01 | s21 [] s02 | s22 [] s03 | s23 []
-	// q1 - [] s10 | s30 [] s11 | s31 [] s12 | s32 [] s13 | s33 []
+	// q1 - [] s00 | s20 [] s01 | s21 [] s02 | s22 [] s03 | s23 []
+	// q0 - [] s10 | s30 [] s11 | s31 [] s12 | s32 [] s13 | s33 []
 
-	// s0 - s00 | s20
-	// s1 - s01 | s21
-	// s2 - s02 | s22
-	// s3 - s03 | s23
+	// gathers are unpipelined, can't overlap with preceeding vstr as well
 
-	// s4 - s10 | s30
-	// s5 - s11 | s31
-	// s6 - s12 | s32
-	// s7 - s13 | s33
+	vldrh.u32 q0, [r4, q4, uxtw #1] // 3 cycles // q3 and q6 are 4 cycles here
+	vldrh.u32 q1, [r4, q3, uxtw #1] // 2 cycles
 
-	// required layout:
-	// q2 - [] s00 [] s12 [] s20 [] s32 [] // s8, s9, s10, s11
-	// q3 - [] s11 [] s23 [] s31 [] s03 [] // s12, s13, s14, s15
-	// q4 - [] s22 [] s30 [] s02 [] s10 [] // s16, s17, s18, s19
-	// q5 - [] s33 [] s01 [] s13 [] s21 [] // s20, s21, s22, s23
+	vldrw.u32 q2, [r12, q0] // 2 cycles
+	vldrw.u32 q0, [r12, q1] // 2 cycles
 
-	vmovx.f16 s11, s6 // no conflict // vabs can't be used at all here
-	//mov.n r11, r11
+	vldrh.u32 q1, [r4, q5, uxtw #1] // 2 cycles // need to distance from dependent gather
 
-	vabs.f16 s8, s0
-	//mov.n r11, r11
+	veor q0, q0, q2
 
-	vmovx.f16 s10, s0
-	vldr.32 s24, [r0, #0] // load rk, nothing else dual issues with vloating point moves
-
-	vabs.f16 s9, s6
-	vldr.32 s25, [r0, #4]
-
-	// current allocation
-	// s0 -
-	// s1 - s01 | s21
-	// s2 - s02 | s22
-	// s3 - s03 | s23
-
-	// s4 - s10 | s30
-	// s5 - s11 | s31
-	// s6 -
-	// s7 - s13 | s33
-
-	// q2 - [] s00 [] s12 [] s20 [] s32 [] //  s8,  s9, s10, s11
-	// q3 - []     []     []     []     [] // s12, s13, s14, s15
-	// q4 - []     []     []     []     [] // s16, s17, s18, s19
-	// q5 - []     []     []     []     [] // s20, s21, s22, s23
-	// q6 - [] rk[0] [] rk[1] []    []    [] // s24, s25, s26, s27
+	vldrw.u32 q2, [r12, q1] // 3 cycles // not enough distance
+	veor q0, q0, q2
 
 
-	vmovx.f16 s13, s3
-	vldr.32 s26, [r0, #8]
+	vldrh.u32 q1, [r4, q6, uxtw #1] // 2 cycles // need to distance from dependent gather
 
-	vabs.f16 s15, s3
-	vldr.32 s27, [r0, #12]
+	//apply rk
+	vldrw.u32 q2, [r0], #16
+	veor q0, q0, q2
 
-	vmovx.f16 s14, s5
-	adds r0, #16
+	vldrw.u32 q2, [r12, q1] // 2 cycles
+	veor q0, q0, q2
 
-	vabs.f16 s12, s5
-	//mov.n r11, r11
-
-	// current allocation
-	// s0 -
-	// s1 - s01 | s21
-	// s2 - s02 | s22
-	// s3 -
-
-	// s4 - s10 | s30
-	// s5 -
-	// s6 -
-	// s7 - s13 | s33
-
-	// q2 - [] s00 [] s12 [] s20 [] s32 [] //  s8,  s9, s10, s11
-	// q3 - [] s11 [] s23 [] s31 [] s03 [] // s12, s13, s14, s15
-	// q4 - []     []     []     []     [] // s16, s17, s18, s19
-	// q5 - []     []     []     []     [] // s20, s21, s22, s23
-	// q6 - [] rk[0] [] rk[1] [] rk[2] [] rk[3] [] // s24, s25, s26, s27
-
-	vldrw.u32 q4, [r12, q2] // 2+1 cycles, 1 cycle lost due to conflict with vloating point use
-
-	veor q6, q6, q4
-
-	vldrw.u32 q5, [r12, q3] // 2+1 cycles (4 above veor)
-
-	veor q6, q6, q5
-
-	// current allocation
-	// s0 -
-	// s1 - s01 | s21
-	// s2 - s02 | s22
-	// s3 -
-
-	// s4 - s10 | s30
-	// s5 -
-	// s6 -
-	// s7 - s13 | s33
-
-	// q2 -
-	// q3 -
-	// q4 - []     []     []     []     [] // s16, s17, s18, s19
-	// q5 - []     []     []     []     [] // s20, s21, s22, s23
-	// q6 - tmp
-
-	vmovx.f16 s16, s2
-	//mov.n r11, r11
-
-	vmovx.f16 s17, s4
-	//mov.n r11, r11
-
-	vabs.f16 s18, s2
-	//mov.n r11, r11
-
-	vabs.f16 s19, s4
-	//mov.n r11, r11
-
-	// current allocation
-	// s0 -
-	// s1 - s01 | s21
-	// s2 -
-	// s3 -
-
-	// s4 -
-	// s5 -
-	// s6 -
-	// s7 - s13 | s33
-
-	// q2 -
-	// q3 -
-	// q4 - [] s22 [] s30 [] s02 [] s10 [] // s16, s17, s18, s19
-	// q5 - []     []     []     []     [] // s20, s21, s22, s23
-	// q6 - tmp
-
-	vmovx.f16 s20, s7
-	//mov.n r11, r11
-
-	vabs.f16 s21, s1
-	//mov.n r11, r11
-
-	vabs.f16 s22, s7
-	//mov.n r11, r11
-
-	vmovx.f16 s23, s1
-	//mov.n r11, r11
-
-	// current allocation
-	// q2 -
-	// q3 -
-	// q4 - [] s22 [] s30 [] s02 [] s10 [] // s16, s17, s18, s19
-	// q5 - [] s33 [] s01 [] s13 [] s21 [] // s20, s21, s22, s23
-	// q6 - tmp
-
-	vldrw.u32 q2, [r12, q4] // 3 cycles again
-
-	veor q0, q6, q2
-
-	vldrw.u32 q3, [r12, q5] // 3 cycles again
-
-	veor q0, q0, q3
 
 	le lr, 1b
 
-	// 36 cycles total, 32 theoretical
-	// gathers are very sensitive to hazards with scalar vloating point, moves also cant dual issue
-	// otherwise it could be more efficient than scatter/gather
+
+	// 27 cycles theoretical // 29 achieved
+
 
 	// final round
 
@@ -438,7 +338,7 @@ CM85_d4T_alt3_opt1_AES_encrypt:
 	nop
 
 	orr.w r9, r3, r0, lsl #8 // col 3 bottom part
-	ldr r6, [sp, #64] // load output pointer, ignore stack opt
+	ldr r6, [sp, #64+32] // load output pointer, ignore stack opt
 
 	ldm r12, {r0-r3}
 
@@ -466,6 +366,8 @@ CM85_d4T_alt3_opt1_AES_encrypt:
 	eors r3, r5
 
 	stmia r6!, {r0-r3}
+
+	add sp, #32 // scatter area
 
 	vpop {s16-s31}
 	pop {r2,r4-r11,pc}
