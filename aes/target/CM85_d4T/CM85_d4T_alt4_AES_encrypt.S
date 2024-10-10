@@ -61,8 +61,8 @@ CM85_d4T_alt4_AES_encrypt:
 	mov r4, sp // can't do widening loads by high reg
 
 	// offsets for odd rows, even rows are done inline
-	vmov.i32 q7, #0x000C0000
-	vorr.i32 q7, #0x00000004
+	movs r5, #4
+	add r5, r5, #0x000C0000
 
 	// state and vector elements will be represented as big endian
 	// (as in transposed canonical state representation)
@@ -71,13 +71,14 @@ CM85_d4T_alt4_AES_encrypt:
 	// r0 - rk
 	// r2 -
 	// r4 - sp (due to widening loads)
+	// r5 - [ 4 12 ] (int16)
 	// r12 - AES_d4Te
 	// r14 - hwloop
 	// q3 - [ 0 12 1 13 ] // shiftrows gather 1
 	// q4 - [ 10 7 11 6 ] // shiftrows gather 2
 	// q5 - [ 5 9 4 8 ]   // shiftrows gather 3
 	// q6 - [ 15 2 14 3 ] // shiftrows gather 4
-	// q7 - [ 4 12 4 12 4 12 4 12]
+	// q7 -
 
 	// row  []  0     1     2     3  []  0     1     2     3  []  0     1     2     3  []  0     1     2     3  []
 	// column            0                        1                        2                        3
@@ -93,10 +94,11 @@ CM85_d4T_alt4_AES_encrypt:
 
 	vshllb.u8 q1, q0, #4
 	vorr.i32 q1, #0x00080000 // [ 0 8 0 8 0 8 0 8 ]
-	vstrh.16 q1, [r4, #0]
 
 	vshllt.u8 q0, q0, #4
-	vorr q0, q0, q7 // immediate is out of range
+	vstrh.16 q1, [r4, #0]
+
+	vadd.i32 q0, q0, r5 // [ 4 12 4 12 4 12 4 12] // indices won't carry across 16 bit
 	vstrh.16 q0, [r4, #16]
 
 	// current allocation
@@ -107,32 +109,28 @@ CM85_d4T_alt4_AES_encrypt:
 
 	vldrh.u32 q0, [r4, q4, uxtw #1] // 3 cycles // q3 and q6 are 4 cycles here
 	vldrh.u32 q1, [r4, q3, uxtw #1] // 2 cycles
+	vldrh.u32 q7, [r4, q5, uxtw #1] // 2 cycles
 
 	vldrw.u32 q2, [r12, q0] // 2 cycles
 	vldrw.u32 q0, [r12, q1] // 2 cycles
-
-	vldrh.u32 q1, [r4, q5, uxtw #1] // 2 cycles // need to distance from dependent gather
+	vldrw.u32 q1, [r12, q7] // 2 cycles
 
 	veor q0, q0, q2
 
-	vldrw.u32 q2, [r12, q1] // 3 cycles // not enough distance
-	veor q0, q0, q2
+	vldrh.u32 q2, [r4, q6, uxtw #1] // 2 cycles
 
+	veor q0, q0, q1
 
-	vldrh.u32 q1, [r4, q6, uxtw #1] // 2 cycles // need to distance from dependent gather
+	// apply rk
+	vldrw.u32 q1, [r0], #16
+	veor q0, q0, q1
 
-	//apply rk
-	vldrw.u32 q2, [r0], #16
-	veor q0, q0, q2
-
-	vldrw.u32 q2, [r12, q1] // 2 cycles
-	veor q0, q0, q2
-
+	vldrw.u32 q1, [r12, q2] // 2 cycles
+	veor q0, q0, q1
 
 	le lr, 1b
 
-
-	// 27 cycles theoretical // 29 achieved
+	// 28 cycles
 
 
 	// final round
