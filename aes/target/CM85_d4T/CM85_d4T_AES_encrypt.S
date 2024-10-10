@@ -4,10 +4,10 @@
  *
  * not optimized yet
  *
+ *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
  */
-
 
 // compile for compatible targets only
 #if __ARM_EABI__ && __thumb2__ && (__ARM_FEATURE_MVE & 0b01)
@@ -16,7 +16,25 @@
 .thumb
 .text
 
-.balign 8
+.balign 16
+AES_shiftrows_d4T_gather_perm:
+.byte 0, 12, 1, 13
+.byte 10, 7, 11, 6
+.byte 5, 9, 4, 8
+.byte 15, 2, 14, 3
+
+	// in memory layout (16 bit elements)
+	// sp+0  - s00, s20, s01, s21, s02, s22, s03, s23 // even rows
+	// sp+16 - s10, s30, s11, s31, s12, s32, s13, s33 // odd rows
+
+	// required layout after gathers:
+	// q0 - [] s00 [] s12 [] s20 [] s32 []
+	// q1 - [] s11 [] s23 [] s31 [] s03 []
+	// q2 - [] s22 [] s30 [] s02 [] s10 []
+	// q3 - [] s33 [] s01 [] s13 [] s21 []
+
+	// 2-bank friendly pattern (for cached stack) ???
+
 // void CM85_d4T_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
 .global CM85_d4T_AES_encrypt
 .type   CM85_d4T_AES_encrypt,%function
@@ -32,185 +50,87 @@ CM85_d4T_AES_encrypt:
 
 	veor q0, q0, q1
 
-	movs r2, #0
-	movs r5, #16
-	viwdup.u32 q4, r2, r5, #4
-	movs r2, #4
-	viwdup.u32 q5, r2, r5, #4
-	movs r2, #8
-	viwdup.u32 q6, r2, r5, #4
-	movs r2, #12
-	viwdup.u32 q7, r2, r5, #4
+	subs sp, #32 // scatter area
+	adr r4, AES_shiftrows_d4T_gather_perm // cant vector load by pc
+	vldrb.u32 q3, [r4, #0]
+	vldrb.u32 q4, [r4, #4]
+	vldrb.u32 q5, [r4, #8]
+	vldrb.u32 q6, [r4, #12]
+	mov r4, sp // can't do widening loads by high reg
 
-	// all register will be represented with the proper little endian register representation
-	// (state is reversed wrt transposed canonical state representation)
+	// offsets for odd rows, even rows are done inline
+	movs r5, #4
+	add r5, r5, #0x000C0000
+
+	// state and vector elements will be represented as big endian
+	// (as in transposed canonical state representation)
 
 	// global allocation
 	// r0 - rk
+	// r2 -
+	// r4 - sp (due to widening loads)
+	// r5 - [ 4 12 ] (int16)
 	// r12 - AES_d4Te
 	// r14 - hwloop
-	// q4 - [12 8 4 0]
-	// q5 - [0 12 8 4]
-	// q6 - [4 0 12 8]
-	// q7 - [8 4 0 12]
+	// q3 - [ 0 12 1 13 ] // shiftrows gather 1
+	// q4 - [ 10 7 11 6 ] // shiftrows gather 2
+	// q5 - [ 5 9 4 8 ]   // shiftrows gather 3
+	// q6 - [ 15 2 14 3 ] // shiftrows gather 4
+	// q7 -
 
-	// row  []  3     2     1     0  []  3     2     1     0  []  3     2     1     0  []  3     2     1     0  []
-	// column            3                        2                        1                        0
-	// q0 - [] s33 | s23 | s13 | s03 [] s32 | s22 | s12 | s02 [] s31 | s21 | s11 | s01 [] s30 | s20 | s10 | s00 []
-	//final []  s32T^s21T^s10T^s03T  []  s31T^s20T^s13T^s02T  []  s30T^s23T^s12T^s01T  []  s33T^s22T^s11T^s00T  []
+	// row  []  0     1     2     3  []  0     1     2     3  []  0     1     2     3  []  0     1     2     3  []
+	// column            0                        1                        2                        3
+	// q0 - [] s00 | s10 | s20 | s30 [] s01 | s11 | s21 | s31 [] s02 | s12 | s22 | s32 [] s03 | s13 | s23 | s33 []
+	//final []  s00T^s11T^s22T^s33T  []  s01T^s12T^s23T^s30T  []  s02T^s13T^s20T^s31T  []  s03T^s10T^s21T^s32T  []
+
 
 	subs r3, #1 // one less
 	dls lr, r3 // no skipping
 .balign 8
 1:
-	//can't gather same rows in each cycle due to bank conflict, d1T would require 3 mve rotations (6x shift)
-	//2+ 4*(4+2) // 26 insns
+	// prepare for gathers // shifts and offsets
 
-	vmov r4,r6, q0[2], q0[0]
-	vmov r5,r7, q0[3], q0[1]
+	vshllb.u8 q1, q0, #4
+	vorr.i32 q1, #0x00080000 // [ 0 8 0 8 0 8 0 8 ]
 
-	// r4 - s30 | s20 | s10 | s00
-	// r5 - s31 | s21 | s11 | s01
-	// r6 - s32 | s22 | s12 | s02
-	// r7 - s33 | s23 | s13 | s03
+	vshllt.u8 q0, q0, #4
+	vstrh.16 q1, [r4, #0]
 
-	// extract  s00, s12, s20, s32
+	vadd.i32 q0, q0, r5 // [ 4 12 4 12 4 12 4 12] // indices won't carry across 16 bit
+	vstrh.16 q0, [r4, #16]
 
-	ubfx r1, r4, #0, #8
-	ubfx r2, r6, #8, #8
-	ubfx r3, r4, #16, #8
-	ubfx r8, r6, #24, #8
+	// current allocation
+	// q1 - [] s00 | s20 [] s01 | s21 [] s02 | s22 [] s03 | s23 []
+	// q0 - [] s10 | s30 [] s11 | s31 [] s12 | s32 [] s13 | s33 []
 
-	// r1 - s00
-	// r2 - s12
-	// r3 - s20
-	// r4 - s30 |  -  | s10 |  -
-	// r5 - s31 | s21 | s11 | s01
-	// r6 -  -  | s22 |  -  | s02
-	// r7 - s33 | s23 | s13 | s03
-	// r8 - s32
-	// r9 -
-	// r10 -
-	// r11 -
+	// gathers are unpipelined, can't overlap with preceeding vstr as well
 
-	vmov q0[2], q0[0], r1, r3
-	vmov q0[3], q0[1], r2, r8
+	vldrh.u32 q0, [r4, q4, uxtw #1] // 3 cycles // q3 and q6 are 4 cycles here
+	vldrh.u32 q1, [r4, q3, uxtw #1] // 2 cycles
+	vldrh.u32 q7, [r4, q5, uxtw #1] // 2 cycles
 
-	// extract  s22, s30, s02, s10
+	vldrw.u32 q2, [r12, q0] // 2 cycles
+	vldrw.u32 q0, [r12, q1] // 2 cycles
+	vldrw.u32 q1, [r12, q7] // 2 cycles
 
-	ubfx r1, r6, #16, #8
-	ubfx r2, r4, #24, #8
-	ubfx r3, r6, #0, #8
-	ubfx r8, r4, #8, #8
-
-	// r1 - s22
-	// r2 - s30
-	// r3 - s02
-	// r4 -
-	// r5 - s31 | s21 | s11 | s01
-	// r6 -
-	// r7 - s33 | s23 | s13 | s03
-	// r8 - s10
-	// r9 -
-	// r10 -
-	// r11 -
-	// q0 - [] s32 [] s20 [] s12 [] s00 []
-	// q1 -
-	// q2 -
-	// q3 -
-
-	vmov q1[2], q1[0], r1, r3
-	vmov q1[3], q1[1], r2, r8
-
-	// extract s33, s01, s13, s21
-
-	ubfx r1, r7, #24, #8
-	ubfx r2, r5, #0, #8
-	ubfx r3, r7, #8, #8
-	ubfx r8, r5, #16, #8
-
-	// r1 - s33
-	// r2 - s01
-	// r3 - s13
-	// r4 -
-	// r5 - s31 |  -  | s11 |  -
-	// r6 -
-	// r7 -  -  | s23 |  -  | s03
-	// r8 - s21
-	// r9 -
-	// r10 -
-	// r11 -
-	// q0 - [] s32 [] s20 [] s12 [] s00 []
-	// q1 - [] s10 [] s02 [] s30 [] s22 []
-	// q2 -
-	// q3 -
-
-	vmov q2[2], q2[0], r1, r3
-	vmov q2[3], q2[1], r2, r8
-
-	// extract s11, s23, s31, s03
-
-	ubfx r1, r5, #8, #8
-	ubfx r2, r7, #16, #8
-	ubfx r3, r5, #24, #8
-	ubfx r8, r7, #0, #8
-
-	// r1 - s11
-	// r2 - s23
-	// r3 - s31
-	// r4 -
-	// r5 -
-	// r6 -
-	// r7 -
-	// r8 - s03
-	// r9 -
-	// r10 -
-	// r11 -
-	// q0 - [] s32 [] s20 [] s12 [] s00 []
-	// q1 - [] s10 [] s02 [] s30 [] s22 []
-	// q2 - [] s21 [] s13 [] s01 [] s33 []
-	// q3 -
-
-	vmov q3[2], q3[0], r1, r3
-	vmov q3[3], q3[1], r2, r8
-
-	// q0 - [] s32 [] s20 [] s12 [] s00 []
-	// q1 - [] s10 [] s02 [] s30 [] s22 []
-	// q2 - [] s21 [] s13 [] s01 [] s33 []
-	// q3 - [] s03 [] s31 [] s23 [] s11 []
-
-	//scale offsets to 128 bit
-	vshl.u32 q0, q0, #4
-	vshl.u32 q1, q1, #4
-	vshl.u32 q2, q2, #4
-	vshl.u32 q3, q3, #4
-
-	//prepare indexes to appropriate Tbox
-	vadd.i32 q0, q0, q4
-	vadd.i32 q1, q1, q6
-	vadd.i32 q2, q2, q7
-	vadd.i32 q3, q3, q5
-
-	vldrw.u32 q4, [r12, q0]
-	vldrw.u32 q0, [r12, q1]
-	vldrw.u32 q1, [r12, q2]
-	vldrw.u32 q2, [r12, q3]
-
-	veor q0, q0, q4
-	veor q0, q0, q1
 	veor q0, q0, q2
 
-	//apply rk
+	vldrh.u32 q2, [r4, q6, uxtw #1] // 2 cycles
+
+	veor q0, q0, q1
+
+	// apply rk
 	vldrw.u32 q1, [r0], #16
 	veor q0, q0, q1
 
-	//restore q4 due to bad scheduling (gathers cant overlap qd and qm)
-	movs r2, #0
-	vidup.u32 q4, r2, #4
+	vldrw.u32 q1, [r12, q2] // 2 cycles
+	veor q0, q0, q1
 
 	le lr, 1b
-	// 43 insns total
-2:
+
+	// 28 cycles
+
+
 	// final round
 
 	movw r14, #:lower16:AES_Te2
@@ -414,7 +334,7 @@ CM85_d4T_AES_encrypt:
 	nop
 
 	orr.w r9, r3, r0, lsl #8 // col 3 bottom part
-	ldr r6, [sp, #64] // load output pointer, ignore stack opt
+	ldr r6, [sp, #64+32] // load output pointer, ignore stack opt
 
 	ldm r12, {r0-r3}
 
@@ -442,6 +362,8 @@ CM85_d4T_AES_encrypt:
 	eors r3, r5
 
 	stmia r6!, {r0-r3}
+
+	add sp, #32 // scatter area
 
 	vpop {s16-s31}
 	pop {r2,r4-r11,pc}
