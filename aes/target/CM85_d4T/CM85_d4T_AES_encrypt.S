@@ -18,10 +18,10 @@
 
 .balign 16
 AES_shiftrows_d4T_gather_perm:
-.byte 0, 12, 1, 13
-.byte 10, 7, 11, 6
-.byte 5, 9, 4, 8
-.byte 15, 2, 14, 3
+	.byte 0, 12, 1, 13
+	.byte 10, 7, 11, 6
+	.byte 5, 9, 4, 8
+	.byte 15, 2, 14, 3
 
 	// in memory layout (16 bit elements)
 	// sp+0  - s00, s20, s01, s21, s02, s22, s03, s23 // even rows
@@ -35,11 +35,20 @@ AES_shiftrows_d4T_gather_perm:
 
 	// 2-bank friendly pattern (for cached stack) ???
 
+AES_shiftrows_d4T_final_gather_perm:
+	.byte 0, 5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12, 1, 6, 11
+
+	// in memory layout
+	//  s00, s10, s20, s30, s01, s11, s21, s31, s02, s12, s22, s32, s03, s13, s23, s33
+
+	// final layout after merge
+	// q0 - [] s00`| s11`| s22`| s33`[] s01`| s12`| s23`| s30`[] s02`| s13`| s20`| s31`[] s03`| s10`| s21`| s32`[]
+
 // void CM85_d4T_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
 .global CM85_d4T_AES_encrypt
 .type   CM85_d4T_AES_encrypt,%function
 CM85_d4T_AES_encrypt:
-	push {r2,r4-r11,lr} //stack out
+	push {r4-r11,lr} //stack out
 	vpush {s16-s31}
 
 	movw r12, #:lower16:AES_d4Te
@@ -67,7 +76,7 @@ CM85_d4T_AES_encrypt:
 
 	// global allocation
 	// r0 - rk
-	// r2 -
+	// r2 - out_p
 	// r4 - sp (due to widening loads)
 	// r5 - [ 4 12 ] (int16)
 	// r12 - AES_d4Te
@@ -89,7 +98,6 @@ CM85_d4T_AES_encrypt:
 .balign 8
 1:
 	// prepare for gathers // shifts and offsets
-
 	vshllb.u8 q1, q0, #4
 	vorr.i32 q1, #0x00080000 // [ 0 8 0 8 0 8 0 8 ]
 
@@ -133,239 +141,80 @@ CM85_d4T_AES_encrypt:
 
 	// final round
 
-	movw r14, #:lower16:AES_Te2
-	movt r14, #:upper16:AES_Te2
+	// sbox at
+	// bank1 - +1 +2
+	// bank2 - +6 +7
+	// bank3 - +8 +11
+	// bank4 - +12 +13
 
-	mov r12, r0
+	// r5 - [ 4 12 ] (int16) // bank 2 and 4
 
-	vmov r0,r2, q0[2], q0[0]
-	vmov r1,r3, q0[3], q0[1]
 
-	// copypaste from CM7_1T
-	//not optimizing now, need rounds first
+	// scalar can be inserted into loop or prologue
+	adds r6, r5, #2 // recycle r5, target actual sbox in bank2
+	subs r7, r6, #0x00040004
 
-	uxtb r6, r3, ror #16 // row 2 col 1
-	lsrs.w r7, r0, #24 // row 3 col 1 // cant .n
 
-	uxtb r5, r2, ror #8 // row 1 col 1
-	ldrb.w r8, [r14, r7, lsl #2]
+	adr r8, AES_shiftrows_d4T_final_gather_perm
+	vldrb.8 q2, [r8]
 
-	uxtb.w r4, r1 // row 0 col 1 // cant .n
-	ldrb.w r6, [r14, r6, lsl #2]
 
-	lsrs.w r7, r3, #24 // row 3 col 0 // cant .n
-	ldrb.w r5, [r14, r5, lsl #2]
 
-	//current alloctaion
-	// r0 - s00 | s10 | s20 |
-	// r1 -     | s11 | s21 | s31
-	// r2 - s02 |     | s22 | s32
-	// r3 - s03 | s13 |     |
-	// r4 - s01  //r0c1
-	// r5 - s12` //r1c1
-	// r6 - s23` //r2c1
-	// r7 - s33  //r3c0
-	// r8 - s30` //r3c1
-	// r9 -
-	// r10 -
-	// r11 -
+	// only 2 alternating banks are needed, but do 4
+	// r6 - [ 6 12 ] (int16) // bank 2 and 4
+	// r7 - [ 2 8 ] (int16) // bank 1 and 3
 
-	orr.w r11, r6, r8, lsl #8 // col 1 upper part
-	ldrb.w r9, [r14, r4, lsl #2]
+	// current allocation
+	// q0 - [] s00 | s10 | s20 | s30 [] s01 | s11 | s21 | s31 [] s02 | s12 | s22 | s32 [] s03 | s13 | s23 | s33 []
+	// q1 -
+	// q2 - [ 0 5 10 15 4 9 14 3 8 13 2 7 12 1 6 11 ] // shiftrows gather
+	// q7 -
 
-	uxtb r6, r2, ror #16 // row 2 col 0
-	ldrb.w r8, [r14, r7, lsl #2]
+	// final
+	// q0 - [] s00`| s11`| s22`| s33`[] s01`| s12`| s23`| s30`[] s02`| s13`| s20`| s31`[] s03`| s10`| s21`| s32`[]
 
-	//current alloctaion
-	// r0 - s00 | s10 | s20 |
-	// r1 -     | s11 | s21 | s31
-	// r2 - s02 |     |     | s32
-	// r3 - s03 | s13 |     |
-	// r4 -
-	// r5 - s12` //r1c1
-	// r6 - s22  //r2c0
-	// r7 -
-	// r8 - s33` //r3c0
-	// r9 - s01` //r0c1
-	// r10 -
-	// r11 - s23` | s30` //c1 upper
 
-	uxtb.w r7, r0 // row 0 col 0 // cant .n
-	orr.w r10, r9, r5, lsl #8 // col 1 bottom part
+	vstrb.8 q0, [r4, #0]
 
-	uxtb r4, r1, ror #8 // row 1 col 0
-	ldrb.w r6, [r14, r6, lsl #2]
+	// cant overlap into gather
 
-	//current alloctaion
-	// r0 -     | s10 | s20 |
-	// r1 -     |     | s21 | s31
-	// r2 - s02 |     |     | s32
-	// r3 - s03 | s13 |     |
-	// r4 - s11  //r1c0
-	// r5 -
-	// r6 - s22` //r2c0
-	// r7 - s00  //r0c0
-	// r8 - s33` //r3c0
-	// r9 -
-	// r10 - s01` | s12` //c1 bottom
-	// r11 - s23` | s30` //c1 upper
+	vldrb.u8 q0, [r4, q2]
 
-	uxtb r5, r0, ror #16 // row 2 col 2
-	ldrb.w r9, [r14, r7, lsl #2]
+	// prepare for sboxing
+	vshllt.u8 q1, q0, #4
+	vshllb.u8 q0, q0, #4
 
-	orr.w r8, r6, r8, lsl #8 // col 0 upper part
-	ldrb.w r4, [r14, r4, lsl #2]
+	vadd.i32 q0, q0, r6
+	vadd.i32 q1, q1, r7
 
-	//current alloctaion
-	// r0 -     | s10 |     |
-	// r1 -     |     | s21 | s31
-	// r2 - s02 |     |     | s32
-	// r3 - s03 | s13 |     |
-	// r4 - s11` //r1c0
-	// r5 - s20  //r2c2
-	// r6 -
-	// r7 -
-	// r8 - s22` | s33` //c0 upper
-	// r9 - s00` //r0c0
-	// r10 - s01` | s12` //c1 bottom
-	// r11 - s23` | s30` //c1 upper
+	// current allocation
+	// q0 - [] s00 | s22 [] s01 | s23 [] s02 | s20 [] s03 | s21 [] // even rows
+	// q1 - [] s11 | s33 [] s12 | s30 [] s13 | s31 [] s10 | s32 [] // odd rows
+	// q7 -
 
-	uxtb r6, r2 // row 0 col 2
-	lsrs r7, r1, #24 // row 3 col 2
+	vldrb.u16 q7, [r12, q0]
+	vldrb.u16 q0, [r12, q1]
 
-	lsrs r2, r2, #24 // row 3 col 3
-	ldrb.w r7, [r14, r7, lsl #2]
+	// current allocation
+	// q0 - [] s11`| s33`[] s12`| s30`[] s13`| s31`[] s10`| s32`[] // odd rows
+	// q1 -
+	// q7 - [] s00`| s22`[] s01`| s23`[] s02`| s20`[] s03`| s21`[] // even rows
 
-	//current alloctaion
-	// r0 -     | s10 |     |
-	// r1 -     |     | s21 |
-	// r2 - s32  //r3c3
-	// r3 - s03 | s13 |     |
-	// r4 - s11` //r1c0
-	// r5 - s20  //r2c2
-	// r6 - s02  //r0c2
-	// r7 - s31` //r3c2
-	// r8 - s22` | s33` //c0 upper
-	// r9 - s00` //r0c0
-	// r10 - s01` | s12` //c1 bottom
-	// r11 - s23` | s30` //c1 upper
+	vsli.16 q7, q0, #8 // insert odd rows
 
-	orr.w r9, r9, r4, lsl #8 // col 0 bottom part
-	ldrb.w r5, [r14, r5, lsl #2]
+	// apply rk
+	vldrw.u32 q1, [r0]
+	veor q7, q7, q1
 
-	uxtb r4, r3, ror #8 // row 1 col 2
-	ldrb.w r6, [r14, r6, lsl #2]
 
-	//current alloctaion
-	// r0 -     | s10 |     |
-	// r1 -     |     | s21 |
-	// r2 - s32  //r3c3
-	// r3 - s03 |     |     |
-	// r4 - s13  //r1c2
-	// r5 - s20` //r2c2
-	// r6 - s02` //r0c2
-	// r7 - s31` //r3c2
-	// r8 - s22` | s33` //c0 upper
-	// r9 - s00` | s11` //c0 bottom
-	// r10 - s01` | s12` //c1 bottom
-	// r11 - s23` | s30` //c1 upper
+	vstrb.8 q7, [r2]
 
-	uxtb r3, r3 // row 0 col 3
-	orr.w r7, r5, r7, lsl #8  // col 2 upper part
 
-	uxtb r1, r1, ror #16 // row 2 col 3
-	ldrb.w r4, [r14, r4, lsl #2]
 
-	//current alloctaion
-	// r0 -     | s10 |     |
-	// r1 - s21  //r2c3
-	// r2 - s32  //r3c3
-	// r3 - s03  //r0c3
-	// r4 - s13` //r1c2
-	// r5 -
-	// r6 - s02` //r0c2
-	// r7 - s20` | s31` //c2 upper
-	// r8 - s22` | s33` //c0 upper
-	// r9 - s00` | s11` //c0 bottom
-	// r10 - s01` | s12` //c1 bottom
-	// r11 - s23` | s30` //c1 upper
-
-	uxtb r0, r0, ror #8 // row 1 col 3
-	ldrb.w r2, [r14, r2, lsl #2]
-
-	orr.w r5, r9, r8, lsl #16 // col 0
-	ldrb.w r1, [r14, r1, lsl #2]
-
-	//current alloctaion
-	// r0 - s10  //r1c3
-	// r1 - s21` //r2c3
-	// r2 - s32` //r3c3
-	// r3 - s03  //r0c3
-	// r4 - s13` //r1c2
-	// r5 - col 0
-	// r6 - s02` //r0c2
-	// r7 - s20` | s31` //c2 upper
-	// r8 -
-	// r9 -
-	// r10 - s01` | s12` //c1 bottom
-	// r11 - s23` | s30` //c1 upper
-
-	orr.w r4, r6, r4, lsl #8 // c2 bottom
-	ldrb.w r0, [r14, r0, lsl #2]
-
-	orr.w r8, r1, r2, lsl #8 // col 3 upper part
-	ldrb.w r3, [r14, r3, lsl #2]
-
-	//current alloctaion
-	// r0 - s10` //r1c3
-	// r1 -
-	// r2 -
-	// r3 - s03` //r0c3
-	// r4 - s02` | s13` //c2 bottom
-	// r5 - col 0
-	// r6 -
-	// r7 - s20` | s31` //c2 upper
-	// r8 - s21` | s32` //c3 upper
-	// r9 -
-	// r10 - s01` | s12` //c1 bottom
-	// r11 - s23` | s30` //c1 upper
-
-	orr.w r7, r4, r7, lsl #16 // col 2
-	nop
-
-	orr.w r9, r3, r0, lsl #8 // col 3 bottom part
-	ldr r6, [sp, #64+32] // load output pointer, ignore stack opt
-
-	ldm r12, {r0-r3}
-
-	//current alloctaion
-	// r0 - rk[0]
-	// r1 - rk[1]
-	// r2 - rk[2]
-	// r3 - rk[3]
-	// r4 - unstacked
-	// r5 - col 0
-	// r6 - out p
-	// r7 - col 2
-	// r8 - s21` | s32` //c3 upper
-	// r9 - s03` | s10` //c3 bottom
-	// r10 - s01` | s12` //c1 bottom
-	// r11 - s23` | s30` //c1 upper
-
-	eors r0, r5
-	orr.w r5, r10, r11, lsl #16 // col 1
-
-	eors r1, r5
-	orr.w r5, r9, r8, lsl #16 // col 3
-
-	eors r2, r7
-	eors r3, r5
-
-	stmia r6!, {r0-r3}
 
 	add sp, #32 // scatter area
 
 	vpop {s16-s31}
-	pop {r2,r4-r11,pc}
+	pop {r4-r11,pc}
 
 #endif

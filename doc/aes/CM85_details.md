@@ -12,11 +12,12 @@ similarly to CM7, dtcm access pattern can be timed by DMA
 
 ### CM85_d4T
 
-usues diffused 4 T tables
+uses diffused 4 T tables
+
+fully resistant to bank timming attacks
+
 
 not optimized yet
-
-shiftrows by MVE is not very efficient
 
 ## perfomance
 
@@ -41,3 +42,4 @@ shiftrows by MVE is not very efficient
 |----------|--------------------|----------------------|-------|
 | `CM85_1T_AES128_keyschedule_enc` | 124 | 24 | uses Te2 table |
 | `CM85_1T_AES_encrypt` | 446 | 40 | uses Te2 table |
+| `CM85_d4T_AES_encrypt` |  |  | uses d4Te table, sensitive (partially processed) data visits stack |
