@@ -58,7 +58,7 @@ AES_shiftrows_d4T_final_gather_perm:
 .type   CM85_d4T_AES_encrypt,%function
 CM85_d4T_AES_encrypt:
 	subs r3, #1 // one less
-	strd r4,lr, [sp, #-72]! // possible to not stack those, but constants would get 48 byte larger (no gain in prologue)
+	strd r4,lr, [sp, #-72]! // possible to not stack those, but constants would get 48 byte larger (no gain in prologue/epilogue)
 
 	adr r4, AES_shiftrows_d4T_gather_perm // cant vector load by pc
 	vldrb.u8 q1, [r1] // in
