@@ -2,7 +2,6 @@
  * \file CM85_d4T_AES_encrypt.S
  * \brief
  *
- * not optimized yet
  *
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
@@ -50,7 +49,7 @@ AES_shiftrows_d4T_final_gather_perm:
 	//bank3 - 8 9 10 11
 	//bank4 - 12 13 14 15
 
-	// 2 banks (each pair access different bank)
+	// 2 banks (each pair still accesses different bank)
 	//bank1 - 0 1 2 3   8 9 10 11
 	//bank2 - 4 5 6 7   12 13 14 15
 
@@ -59,7 +58,7 @@ AES_shiftrows_d4T_final_gather_perm:
 .type   CM85_d4T_AES_encrypt,%function
 CM85_d4T_AES_encrypt:
 	subs r3, #1 // one less
-	strd r4,lr, [sp, #-72]!
+	strd r4,lr, [sp, #-72]! // possible to not stack those, but constants would get 48 byte larger (no gain in prologue)
 
 	adr r4, AES_shiftrows_d4T_gather_perm // cant vector load by pc
 	vldrb.u8 q1, [r1] // in
@@ -75,11 +74,11 @@ CM85_d4T_AES_encrypt:
 
 	//mov.n r10, r10
 	vldrb.u32 q3, [r4, #0]
-	vstrw.32 q5, [sp, #8+16+32]
+	vstrw.32 q5, [sp, #32+8+16]
 	vldrb.u32 q4, [r4, #4]
-	vstrw.32 q6, [sp, #8+32+32]
+	vstrw.32 q6, [sp, #32+8+32]
 	vldrb.u32 q5, [r4, #8]
-	vstrw.32 q7, [sp, #8+48+32]
+	vstrw.32 q7, [sp, #32+8+48]
 	vldrb.u32 q6, [r4, #12]
 
 	// state and vector elements will be represented with big endian representation
@@ -89,7 +88,7 @@ CM85_d4T_AES_encrypt:
 	// r0 - rk
 	// r1 -
 	// r2 - out_p
-	// r3 - [ 4 12 ] (int16)
+	// r3 - [ 4 12 ] (int16) ????
 	// r4 - pointer to shiftrows constants
 	// r12 - AES_d4Te
 	// r14 - hwloop
@@ -103,7 +102,6 @@ CM85_d4T_AES_encrypt:
 	// column            0                        1                        2                        3
 	// q0 - [] s00 | s10 | s20 | s30 [] s01 | s11 | s21 | s31 [] s02 | s12 | s22 | s32 [] s03 | s13 | s23 | s33 []
 	//final []  s00T^s11T^s22T^s33T  []  s01T^s12T^s23T^s30T  []  s02T^s13T^s20T^s31T  []  s03T^s10T^s21T^s32T  []
-
 
 .balign 8
 1:
@@ -138,23 +136,23 @@ CM85_d4T_AES_encrypt:
 	vldrw.u32 q0, [r12, q1] // 2 cycles
 	vldrw.u32 q1, [r12, q7] // 2 cycles
 
-mov.n r10, r10
+	//mov.n r10, r10
 	veor q0, q0, q2
 
 	vldrh.u32 q2, [sp, q6, uxtw #1] // 2 cycles
 
-mov.n r10, r10
+	//mov.n r10, r10
 	veor q0, q0, q1
 
 	// apply rk
-mov.n r10, r10
+	//mov.n r10, r10
 	vldrw.u32 q1, [r0], #16
 	veor q0, q0, q1
 
 
 	vldrw.u32 q1, [r12, q2] // 2 cycles
 
-//mov.n r10, r10 /// ????????? tripple issues with insn after loop
+	//mov.n r10, r10
 	veor q0, q0, q1
 
 	le lr, 1b
@@ -184,7 +182,7 @@ mov.n r10, r10
 	// q0 -
 	// q1 -
 	// q2 -
-	// q3:q6 - loop shiftrows, preserve for CTR mode
+	// q3:q6 - loop shiftrows, preserved in CTR mode
 	// q7 -
 
 	// scalar can be inserted into loop or prologue
@@ -207,21 +205,25 @@ mov.n r10, r10
 	// final
 	// q0 - [] s00`| s11`| s22`| s33`[] s01`| s12`| s23`| s30`[] s02`| s13`| s20`| s31`[] s03`| s10`| s21`| s32`[]
 
-//mov.n r10, r10
-	vstrb.8 q0, [sp, #0]
+	subs r1, r3, #0x00040004
+	vstrb.8 q0, [sp, #0] // cant overlap into gather
 
-// another vdup ?????
-
-	// cant overlap into gather
+	// another vdup ?????
 
 	vldrb.u8 q0, [sp, q2]
 
 	// prepare for sboxing
+	ldrd r4,lr, [sp, #32] // start unstacking
 	vshllt.u8 q1, q0, #4
-	vshllb.u8 q0, q0, #4
 
-	vadd.i32 q0, q0, r3
-	vadd.i32 q1, q1, r3
+	vldrw.32 q4, [sp, #32+8+0]
+	vorr q1, q1, q7
+
+	vldrw.32 q5, [sp, #32+8+16]
+
+	vshllb.u8 q0, q0, #4
+	vldrw.32 q6, [sp, #32+8+32]
+	vadd.i32 q0, q0, r1 // even out DTCM bank accesses // needs vorr if can't overlap with epilogue
 
 	// current allocation
 	// q0 - [] s00 | s22 [] s01 | s23 [] s02 | s20 [] s03 | s21 [] // even rows
@@ -229,27 +231,26 @@ mov.n r10, r10
 	// q2 -
 	// q7 -
 
-	vldrb.u16 q7, [r12, q0]
-	vldrb.u16 q0, [r12, q1]
+	vldrb.u16 q2, [r12, q1]
+	vldrb.u16 q1, [r12, q0]
 
 	// current allocation
-	// q0 - [] s11`| s33`[] s12`| s30`[] s13`| s31`[] s10`| s32`[] // odd rows
-	// q1 -
-	// q2 -
-	// q7 - [] s00`| s22`[] s01`| s23`[] s02`| s20`[] s03`| s21`[] // even rows
+	// q0 -
+	// q1 - [] s00`| s22`[] s01`| s23`[] s02`| s20`[] s03`| s21`[] // even rows
+	// q2 - [] s11`| s33`[] s12`| s30`[] s13`| s31`[] s10`| s32`[] // odd rows
+	// q7 -
 
-	vsli.16 q7, q0, #8 // insert odd rows
+	vldrw.32 q7, [sp, #32+8+48]
+
+	vsli.16 q1, q2, #8 // insert odd rows
 
 	// apply rk
-	vldrw.u32 q1, [r0]
-	veor q7, q7, q1
+	vldrw.u32 q0, [r0]
+	veor q1, q1, q0
 
-	add sp, #32 // scatter area
-	vstrb.8 q7, [r2]
+	vstrb.8 q1, [r2]
 
-	ldrd r4,lr, [sp], #8
-	vpop {s16-s31}
-
+	add sp, #32+8+64
 	bx lr
 
 #endif
