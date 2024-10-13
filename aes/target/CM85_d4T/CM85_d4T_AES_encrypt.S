@@ -73,13 +73,13 @@ CM85_d4T_AES_encrypt:
 	dls lr, r3 // no skipping
 
 	//mov.n r10, r10
-	vldrb.u32 q3, [r4, #0]
+	vldrb.u32 q4, [r4, #0]
 	vstrw.32 q5, [sp, #32+8+16]
-	vldrb.u32 q4, [r4, #4]
+	vldrb.u32 q5, [r4, #4]
 	vstrw.32 q6, [sp, #32+8+32]
-	vldrb.u32 q5, [r4, #8]
+	vldrb.u32 q6, [r4, #8]
 	vstrw.32 q7, [sp, #32+8+48]
-	vldrb.u32 q6, [r4, #12]
+	vldrb.u32 q7, [r4, #12]
 
 	// state and vector elements will be represented with big endian representation
 	// (as in transposed canonical state representation)
@@ -88,15 +88,14 @@ CM85_d4T_AES_encrypt:
 	// r0 - rk
 	// r1 -
 	// r2 - out_p
-	// r3 - [ 4 12 ] (int16) ????
+	// r3 - [ 4 12 ] (int16)
 	// r4 - pointer to shiftrows constants
 	// r12 - AES_d4Te
 	// r14 - hwloop
-	// q3 - [ 0 12 1 13 ] // shiftrows gather 1
-	// q4 - [ 10 7 11 6 ] // shiftrows gather 2
-	// q5 - [ 5 9 4 8 ]   // shiftrows gather 3
-	// q6 - [ 15 2 14 3 ] // shiftrows gather 4
-	// q7 -
+	// q4 - [ 0 12 1 13 ] // shiftrows gather 1
+	// q5 - [ 10 7 11 6 ] // shiftrows gather 2
+	// q6 - [ 5 9 4 8 ]   // shiftrows gather 3
+	// q7 - [ 15 2 14 3 ] // shiftrows gather 4
 
 	// row  []  0     1     2     3  []  0     1     2     3  []  0     1     2     3  []  0     1     2     3  []
 	// column            0                        1                        2                        3
@@ -128,18 +127,18 @@ CM85_d4T_AES_encrypt:
 
 	// gathers are unpipelined, can't overlap with preceeding vstr as well
 
-	vldrh.u32 q0, [sp, q4, uxtw #1] // 3 cycles // q3 and q6 are 4 cycles here
-	vldrh.u32 q1, [sp, q3, uxtw #1] // 2 cycles
-	vldrh.u32 q7, [sp, q5, uxtw #1] // 2 cycles
+	vldrh.u32 q0, [sp, q5, uxtw #1] // 3 cycles // q4 and q7 are 4 cycles here
+	vldrh.u32 q1, [sp, q4, uxtw #1] // 2 cycles
+	vldrh.u32 q3, [sp, q6, uxtw #1] // 2 cycles
 
 	vldrw.u32 q2, [r12, q0] // 2 cycles
 	vldrw.u32 q0, [r12, q1] // 2 cycles
-	vldrw.u32 q1, [r12, q7] // 2 cycles
+	vldrw.u32 q1, [r12, q3] // 2 cycles
 
 	//mov.n r10, r10
 	veor q0, q0, q2
 
-	vldrh.u32 q2, [sp, q6, uxtw #1] // 2 cycles
+	vldrh.u32 q2, [sp, q7, uxtw #1] // 2 cycles
 
 	//mov.n r10, r10
 	veor q0, q0, q1
@@ -148,7 +147,6 @@ CM85_d4T_AES_encrypt:
 	//mov.n r10, r10
 	vldrw.u32 q1, [r0], #16
 	veor q0, q0, q1
-
 
 	vldrw.u32 q1, [r12, q2] // 2 cycles
 
@@ -182,15 +180,15 @@ CM85_d4T_AES_encrypt:
 	// q0 -
 	// q1 -
 	// q2 -
-	// q3:q6 - loop shiftrows, preserved in CTR mode
-	// q7 -
+	// q3 -
+	// q4:q7 - loop shiftrows, preserved in CTR mode
 
 	// scalar can be inserted into loop or prologue
 	adds r3, r3, #2 // recycle r3, target actual sbox in bank2
 	vldrb.8 q2, [r4, #16] // reach into AES_shiftrows_d4T_final_gather_perm
 
 	// 1 vector instruction is free here
-	vdup.i32 q7, r3
+	vdup.i32 q3, r3
 
 	// current allocation
 	// r0 - rk
@@ -200,7 +198,7 @@ CM85_d4T_AES_encrypt:
 	// q0 - [] s00 | s10 | s20 | s30 [] s01 | s11 | s21 | s31 [] s02 | s12 | s22 | s32 [] s03 | s13 | s23 | s33 []
 	// q1 -
 	// q2 - [ 0 5 10 15 4 9 14 3 8 13 2 7 12 1 6 11 ] // shiftrows gather
-	// q7 - [ 6 12 6 12 6 12 6 12] (int16) // bank 2 and 4
+	// q3 - [ 6 12 6 12 6 12 6 12] (int16) // bank 2 and 4
 
 	// final
 	// q0 - [] s00`| s11`| s22`| s33`[] s01`| s12`| s23`| s30`[] s02`| s13`| s20`| s31`[] s03`| s10`| s21`| s32`[]
@@ -217,7 +215,7 @@ CM85_d4T_AES_encrypt:
 	vshllt.u8 q1, q0, #4
 
 	vldrw.32 q4, [sp, #32+8+0]
-	vorr q1, q1, q7
+	vorr q1, q1, q3
 
 	vldrw.32 q5, [sp, #32+8+16]
 
