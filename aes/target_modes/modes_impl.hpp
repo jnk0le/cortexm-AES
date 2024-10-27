@@ -109,6 +109,10 @@ namespace target
 				data_in_p += 4;
 			}
 		}
+
+		void encryptByExposedBase(const uint8_t* data_in, uint8_t* data_out) {
+			CipherContext<key_length, base_impl>::encrypt(data_in, data_out);
+		}
 	};
 
 	template<size_t key_length, template<size_t> class base_impl>
@@ -121,6 +125,10 @@ namespace target
 		{
 			//nonce should be placed right before expanded key
 			CM3_1T_AES_CTR32_enc(nonce, data_in, data_out, this->key_rounds, blocks_cnt);
+		}
+
+		void encryptByExposedBase(const uint8_t* data_in, uint8_t* data_out) {
+			CipherContext<key_length, base_impl>::encrypt(data_in, data_out);
 		}
 	};
 
@@ -147,6 +155,10 @@ namespace target
 				break;
 			}
 		}
+
+		void encryptByExposedBase(const uint8_t* data_in, uint8_t* data_out) {
+			CipherContext<key_length, base_impl>::encrypt(data_in, data_out);
+		}
 	};
 
 	template<size_t key_length, template<size_t> class base_impl>
@@ -159,6 +171,10 @@ namespace target
 		{
 			//nonce should be placed right before expanded key
 			CM7_1T_AES_CTR32_enc(nonce, data_in, data_out, this->key_rounds, blocks_cnt);
+		}
+
+		void encryptByExposedBase(const uint8_t* data_in, uint8_t* data_out) {
+			CipherContext<key_length, base_impl>::encrypt(data_in, data_out);
 		}
 	};
 
@@ -184,6 +200,10 @@ namespace target
 				CM7_1T_AES256_CTR32_enc_unrolled(nonce, data_in, data_out, blocks_cnt);
 				break;
 			}
+		}
+
+		void encryptByExposedBase(const uint8_t* data_in, uint8_t* data_out) {
+			CipherContext<key_length, base_impl>::encrypt(data_in, data_out);
 		}
 	};
 

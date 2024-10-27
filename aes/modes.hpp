@@ -20,7 +20,8 @@ namespace aes
 {
 namespace mode
 {
-	template<size_t key_length, template<size_t> class base_impl = aes::target::CM3_1T,
+	template<size_t key_length,
+			template<size_t> class base_impl = aes::target::CM3_1T,
 			template<size_t key_len, template<size_t> class base> class mode_impl = aes::mode::target::CBC_GENERIC>
 	class CBC_PKCS7 : private mode_impl<key_length, base_impl>
 	{
@@ -139,18 +140,11 @@ namespace mode
 		uint32_t iv[4];
 	};
 
-	namespace ctr // workaround
-	{
-		class Nonce
-		{
-		public:
-			uint32_t nonce[4];
-		};
-	}
-
 	//SP 800-38A compliant, 32 bit counter
-	template<size_t key_length, template<size_t> class base_impl = aes::target::CM3_1T, template<size_t key_len, template<size_t> class base> class mode_impl = aes::mode::target::CTR32_GENERIC>
-	class CTR32 : protected ctr::Nonce, private mode_impl<key_length, base_impl> // put the nonce before rk, to be compatible with current implementations
+	template<size_t key_length,
+			template<size_t> class base_impl = aes::target::CM3_1T,
+			template<size_t key_len, template<size_t> class base> class mode_impl = aes::mode::target::CTR32_GENERIC>
+	class CTR32
 	{
 	public:
 		CTR32() {}
@@ -170,12 +164,14 @@ namespace mode
 			this->nonce[3] = nonce3;
 		}
 
-		using mode_impl<key_length, base_impl>::setEncKey;
+		void setEncKey(const uint8_t* key) {
+			ctx.setEncKey(key);
+		}
 
 		void encrypt(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
 			uint32_t block_len = len >> 4; // div by 16
 
-			mode_impl<key_length, base_impl>::encrypt(data_in, data_out, this->nonce, block_len);
+			ctx.encrypt(data_in, data_out, this->nonce, block_len);
 
 			uint32_t bytes_remaining = len & 15;
 
@@ -184,7 +180,7 @@ namespace mode
 				uint8_t tmp[16]; // uninitialized part will go through encryption but won't be sent out.
 
 				memcpy(tmp, &data_in[len - bytes_remaining], bytes_remaining);
-				mode_impl<key_length, base_impl>::encrypt(tmp, tmp, this->nonce, 1); // finish with same function
+				ctx.encrypt(tmp, tmp, this->nonce, 1); // finish with same function
 				memcpy(&data_out[len - bytes_remaining], tmp, bytes_remaining);
 			}
 		}
@@ -194,7 +190,8 @@ namespace mode
 		}
 
 	private:
-		//uint32_t nonce[4];
+		uint32_t nonce[4]; // nonce must be placed before expanded key
+		mode_impl<key_length, base_impl> ctx;
 	};
 
 }
