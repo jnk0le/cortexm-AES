@@ -8,7 +8,7 @@
 #endif
 
 	// functions extracted from bearssl, should be constant time with ct multipliers
-	// there is a bit of redundancy still
+	// there will be a bit of redundancy
 
 	void br_ghash_ctmul32(void *y, const void *h, const void *data, size_t len);
 	void br_ghash_ctmul(void *y, const void *h, const void *data, size_t len);

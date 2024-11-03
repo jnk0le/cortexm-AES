@@ -14,19 +14,22 @@ Includes also have to start from root (e.g. `#include <aes/cipher.hpp>`)
 No cmake yet.
 
 ## notes
-- Do not use ECB cipher mode for any serious encryption.
+
+- Do not use ECB cipher mode for any serious encryption. It's provided for building proper modes.
 - Do not blindly trust in timming constantness of LUT based ciphers since it depends on many factors that are 
 unknown or just implementation defined like section placement or pipeline suprises (you need to verify it, especially where is `.data` 
 section).
 - LUT tables have to be placed in deterministic memory section, usally TCMs and non-waitstated SRAMs (by default it lands in .data section)
 - FLASH memory is unsafe even on simplest cortex m0(+) as there might be a prefetcher with a few entry cache (like stm32f0/l0)
 - None of the currently available implementations protects against power/EMI analysis or glitch attacks.
-- do not use cortex-m3 and cortex-m4 implementations on cortex-m7 since it is slower and will introduce timming leaks.
+- do not use cortex-m3 and cortex-m4 implementations on cortex-m7/m85 since it is slower and will introduce timming leaks.
 - Unrolled ciphers might perform slower than looped versions due to (usually LRU) cache pressure and flash waitstates. (like STM32F4 with 1K ART cache and up to 8WS)
 - input/output buffers might have to be word aligned due to use of ldm,stm,ldrd and strd instructions.
 - for optimization gimmicks refer to [pipeline cycle test repo](https://github.com/jnk0le/random/tree/master/pipeline%20cycle%20test)
-- included unit tests don't cover timming leaks (performance difference on different runs may not be a data dependent ones)  
+- included unit tests don't cover timming leaks (performance difference on different runs may not be a data dependent ones,
+there are special tools like dudect for that)
 - asm functions (and CM*.h headers) can be extracted and used as C only code, but that may require extra boilerplate code (structures etc.)
+- C++ API doesn't use exceptions nor dynamic memory allocation
 
 ## cryptoanalysis 
 
