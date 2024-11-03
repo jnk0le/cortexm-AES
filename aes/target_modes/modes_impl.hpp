@@ -16,12 +16,10 @@
 #include "CM7_modes.h"
 #include "../cipher.hpp"
 
-namespace aes
-{
-namespace mode
-{
-namespace target
-{
+namespace aes {
+namespace mode {
+namespace target {
+
 	template<size_t key_length, template<size_t> class base_impl>
 	class CBC_GENERIC : private CipherContext<key_length, base_impl>
 	{
