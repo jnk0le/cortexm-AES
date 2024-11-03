@@ -331,7 +331,7 @@ namespace mode {
 		 *
 		 *	It's not recommended to use fully random sequence numbers (in TLS 1.2) due to birthday paradox.
 		 *	Instead you can use a counter (initialized with random data). Endianess doesn't matter
-		 *	(as per the TLS 1.2) as long as it's kept consistent with the sequence fields in transmitted packets.
+		 *	(as per the TLS 1.2) as long as it's kept consistent with the sequence fields in transmitted records.
 		 *
 		 * \param seq sequence to be written into nonce, endianess is not swapped
 		 */
