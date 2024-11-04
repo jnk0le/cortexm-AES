@@ -101,7 +101,7 @@ namespace target {
 
 				tmp_ctr++;
 
-				nonce_p[3] = __builtin_bswap32(tmp_ctr); // SP 800-38A compliant format
+				nonce_p[3] = __builtin_bswap32(tmp_ctr); // make big endian
 
 				data_out_p += 4;
 				data_in_p += 4;

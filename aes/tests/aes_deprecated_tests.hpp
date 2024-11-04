@@ -12,4 +12,7 @@ void aes_ctr_nist_test(void); // tests against example nist vectors
 void aes_cbc_perf_test(void);
 void aes_ctr_perf_test(void);
 
+void aes_gcm_test(void);
+void aes_gcm_perf_test(void);
+
 #endif

@@ -265,7 +265,7 @@ namespace mode {
 
 			if constexpr(code_compact_mode) {
 				ctr_ctx.setNonce(0, 0, 0, 0);
-				ctr_ctx.encrypt(g_ctx.H, g_ctx.H, 1);
+				ctr_ctx.encrypt(g_ctx.H, g_ctx.H, 16);
 			} else {
 				ctr_ctx.encryptByExposedBase(g_ctx.H, g_ctx.H);
 			}
@@ -368,15 +368,15 @@ namespace mode {
 			uint32_t block_len = len >> 4; // div by 16
 			uint32_t bytes_remaining = len & 15;
 
-			len_A += len;
+			len_A += len*8; // counting bits
 
-			g_ctx.gmulH(partial_tag_cache, aad_in, len);
+			g_ctx.gmulH(partial_tag_cache, aad_in, block_len);
 
 			if(bytes_remaining) {
 				uint8_t tmp[16];
 
 				memcpy(tmp, &aad_in[len - bytes_remaining], bytes_remaining);
-				memset(&tmp[15 - bytes_remaining], 0, bytes_remaining);
+				memset(&tmp[16 - bytes_remaining], 0, bytes_remaining);
 				g_ctx.gmulH(partial_tag_cache, aad_in, 1);
 			}
 		}
@@ -391,10 +391,11 @@ namespace mode {
 		 * \param len length in bytes of data to encrypt
 		 */
 		void encryptAppend(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
-			len_C += len;
+			len_C += len*8;
 
 			ctr_ctx.encrypt(data_in, data_out, len);
 			aadAppend(data_out, len);
+			len_A -= len*8; // unsum from AAD length // aad append needs split
 		}
 
 		/*!
@@ -406,10 +407,10 @@ namespace mode {
 			*reinterpret_cast<uint64_t*>(&partial_tag_cache[0]) ^= aux::byteswap(len_A);
 			*reinterpret_cast<uint64_t*>(&partial_tag_cache[8]) ^= aux::byteswap(len_C);
 
-			aadAppend(partial_tag_cache, 16);
+			g_ctx.gmulH(partial_tag_cache, partial_tag_cache, 1);
 
 			// handle "counter 0" aka J0 aka HF
-			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)1)); // after encryption ctr will be set to "counter 1"
+			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)1)); // after J0 encryption ctr will be set to "counter 1"
 
 			if constexpr(code_compact_mode) {
 				memset(tag, 0, 16);
@@ -458,10 +459,10 @@ namespace mode {
 			*reinterpret_cast<uint64_t*>(&partial_tag_cache[0]) ^= aux::byteswap(len_A);
 			*reinterpret_cast<uint64_t*>(&partial_tag_cache[8]) ^= aux::byteswap(len_C);
 
-			aadAppend(partial_tag_cache, 16);
+			g_ctx.gmulH(partial_tag_cache, partial_tag_cache, 1);
 
 			// handle "counter 0" aka J0 aka HF
-			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)1)); // after encryption ctr will be set to "counter 1"
+			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)1)); // after J0 encryption ctr will be set to "counter 1"
 
 			uint8_t tmp[16];
 
@@ -510,11 +511,10 @@ namespace mode {
 	private:
 		uint8_t partial_tag_cache[16];
 
-		// those could be actually 32bit
 		uint64_t len_A;
 		uint64_t len_C;
 
-		CTR32<key_length, base_impl, ctr_mode_impl, false> ctr_ctx;
+		CTR32<key_length, base_impl, ctr_mode_impl, code_compact_mode> ctr_ctx;
 		ghash_impl g_ctx;
 	};
 

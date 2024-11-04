@@ -17,7 +17,7 @@ namespace version
 
 	constexpr int major = 0;
 	constexpr int minor = 40;
-	constexpr int patch = 0;
+	constexpr int patch = 1;
 }
 }
 
