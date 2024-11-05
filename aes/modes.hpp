@@ -211,12 +211,7 @@ namespace mode {
 				uint8_t tmp[16]; // uninitialized part will go through encryption but won't be sent out.
 
 				memcpy(tmp, &data_in[len - bytes_remaining], bytes_remaining);
-
-				if constexpr(code_compact_mode)
-					ctx.encrypt(tmp, tmp, this->nonce, 1); // finish with same function
-				else
-					ctx.encryptByExposedBase(tmp, tmp);
-
+				ctx.encrypt(tmp, tmp, this->nonce, 1); // finish with same function
 				memcpy(&data_out[len - bytes_remaining], tmp, bytes_remaining);
 			}
 		}
@@ -261,7 +256,7 @@ namespace mode {
 		void setEncKeyAndH(const uint8_t* key) {
 			ctr_ctx.setEncKey(key);
 
-			memset(g_ctx.H, 0, 16);
+			memset(g_ctx.H, 0xaa, 16);
 
 			if constexpr(code_compact_mode) {
 				ctr_ctx.setNonce(0, 0, 0, 0);
@@ -271,7 +266,7 @@ namespace mode {
 			}
 
 			// prepare for first encryption
-			memset(partial_tag_cache, 0, 16);
+			memset(partial_tag_cache, 0x0, 16);
 
 			len_A = 0;
 			len_C = 0;
@@ -416,7 +411,7 @@ namespace mode {
 				memset(tag, 0, 16);
 				ctr_ctx.encrypt(tag, tag, 16);
 			} else {
-				ctr_ctx.encryptByExposedBase(ctr_ctx.getNoncePtr(), tag);
+				ctr_ctx.encryptByExposedBase((uint8_t*)ctr_ctx.getNoncePtr(), tag);
 				ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)2));
 			}
 
@@ -470,7 +465,7 @@ namespace mode {
 				memset(tmp, 0, 16);
 				ctr_ctx.encrypt(tmp, tmp, 16);
 			} else {
-				ctr_ctx.encryptByExposedBase(ctr_ctx.getNoncePtr(), tmp);
+				ctr_ctx.encryptByExposedBase((uint8_t*)ctr_ctx.getNoncePtr(), tmp);
 			}
 
 			// gcm allows tags with 1 byte granularity at upper end

@@ -598,7 +598,7 @@ uint8_t gcm_expected_tag[16] = {
 uint8_t gcm_tmp[64];
 uint8_t gcm_tmp2[16];
 
-aes::mode::GCM<128, aes::target::CM85_1T, aes::mode::target::CTR32_GENERIC, aes::mode::target::GCM_GHASH_GENERIC_BEAR_CT> tgcm128;
+aes::mode::GCM<128, aes::target::CM85_1T, aes::mode::target::CTR32_GENERIC, aes::mode::target::GCM_GHASH_GENERIC_BEAR_CT, false> tgcm128;
 
 void aes_gcm_test(void)
 {
@@ -606,6 +606,7 @@ void aes_gcm_test(void)
 	tgcm128.setIv(gcm_iv, 12);
 
 	tgcm128.aadAppend(gcm_aad, sizeof(gcm_aad));
+
 	tgcm128.encryptAppend(gcm_expected_plaintext, gcm_tmp, sizeof(gcm_expected_plaintext));
 
 	tgcm128.finalizeTagLast(gcm_tmp2);
@@ -621,6 +622,7 @@ void aes_gcm_test(void)
 	else {
 		printf("gcm tag ok\n");
 	}
+
 
 }
 

@@ -86,18 +86,22 @@ namespace target {
 			uint32_t* data_out_p = (uint32_t*)data_out;
 			uint32_t* nonce_p = (uint32_t*)nonce;
 
+			// buffer for intermediate encryption output
+			// as to be compatible with assembly implementations
+			uint32_t tmp[16];
+
 			uint32_t tmp_ctr = nonce_p[3];
 
 			tmp_ctr = __builtin_bswap32(tmp_ctr); // initially swap to little endian format
 
 			for(uint32_t i = 0; i<blocks_cnt; i++)
 			{
-				CipherContext<key_length, base_impl>::encrypt((uint8_t*)nonce_p, (uint8_t*)data_out_p);
+				CipherContext<key_length, base_impl>::encrypt((uint8_t*)nonce_p, (uint8_t*)tmp);
 
-				data_out_p[0] ^= data_in_p[0];
-				data_out_p[1] ^= data_in_p[1];
-				data_out_p[2] ^= data_in_p[2];
-				data_out_p[3] ^= data_in_p[3];
+				data_out_p[0] = tmp[0] ^ data_in_p[0];
+				data_out_p[1] = tmp[1] ^ data_in_p[1];
+				data_out_p[2] = tmp[2] ^ data_in_p[2];
+				data_out_p[3] = tmp[3] ^ data_in_p[3];
 
 				tmp_ctr++;
 
