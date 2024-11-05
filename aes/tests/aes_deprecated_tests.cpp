@@ -598,7 +598,7 @@ uint8_t gcm_expected_tag[16] = {
 uint8_t gcm_tmp[64];
 uint8_t gcm_tmp2[16];
 
-aes::mode::GCM<128, aes::target::CM85_1T, aes::mode::target::CTR32_GENERIC, aes::mode::target::GCM_GHASH_GENERIC_BEAR_CT, false> tgcm128;
+aes::mode::GCM<128, aes::target::CM85_1T, aes::mode::target::CTR32_GENERIC, aes::mode::target::GCM_GHASH_GENERIC_BEAR_CT, true> tgcm128;
 
 void aes_gcm_test(void)
 {

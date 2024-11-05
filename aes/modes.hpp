@@ -256,7 +256,7 @@ namespace mode {
 		void setEncKeyAndH(const uint8_t* key) {
 			ctr_ctx.setEncKey(key);
 
-			memset(g_ctx.H, 0xaa, 16);
+			memset(g_ctx.H, 0, 16);
 
 			if constexpr(code_compact_mode) {
 				ctr_ctx.setNonce(0, 0, 0, 0);
@@ -266,7 +266,7 @@ namespace mode {
 			}
 
 			// prepare for first encryption
-			memset(partial_tag_cache, 0x0, 16);
+			memset(partial_tag_cache, 0, 16);
 
 			len_A = 0;
 			len_C = 0;
