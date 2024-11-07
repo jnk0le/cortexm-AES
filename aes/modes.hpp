@@ -371,8 +371,8 @@ namespace mode {
 				uint8_t tmp[16];
 
 				memcpy(tmp, &aad_in[len - bytes_remaining], bytes_remaining);
-				memset(&tmp[16 - bytes_remaining], 0, bytes_remaining);
-				g_ctx.gmulH(partial_tag_cache, aad_in, 1);
+				memset(&tmp[bytes_remaining], 0, (16-bytes_remaining));
+				g_ctx.gmulH(partial_tag_cache, tmp, 1);
 			}
 		}
 
@@ -399,26 +399,27 @@ namespace mode {
 		 * \param[out] tag pointer to write the tag
 		 */
 		void finalizeTagLast(uint8_t* tag) {
-			*reinterpret_cast<uint64_t*>(&partial_tag_cache[0]) ^= aux::byteswap(len_A);
-			*reinterpret_cast<uint64_t*>(&partial_tag_cache[8]) ^= aux::byteswap(len_C);
+			uint8_t lenAC[16];
 
-			g_ctx.gmulH(partial_tag_cache, partial_tag_cache, 1);
+			*reinterpret_cast<uint64_t*>(&lenAC[0]) = aux::byteswap(len_A);
+			*reinterpret_cast<uint64_t*>(&lenAC[8]) = aux::byteswap(len_C);
 
-			// handle "counter 0" aka J0 aka HF
+			g_ctx.gmulH(lenAC, partial_tag_cache, 1); // need non xoring gmul ??
+
+			// handle "counter 0" aka J0 aka HF, recycle partial_tag_cache for output
 			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)1)); // after J0 encryption ctr will be set to "counter 1"
 
 			if constexpr(code_compact_mode) {
-				memset(tag, 0, 16);
-				ctr_ctx.encrypt(tag, tag, 16);
+				memset(partial_tag_cache, 0, 16);
+				ctr_ctx.encrypt(partial_tag_cache, partial_tag_cache, 16);
 			} else {
-				ctr_ctx.encryptByExposedBase((uint8_t*)ctr_ctx.getNoncePtr(), tag);
-				ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)2));
+				ctr_ctx.encryptByExposedBase((uint8_t*)ctr_ctx.getNoncePtr(), partial_tag_cache);
 			}
 
-			*reinterpret_cast<uint32_t*>(&tag[0]) ^= *reinterpret_cast<uint32_t*>(&partial_tag_cache[0]);
-			*reinterpret_cast<uint32_t*>(&tag[4]) ^= *reinterpret_cast<uint32_t*>(&partial_tag_cache[4]);
-			*reinterpret_cast<uint32_t*>(&tag[8]) ^= *reinterpret_cast<uint32_t*>(&partial_tag_cache[8]);
-			*reinterpret_cast<uint32_t*>(&tag[12]) ^= *reinterpret_cast<uint32_t*>(&partial_tag_cache[12]);
+			*reinterpret_cast<uint32_t*>(&tag[0]) = *reinterpret_cast<uint32_t*>(&partial_tag_cache[0]) ^ *reinterpret_cast<uint32_t*>(&lenAC[0]);
+			*reinterpret_cast<uint32_t*>(&tag[4]) = *reinterpret_cast<uint32_t*>(&partial_tag_cache[4]) ^ *reinterpret_cast<uint32_t*>(&lenAC[4]);
+			*reinterpret_cast<uint32_t*>(&tag[8]) = *reinterpret_cast<uint32_t*>(&partial_tag_cache[8]) ^ *reinterpret_cast<uint32_t*>(&lenAC[8]);
+			*reinterpret_cast<uint32_t*>(&tag[12]) = *reinterpret_cast<uint32_t*>(&partial_tag_cache[12]) ^ *reinterpret_cast<uint32_t*>(&lenAC[12]);
 		}
 
 		/*!
@@ -451,30 +452,30 @@ namespace mode {
 		 * \param len length of the tag to generate , allows non standard lengths
 		 */
 		void finalizeTagLast(uint8_t* tag, uint32_t len) {
-			*reinterpret_cast<uint64_t*>(&partial_tag_cache[0]) ^= aux::byteswap(len_A);
-			*reinterpret_cast<uint64_t*>(&partial_tag_cache[8]) ^= aux::byteswap(len_C);
+			uint8_t lenAC[16];
 
-			g_ctx.gmulH(partial_tag_cache, partial_tag_cache, 1);
+			*reinterpret_cast<uint64_t*>(&lenAC[0]) = aux::byteswap(len_A);
+			*reinterpret_cast<uint64_t*>(&lenAC[8]) = aux::byteswap(len_C);
 
-			// handle "counter 0" aka J0 aka HF
+			g_ctx.gmulH(lenAC, partial_tag_cache, 1); // need non xoring gmul ??
+
+			// handle "counter 0" aka J0 aka HF, recycle partial_tag_cache for output
 			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)1)); // after J0 encryption ctr will be set to "counter 1"
 
-			uint8_t tmp[16];
-
 			if constexpr(code_compact_mode) {
-				memset(tmp, 0, 16);
-				ctr_ctx.encrypt(tmp, tmp, 16);
+				memset(partial_tag_cache, 0, 16);
+				ctr_ctx.encrypt(partial_tag_cache, partial_tag_cache, 16);
 			} else {
-				ctr_ctx.encryptByExposedBase((uint8_t*)ctr_ctx.getNoncePtr(), tmp);
+				ctr_ctx.encryptByExposedBase((uint8_t*)ctr_ctx.getNoncePtr(), partial_tag_cache);
 			}
 
 			// gcm allows tags with 1 byte granularity at upper end
-			*reinterpret_cast<uint32_t*>(&tmp[0]) ^= *reinterpret_cast<uint32_t*>(&partial_tag_cache[0]);
-			*reinterpret_cast<uint32_t*>(&tmp[4]) ^= *reinterpret_cast<uint32_t*>(&partial_tag_cache[4]);
-			*reinterpret_cast<uint32_t*>(&tmp[8]) ^= *reinterpret_cast<uint32_t*>(&partial_tag_cache[8]);
-			*reinterpret_cast<uint32_t*>(&tmp[12]) ^= *reinterpret_cast<uint32_t*>(&partial_tag_cache[12]);
+			*reinterpret_cast<uint32_t*>(&partial_tag_cache[0]) ^= *reinterpret_cast<uint32_t*>(&lenAC[0]);
+			*reinterpret_cast<uint32_t*>(&partial_tag_cache[4]) ^= *reinterpret_cast<uint32_t*>(&lenAC[4]);
+			*reinterpret_cast<uint32_t*>(&partial_tag_cache[8]) ^= *reinterpret_cast<uint32_t*>(&lenAC[8]);
+			*reinterpret_cast<uint32_t*>(&partial_tag_cache[12]) ^= *reinterpret_cast<uint32_t*>(&lenAC[12]);
 
-			memcpy(tag, tmp, len); // output tag
+			memcpy(tag, partial_tag_cache, len); // output tag
 		}
 
 		/*!

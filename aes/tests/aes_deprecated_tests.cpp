@@ -623,7 +623,6 @@ void aes_gcm_test(void)
 		printf("gcm tag ok\n");
 	}
 
-
 }
 
 
