@@ -609,7 +609,7 @@ void aes_gcm_test(void)
 
 	tgcm128.encryptAppend(gcm_expected_plaintext, gcm_tmp, sizeof(gcm_expected_plaintext));
 
-	tgcm128.finalizeTagLast(gcm_tmp2);
+	tgcm128.finalizeTag(gcm_tmp2);
 
 	if(memcmp(gcm_expected_ciphertext, gcm_tmp, sizeof(gcm_expected_ciphertext)) != 0)
 		printf("gcm enc incorrect\n");
@@ -623,6 +623,24 @@ void aes_gcm_test(void)
 		printf("gcm tag ok\n");
 	}
 
+	tgcm128.aadAppend(gcm_aad, sizeof(gcm_aad));
+
+	tgcm128.decryptAppend(gcm_expected_ciphertext, gcm_tmp, sizeof(gcm_expected_ciphertext));
+
+	bool tagcheck = tgcm128.verifyTag(gcm_expected_tag);
+
+
+	if(memcmp(gcm_expected_plaintext, gcm_tmp, sizeof(gcm_expected_plaintext)) != 0)
+		printf("gcm dec incorrect\n");
+	else {
+		printf("gcm dec ok\n");
+	}
+
+	if(tagcheck) {
+		printf("gcm tag verify ok\n");
+	} else {
+		printf("gcm tag verify failed\n");
+	}
 }
 
 

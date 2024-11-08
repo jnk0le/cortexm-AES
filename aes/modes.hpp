@@ -377,7 +377,7 @@ namespace mode {
 		}
 
 		/*!
-		 * \brief encrypts the plaintext and hashes
+		 * \brief encrypts the plaintext and hashes in for authentication
 		 *
 		 * allows streaming type of operation, all but last block must be in multiplies of 16
 		 *
@@ -387,11 +387,31 @@ namespace mode {
 		 */
 		void encryptAppend(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
 			len_C += len*8;
-
 			ctr_ctx.encrypt(data_in, data_out, len);
+
 			aadAppend(data_out, len);
 			len_A -= len*8; // unsum from AAD length // aad append needs split
 		}
+
+		/*!
+		 * \brief decrypts the ciphertext and hashes in for authentication
+		 *
+		 * allows streaming type of operation, all but last block must be in multiplies of 16
+		 *
+		 * \warning the tag must be verified before decrypted data is consumed
+		 *
+		 * \param[in] data_in ciphertext to decrypt
+		 * \param[out] data_out decrypted plaintext
+		 * \param len length in bytes of data to decrypt
+		 */
+		void decryptAppend(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
+			aadAppend(data_out, len);
+			len_A -= len*8; // unsum from AAD length // aad append needs split
+
+			len_C += len*8;
+			ctr_ctx.encrypt(data_in, data_out, len);
+		}
+
 
 		/*!
 		 * \brief generates GCM tag
@@ -500,9 +520,111 @@ namespace mode {
 			memset(partial_tag_cache, 0, 16);
 		}
 
+		/*!
+		 * \brief verifies provided tag against internal state
+		 *
+		 *
+		 * \param[in] tag to verify
+		 * \return true if tag was validated correctly
+		 */
+		bool verifyTagLast(uint8_t* tag) {
+			uint8_t internal_tag[16];
 
-		//decrypt and verif ????????
+			finalizeTagLast(internal_tag);
 
+			uint32_t* internal_tag32 = reinterpret_cast<uint32_t*>(internal_tag);
+			uint32_t* tag32 = reinterpret_cast<uint32_t*>(tag);
+
+			uint32_t tag_diff = internal_tag32[0] ^ tag32[0];
+			tag_diff |= internal_tag32[1] ^ tag32[1];
+			tag_diff |= internal_tag32[2] ^ tag32[2];
+			tag_diff |= internal_tag32[3] ^ tag32[3];
+
+			if(tag_diff != 0)
+				return false;
+			else
+				return true;
+		}
+
+		/*!
+		 * \brief verifies provided tag and prepares for new encryption
+		 *
+		 *
+		 * \param[in] tag to verify
+		 * \return true if tag was validated correctly
+		 */
+		bool verifyTag(uint8_t* tag) {
+			bool ret = verifyTagLast(tag);
+
+			// prepare for new encryptions
+			len_A = 0;
+			len_C = 0;
+
+			if constexpr(!code_compact_mode) {
+				ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)2)); // non compact doesn't increment ctr
+			}
+
+			memset(partial_tag_cache, 0, 16);
+
+			return ret;
+		}
+
+
+		/*!
+		 * \brief verifies provided tag against internal state
+		 *
+		 *
+		 * \param[in] tag to verify
+		 * \param len tag length
+		 * \return true if tag was validated correctly
+		 */
+		bool verifyTagLast(uint8_t* tag, uint32_t len) {
+			uint8_t internal_tag[16];
+
+			finalizeTagLast(internal_tag);
+			memset(&internal_tag[len], 0, (16-len));
+
+			uint8_t external_tag[16];
+			memcpy(external_tag, tag, len);
+			memset(external_tag, 0, (16-len));
+
+			uint32_t* internal_tag32 = reinterpret_cast<uint32_t*>(internal_tag);
+			uint32_t* external_tag32 = reinterpret_cast<uint32_t*>(external_tag);
+
+			uint32_t tag_diff = internal_tag32[0] ^ external_tag32[0];
+			tag_diff |= internal_tag32[1] ^ external_tag32[1];
+			tag_diff |= internal_tag32[2] ^ external_tag32[2];
+			tag_diff |= internal_tag32[3] ^ external_tag32[3];
+
+			if(tag_diff != 0)
+				return false;
+			else
+				return true;
+		}
+
+		/*!
+		 * \brief verifies provided tag and prepares for new encryption
+		 *
+		 *
+		 * \param[in] tag to verify
+		 * \param len tag length
+		 * \return true if tag was validated correctly
+		 */
+		bool verifyTag(uint8_t* tag, uint32_t len) {
+			bool ret = verifyTagLast(tag, len);
+
+			// prepare for new encryptions
+			len_A = 0;
+			len_C = 0;
+
+			if constexpr(!code_compact_mode) {
+				ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)2)); // non compact doesn't increment ctr
+			}
+
+			memset(partial_tag_cache, 0, 16);
+
+			return ret;
+		}
 
 	private:
 		uint8_t partial_tag_cache[16];
