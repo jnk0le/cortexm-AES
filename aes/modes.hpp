@@ -436,10 +436,14 @@ namespace mode {
 				ctr_ctx.encryptByExposedBase((uint8_t*)ctr_ctx.getNoncePtr(), partial_tag_cache);
 			}
 
-			*reinterpret_cast<uint32_t*>(&tag[0]) = *reinterpret_cast<uint32_t*>(&partial_tag_cache[0]) ^ *reinterpret_cast<uint32_t*>(&lenAC[0]);
-			*reinterpret_cast<uint32_t*>(&tag[4]) = *reinterpret_cast<uint32_t*>(&partial_tag_cache[4]) ^ *reinterpret_cast<uint32_t*>(&lenAC[4]);
-			*reinterpret_cast<uint32_t*>(&tag[8]) = *reinterpret_cast<uint32_t*>(&partial_tag_cache[8]) ^ *reinterpret_cast<uint32_t*>(&lenAC[8]);
-			*reinterpret_cast<uint32_t*>(&tag[12]) = *reinterpret_cast<uint32_t*>(&partial_tag_cache[12]) ^ *reinterpret_cast<uint32_t*>(&lenAC[12]);
+			uint32_t* tag32 = reinterpret_cast<uint32_t*>(tag);
+			uint32_t* partial_tag_cache32 = reinterpret_cast<uint32_t*>(partial_tag_cache);
+			uint32_t* lenAC32 = reinterpret_cast<uint32_t*>(lenAC);
+
+			tag32[0] = partial_tag_cache32[0] ^ lenAC32[0];
+			tag32[1] = partial_tag_cache32[1] ^ lenAC32[1];
+			tag32[2] = partial_tag_cache32[2] ^ lenAC32[2];
+			tag32[3] = partial_tag_cache32[3] ^ lenAC32[3];
 		}
 
 		/*!
@@ -451,16 +455,7 @@ namespace mode {
 		 */
 		void finalizeTag(uint8_t* tag) {
 			finalizeTagLast(tag);
-
-			len_A = 0;
-			len_C = 0;
-
-			if constexpr(!code_compact_mode) {
-				ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)2)); // non compact doesn't increment ctr
-			}
-
-			// prepare for new encryptions
-			memset(partial_tag_cache, 0, 16);
+			reinitInternalState();
 		}
 
 		/*!
@@ -489,11 +484,14 @@ namespace mode {
 				ctr_ctx.encryptByExposedBase((uint8_t*)ctr_ctx.getNoncePtr(), partial_tag_cache);
 			}
 
+			uint32_t* partial_tag_cache32 = reinterpret_cast<uint32_t*>(partial_tag_cache);
+			uint32_t* lenAC32 = reinterpret_cast<uint32_t*>(lenAC);
+
 			// gcm allows tags with 1 byte granularity at upper end
-			*reinterpret_cast<uint32_t*>(&partial_tag_cache[0]) ^= *reinterpret_cast<uint32_t*>(&lenAC[0]);
-			*reinterpret_cast<uint32_t*>(&partial_tag_cache[4]) ^= *reinterpret_cast<uint32_t*>(&lenAC[4]);
-			*reinterpret_cast<uint32_t*>(&partial_tag_cache[8]) ^= *reinterpret_cast<uint32_t*>(&lenAC[8]);
-			*reinterpret_cast<uint32_t*>(&partial_tag_cache[12]) ^= *reinterpret_cast<uint32_t*>(&lenAC[12]);
+			partial_tag_cache32[0] ^= lenAC32[0];
+			partial_tag_cache32[1] ^= lenAC32[1];
+			partial_tag_cache32[2] ^= lenAC32[2];
+			partial_tag_cache32[3] ^= lenAC32[3];
 
 			memcpy(tag, partial_tag_cache, len); // output tag
 		}
@@ -508,16 +506,7 @@ namespace mode {
 		 */
 		void finalizeTag(uint8_t* tag, uint32_t len) {
 			finalizeTagLast(tag, len);
-
-			// prepare for new encryptions
-			len_A = 0;
-			len_C = 0;
-
-			if constexpr(!code_compact_mode) {
-				ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)2)); // non compact doesn't increment ctr
-			}
-
-			memset(partial_tag_cache, 0, 16);
+			reinitInternalState();
 		}
 
 		/*!
@@ -555,16 +544,7 @@ namespace mode {
 		 */
 		bool verifyTag(uint8_t* tag) {
 			bool ret = verifyTagLast(tag);
-
-			// prepare for new encryptions
-			len_A = 0;
-			len_C = 0;
-
-			if constexpr(!code_compact_mode) {
-				ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)2)); // non compact doesn't increment ctr
-			}
-
-			memset(partial_tag_cache, 0, 16);
+			reinitInternalState();
 
 			return ret;
 		}
@@ -612,8 +592,14 @@ namespace mode {
 		 */
 		bool verifyTag(uint8_t* tag, uint32_t len) {
 			bool ret = verifyTagLast(tag, len);
+			reinitInternalState();
 
-			// prepare for new encryptions
+			return ret;
+		}
+
+	private:
+		//this is private as it doesn't always reinitialize CTR, which is done by "J0" encryption
+		void reinitInternalState() {
 			len_A = 0;
 			len_C = 0;
 
@@ -622,11 +608,8 @@ namespace mode {
 			}
 
 			memset(partial_tag_cache, 0, 16);
-
-			return ret;
 		}
 
-	private:
 		uint8_t partial_tag_cache[16];
 
 		uint64_t len_A;
