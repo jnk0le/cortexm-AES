@@ -354,20 +354,8 @@ namespace mode {
 		 * \param len length of additional auth data
 		 */
 		void aadAppend(const uint8_t* aad_in, uint32_t len) {
-			uint32_t block_len = len >> 4; // div by 16
-			uint32_t bytes_remaining = len & 15;
-
 			len_A += len*8; // counting bits
-
-			g_ctx.gmulH(partial_tag_cache, aad_in, block_len);
-
-			if(bytes_remaining) {
-				uint8_t tmp[16];
-
-				memcpy(tmp, &aad_in[len - bytes_remaining], bytes_remaining);
-				memset(&tmp[bytes_remaining], 0, (16-bytes_remaining));
-				g_ctx.gmulH(partial_tag_cache, tmp, 1);
-			}
+			ghashData(aad_in, len);
 		}
 
 		/*!
@@ -382,9 +370,7 @@ namespace mode {
 		void encryptAppend(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
 			len_C += len*8;
 			ctr_ctx.encrypt(data_in, data_out, len);
-
-			aadAppend(data_out, len);
-			len_A -= len*8; // unsum from AAD length // aad append needs split
+			ghashData(data_out, len);
 		}
 
 		/*!
@@ -399,8 +385,7 @@ namespace mode {
 		 * \param len length in bytes of data to decrypt
 		 */
 		void decryptAppend(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
-			aadAppend(data_out, len);
-			len_A -= len*8; // unsum from AAD length // aad append needs split
+			ghashData(data_out, len);
 
 			len_C += len*8;
 			ctr_ctx.encrypt(data_in, data_out, len);
@@ -588,6 +573,21 @@ namespace mode {
 			len_C = 0;
 
 			memset(partial_tag_cache, 0, 16);
+		}
+
+		void ghashData(const uint8_t* data_in, uint32_t len) {
+			uint32_t block_len = len >> 4; // div by 16
+			uint32_t bytes_remaining = len & 15;
+
+			g_ctx.gmulH(partial_tag_cache, data_in, block_len);
+
+			if(bytes_remaining) {
+				uint8_t tmp[16];
+
+				memcpy(tmp, &data_in[len - bytes_remaining], bytes_remaining);
+				memset(&tmp[bytes_remaining], 0, (16-bytes_remaining));
+				g_ctx.gmulH(partial_tag_cache, tmp, 1);
+			}
 		}
 
 		uint8_t partial_tag_cache[16];
