@@ -514,9 +514,9 @@ void aes_cbc_perf_test(void)
 
 }*/
 
-aes::mode::CTR32<128, aes::target::CM3_1T, aes::mode::target::CTR32_CM3_1T_unrolled> tctr128;
-aes::mode::CTR32<192, aes::target::CM3_1T, aes::mode::target::CTR32_CM3_1T_unrolled> tctr192;
-aes::mode::CTR32<256, aes::target::CM3_1T, aes::mode::target::CTR32_CM3_1T_unrolled> tctr256;
+aes::mode::CTR32<128, aes::target::CM85_1T, aes::mode::target::CTR32_CM7_1T> tctr128;
+aes::mode::CTR32<192, aes::target::CM85_1T, aes::mode::target::CTR32_CM7_1T> tctr192;
+aes::mode::CTR32<256, aes::target::CM85_1T, aes::mode::target::CTR32_CM7_1T> tctr256;
 
 void aes_ctr_perf_test(void)
 {
@@ -598,7 +598,7 @@ uint8_t gcm_expected_tag[16] = {
 uint8_t gcm_tmp[64];
 uint8_t gcm_tmp2[16];
 
-aes::mode::GCM<128, aes::target::CM85_1T, aes::mode::target::CTR32_GENERIC, aes::mode::target::GCM_GHASH_GENERIC_BEAR_CT, true> tgcm128;
+aes::mode::GCM<128, aes::target::CM85_1T, aes::mode::target::CTR32_CM7_1T, aes::mode::target::GCM_GHASH_GENERIC_BEAR_CT> tgcm128;
 
 void aes_gcm_test(void)
 {
@@ -629,7 +629,6 @@ void aes_gcm_test(void)
 
 	bool tagcheck = tgcm128.verifyTag(gcm_expected_tag);
 
-
 	if(memcmp(gcm_expected_plaintext, gcm_tmp, sizeof(gcm_expected_plaintext)) != 0)
 		printf("gcm dec incorrect\n");
 	else {
@@ -647,9 +646,22 @@ void aes_gcm_test(void)
 
 void aes_gcm_perf_test(void)
 {
+	uint32_t t1, t2;
 
+	//dummy_8k
+	tgcm128.setEncKeyAndH(gcm_key);
+	tgcm128.setIv(gcm_iv, 12);
 
+	tgcm128.encryptAppend(dummy_8k, dummy_8k, sizeof(dummy_8k));
+	tgcm128.finalizeTag(gcm_tmp2);
 
+	t1 = DWT->CYCCNT;
+	tgcm128.encryptAppend(dummy_8k, dummy_8k, sizeof(dummy_8k));
+	tgcm128.finalizeTag(gcm_tmp2); // should it be measured ? // insignificant at large sizes
+	t2 = DWT->CYCCNT - t1 - 1;
+
+	printf("gcm 128 total: %d \n", t2);
+	printf("gcm 128: %f cycles per byte\n", (double)t2/8192.0);
 }
 
 

@@ -160,8 +160,7 @@ namespace mode {
 	//SP 800-38A compliant, 32 bit counter
 	template<size_t key_length,
 			template<size_t> class base_impl = aes::target::CM3_1T,
-			template<size_t key_len, template<size_t> class base> class mode_impl = aes::mode::target::CTR32_GENERIC,
-			bool code_compact_mode = true>
+			template<size_t key_len, template<size_t> class base> class mode_impl = aes::mode::target::CTR32_GENERIC>
 	class CTR32
 	{
 	public:
@@ -238,8 +237,7 @@ namespace mode {
 	template<size_t key_length,
 			template<size_t> class base_impl = aes::target::CM3_1T,
 			template<size_t key_len, template<size_t> class base> class ctr_mode_impl = aes::mode::target::CTR32_GENERIC,
-			class ghash_impl = aes::mode::target::GCM_GHASH_GENERIC_BEAR_CT32,
-			bool code_compact_mode = true>
+			class ghash_impl = aes::mode::target::GCM_GHASH_GENERIC_BEAR_CT32>
 	class GCM
 	{
 	public:
@@ -258,12 +256,8 @@ namespace mode {
 
 			memset(g_ctx.H, 0, 16);
 
-			if constexpr(code_compact_mode) {
-				ctr_ctx.setNonce(0, 0, 0, 0);
-				ctr_ctx.encrypt(g_ctx.H, g_ctx.H, 16);
-			} else {
-				ctr_ctx.encryptByExposedBase(g_ctx.H, g_ctx.H);
-			}
+			ctr_ctx.setNonce(0, 0, 0, 0);
+			ctr_ctx.encrypt(g_ctx.H, g_ctx.H, 16);
 
 			// prepare for first encryption
 			memset(partial_tag_cache, 0, 16);
@@ -412,7 +406,6 @@ namespace mode {
 			ctr_ctx.encrypt(data_in, data_out, len);
 		}
 
-
 		/*!
 		 * \brief generates GCM tag
 		 *
@@ -429,12 +422,8 @@ namespace mode {
 			// handle "counter 0" aka J0 aka HF, recycle partial_tag_cache for output
 			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)1)); // after J0 encryption ctr will be set to "counter 1"
 
-			if constexpr(code_compact_mode) {
-				memset(partial_tag_cache, 0, 16);
-				ctr_ctx.encrypt(partial_tag_cache, partial_tag_cache, 16);
-			} else {
-				ctr_ctx.encryptByExposedBase((uint8_t*)ctr_ctx.getNoncePtr(), partial_tag_cache);
-			}
+			memset(partial_tag_cache, 0, 16);
+			ctr_ctx.encrypt(partial_tag_cache, partial_tag_cache, 16);
 
 			uint32_t* tag32 = reinterpret_cast<uint32_t*>(tag);
 			uint32_t* partial_tag_cache32 = reinterpret_cast<uint32_t*>(partial_tag_cache);
@@ -477,12 +466,8 @@ namespace mode {
 			// handle "counter 0" aka J0 aka HF, recycle partial_tag_cache for output
 			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)1)); // after J0 encryption ctr will be set to "counter 1"
 
-			if constexpr(code_compact_mode) {
-				memset(partial_tag_cache, 0, 16);
-				ctr_ctx.encrypt(partial_tag_cache, partial_tag_cache, 16);
-			} else {
-				ctr_ctx.encryptByExposedBase((uint8_t*)ctr_ctx.getNoncePtr(), partial_tag_cache);
-			}
+			memset(partial_tag_cache, 0, 16);
+			ctr_ctx.encrypt(partial_tag_cache, partial_tag_cache, 16);
 
 			uint32_t* partial_tag_cache32 = reinterpret_cast<uint32_t*>(partial_tag_cache);
 			uint32_t* lenAC32 = reinterpret_cast<uint32_t*>(lenAC);
@@ -549,7 +534,6 @@ namespace mode {
 			return ret;
 		}
 
-
 		/*!
 		 * \brief verifies provided tag against internal state
 		 *
@@ -603,10 +587,6 @@ namespace mode {
 			len_A = 0;
 			len_C = 0;
 
-			if constexpr(!code_compact_mode) {
-				ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)2)); // non compact doesn't increment ctr
-			}
-
 			memset(partial_tag_cache, 0, 16);
 		}
 
@@ -615,7 +595,7 @@ namespace mode {
 		uint64_t len_A;
 		uint64_t len_C;
 
-		CTR32<key_length, base_impl, ctr_mode_impl, code_compact_mode> ctr_ctx;
+		CTR32<key_length, base_impl, ctr_mode_impl> ctr_ctx;
 		ghash_impl g_ctx;
 	};
 
