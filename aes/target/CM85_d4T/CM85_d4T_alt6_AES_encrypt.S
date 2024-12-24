@@ -312,7 +312,8 @@ mov.n r11, r11
 	le lr, 1b
 
 	// 29 cycles per round
-	// eors in scalar gets to 28
+	// 27 with ofsset from 4 pointers instead of vorr/vadd
+	// eors in scalar ?
 
 	// copypaste from CM7_1T
 	//not optimizing now, need rounds first
