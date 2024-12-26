@@ -8,32 +8,12 @@
  * \license SPDX-License-Identifier: MIT
  */
 
-// compile for compatible targets only
 #if __ARM_EABI__ && __thumb2__ && (__ARM_FEATURE_MVE & 0b01)
-
 .syntax unified
 .thumb
 .text
 
 .balign 16
-AES_shiftrows_d4T_gather_perm:
-	.byte 0, 12, 1, 13
-	.byte 10, 7, 11, 6
-	.byte 5, 9, 4, 8
-	.byte 15, 2, 14, 3
-
-	// in memory layout (16 bit elements)
-	// sp+0  - s00, s20, s01, s21, s02, s22, s03, s23 // even rows
-	// sp+16 - s10, s30, s11, s31, s12, s32, s13, s33 // odd rows
-
-	// required layout after gathers:
-	// q0 - [] s00 [] s12 [] s20 [] s32 []
-	// q1 - [] s11 [] s23 [] s31 [] s03 []
-	// q2 - [] s22 [] s30 [] s02 [] s10 []
-	// q3 - [] s33 [] s01 [] s13 [] s21 []
-
-	// 2-bank friendly pattern (for cached stack) ???
-
 AES_shiftrows_d4T_final_gather_perm:
 	.byte 0, 5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12, 1, 6, 11
 
@@ -53,109 +33,243 @@ AES_shiftrows_d4T_final_gather_perm:
 	//bank1 - 0 1 2 3   8 9 10 11
 	//bank2 - 4 5 6 7   12 13 14 15
 
+.balign 8
 // void CM85_d4T_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
 .global CM85_d4T_AES_encrypt
 .type   CM85_d4T_AES_encrypt,%function
 CM85_d4T_AES_encrypt:
-	subs r3, #1 // one less
-	strd r4,lr, [sp, #-72]! // possible to not stack those, but constants would get 48 byte larger (no gain in prologue/epilogue)
+	strd r11,lr, [sp, #-(32+8)]! // 1 slot for padding
+	movw r12, #:lower16:AES_d4Te
 
-	adr r4, AES_shiftrows_d4T_gather_perm // cant vector load by pc
+	strd r9,r10, [sp, #8]
+	movt r12, #:upper16:AES_d4Te
+
+	strd r7,r8, [sp, #16]
+	subs r3, #1 // one less
+
+	strd r5,r6, [sp, #24]
+	dls lr, r3 // no skipping
+
+	str r4, [sp, #32]
 	vldrb.u8 q1, [r1] // in
 
-	vstrw.32 q4, [sp, #8] // this one can't predecrement
-
+	sub sp, #16 // area for shiftrows shuffling in final round
 	vldrb.u8 q0, [r0], #16 // rk
 
 	veor q0, q0, q1
-
-	subs sp, #32 // scatter area // shuffling area needs to be at sp+0
-	dls lr, r3 // no skipping
-
-	//mov.n r10, r10
-	vldrb.u32 q4, [r4, #0]
-	vstrw.32 q5, [sp, #32+8+16]
-	vldrb.u32 q5, [r4, #4]
-	vstrw.32 q6, [sp, #32+8+32]
-	vldrb.u32 q6, [r4, #8]
-	vstrw.32 q7, [sp, #32+8+48]
-	vldrb.u32 q7, [r4, #12]
 
 	// state and vector elements will be represented with big endian representation
 	// (as in transposed canonical state representation)
 
 	// global allocation
 	// r0 - rk
-	// r1 -
+	// r1 - AES_d4Te + 4
 	// r2 - out_p
-	// r3 - [ 4 12 ] (int16)
-	// r4 - pointer to shiftrows constants
+	// r3 - AES_d4Te + 12
+
 	// r12 - AES_d4Te
 	// r14 - hwloop
-	// q4 - [ 0 12 1 13 ] // shiftrows gather 1
-	// q5 - [ 10 7 11 6 ] // shiftrows gather 2
-	// q6 - [ 5 9 4 8 ]   // shiftrows gather 3
-	// q7 - [ 15 2 14 3 ] // shiftrows gather 4
 
 	// row  []  0     1     2     3  []  0     1     2     3  []  0     1     2     3  []  0     1     2     3  []
 	// column            0                        1                        2                        3
 	// q0 - [] s00 | s10 | s20 | s30 [] s01 | s11 | s21 | s31 [] s02 | s12 | s22 | s32 [] s03 | s13 | s23 | s33 []
 	//final []  s00T^s11T^s22T^s33T  []  s01T^s12T^s23T^s30T  []  s02T^s13T^s20T^s31T  []  s03T^s10T^s21T^s32T  []
 
+	//used addressing modes
+	// row 0 - r12 + x
+	// row 2 - (x + r12) + 8
+	// row 1/3 - r1/r3 + x
+
 .balign 8
 1:
-	// prepare for gathers // shifts and offsets
-	//mov.n r10, r10 // can't use due to vldrb from prologue
-	vshllb.u8 q1, q0, #4
+	// current allocation
+	// q0 - [] s00 | s10 | s20 | s30 [] s01 | s11 | s21 | s31 [] s02 | s12 | s22 | s32 [] s03 | s13 | s23 | s33 []
 
-	movs r3, #4 // offsets for odd rows, even rows are done inline
-	vorr.i32 q1, #0x00080000 // [ 0 8 0 8 0 8 0 8 ]
+	add r1, r12, #4 // AES_d4Te + 4
+	vldrw.u32 q3, [r0], #16 // rk
 
-	add r3, r3, #0x000C0000 // finish offset for odd rows
-	vshllt.u8 q0, q0, #4
-
-	movw r12, #:lower16:AES_d4Te
-	vstrh.16 q1, [sp, #0]
-
-	vadd.i32 q0, q0, r3 // [ 4 12 4 12 4 12 4 12] // indices won't carry across 16 bit
-	movt r12, #:upper16:AES_d4Te
-	vstrh.16 q0, [sp, #16]
+	vshllb.u8 q1, q0, #4 // even rows
 
 	// current allocation
+	// q0 - []  -  | s10 |  -   | s30 []  -  | s11 |  -  | s31 []  -  | s12 |  -  | s32 []  -  | s13 |  -  | s33 []
 	// q1 - [] s00 | s20 [] s01 | s21 [] s02 | s22 [] s03 | s23 []
+	// q2 -
+	// q3 - rk
+
+	vmov.64 r4,r5, d2 // move in asap
+	add r3, r12, #12 // AES_d4Te + 12
+
+	vmov.64 r6,r7, d3
+	and.w r8, r4, #0xff0 // EX3
+
+	vshllt.u8 q0, q0, #4 // odd rows
+	and.w r9, r5, #0xff0 // EX2
+
+	// current allocation
+	// r4 -  -  | s20
+	// r5 -  -  | s21
+	// r6 - s02 | s22
+	// r7 - s03 | s23
+	// r8 - s00
+	// r9 - s01
+	// r10 -
+	// r11 -
 	// q0 - [] s10 | s30 [] s11 | s31 [] s12 | s32 [] s13 | s33 []
+	// q1 -
+	// q2 -
+	// q3 - rk
 
-	// gathers are unpipelined, can't overlap with preceeding vstr as well
+	// can't do vector due to A port contention
+	add.w r10, r12, r4, lsr #16
+	add.w r11, r12, r5, lsr #16
 
-	vldrh.u32 q0, [sp, q5, uxtw #1] // 3 cycles // q4 and q7 are 4 cycles here
-	vldrh.u32 q1, [sp, q4, uxtw #1] // 2 cycles
-	vldrh.u32 q3, [sp, q6, uxtw #1] // 2 cycles
+	vmovlb.u16 q1, q0
+	ldr r8, [r12, r8]
 
-	vldrw.u32 q2, [r12, q0] // 2 cycles
-	vldrw.u32 q0, [r12, q1] // 2 cycles
-	vldrw.u32 q1, [r12, q3] // 2 cycles
+	add.w r4, r12, r6, lsr #16
+	ldr r9, [r12, r9]
 
-	//mov.n r10, r10
+	// current allocation
+	// r4 - s22
+	// r5 -
+	// r6 - s02 |  -
+	// r7 - s03 | s23
+	// r8 - s00T
+	// r9 - s01T
+	// r10 - s20
+	// r11 - s21
+	// q0 - []  -  | s30 []  -  | s31 []  -  | s32 []  -  | s33 []
+	// q1 - [] s10 [] s11 [] s12 [] s13 []
+	// q2 -
+	// q3 - rk
+
+	vmovlt.u16 q0, q0
+	ldr r10, [r10, #8]
+
+	vmov.64 d4, r8,r9
+	ldr r11, [r11, #8]
+
+	vmov.64 d5, r10,r11
+	add.w r5, r12, r7, lsr #16
+
+	// current allocation
+	// r4 - s22
+	// r5 - s23
+	// r6 - s02 |  -
+	// r7 - s03 |  -
+	// r8 -
+	// r9 -
+	// r10 -
+	// r11 -
+	// q0 - [] s30 [] s31 [] s32 [] s33 []
+	// q1 - [] s10 [] s11 [] s12 [] s13 []
+	// q2 - [] s00T [] s01T [] s20T [] s21T []
+	// q3 - rk
+
+	and.w r6, r6, #0xff0
+	and.w r7, r7, #0xff0
+
+	vmov.64 r8,r9, d2
+	ldr r4, [r4, #8]
+
+	vmov.64 r10,r11, d3
+	ldr r5, [r5, #8]
+
+	// current allocation
+	// r4 - s22T
+	// r5 - s23T
+	// r6 - s02
+	// r7 - s03
+	// r8 - s10
+	// r9 - s11
+	// r10 - s12
+	// r11 - s13
+	// q0 - [] s30 [] s31 [] s32 [] s33 []
+	// q1 -
+	// q2 - [] s00T [] s01T [] s20T [] s21T []
+	// q3 - rk
+
+	veor q2, q2, q3
+	ldr r6, [r12, r6]
+
+	vmov.64 d2, r4,r5
+	ldr r7, [r12, r7]
+
+	vmov.64 d3, r6,r7
+	ldr r9, [r1, r9]
+
+	// current allocation
+	// r4 -
+	// r5 -
+	// r6 -
+	// r7 -
+	// r8 - s10
+	// r9 - s11T
+	// r10 - s12
+	// r11 - s13
+	// q0 - [] s30 [] s31 [] s32 [] s33 []
+	// q1 - [] s22T [] s23T [] s02T [] s03T []
+	// q2 - [] s00T [] s01T [] s20T [] s21T [] ^ rk
+	// q3 -
+
+	vmov.64 r4,r5, d0
+	ldr r10, [r1, r10]
+
+	vmov.64 r6,r7, d1
+	ldr r11, [r1, r11]
+
+	veor q2, q2, q1
+	ldr r8, [r1, r8]
+
+	// current allocation
+	// r4 - s30
+	// r5 - s31
+	// r6 - s32
+	// r7 - s33
+	// r8 - s10T
+	// r9 - s11T
+	// r10 - s12T
+	// r11 - s13T
+	// q0 -
+	// q1 -
+	// q2 - [] s00T^s22T [] s01T^s23T [] s02T^s20T [] s03T^s21T [] ^ rk
+	// q3 -
+
+	vmov.64 d0, r9,r10
+	ldr r4, [r3, r4]
+
+	vmov.64 d1, r11,r8
+	ldr r7, [r3, r7] // r7 available
+
 	veor q0, q0, q2
+	ldr r5, [r3, r5]
 
-	vldrh.u32 q2, [sp, q7, uxtw #1] // 2 cycles
+	// current allocation
+	// r4 - s30T
+	// r5 - s31T
+	// r6 - s32
+	// r7 - s33T
+	// r8 -
+	// r9 -
+	// r10 -
+	// r11 -
+	// q0 - [] s00T^s11T^s22T [] s01T^s12T^s23T [] s02T^s13T^s20T [] s03T^s10T^s21T [] ^ rk
+	// q1 -
+	// q2 -
+	// q3 -
 
-	//mov.n r10, r10
+	vmov.64 d2, r7,r4
+	ldr r6, [r3, r6]
+
+	vmov.64 d3, r5,r6
+	adr r5, AES_shiftrows_d4T_final_gather_perm // movw+movt into rodata?
+
 	veor q0, q0, q1
-
-	// apply rk
-	//mov.n r10, r10
-	vldrw.u32 q1, [r0], #16
-	veor q0, q0, q1
-
-	vldrw.u32 q1, [r12, q2] // 2 cycles
-
-	//mov.n r10, r10
-	veor q0, q0, q1
+	//mov.n r10, r10 // instruction here or in front of vldrb, otherwise +1 cycle
 
 	le lr, 1b
 
-	// 28 cycles per loop (for comparison CM7_1T is doing 27 cycles per loop and 25 for CM85_1T)
+	// 26 cycles per round (for comparison CM7_1T is doing 27 cycles per loop and 25 for CM85_1T)
 
 	// final round
 
@@ -165,69 +279,53 @@ CM85_d4T_AES_encrypt:
 	// bank3 - +8 +11
 	// bank4 - +12 +13
 
-	// only 2 alternating banks are needed
-	// [ 6 12 ] (int16) // bank 2 and 4
-	// [ 2 8 ] (int16) // bank 1 and 3 (differs by 0x00040004)
+	// only 2 alternating banks are needed, evened pressure require +1 cycle
+
+	// not sure if 2 banked M85 instances exists, so better to target even/odd banks
+	// (ra8e1 datasheet says so, but ra8d1 would be supposed to have 8 banks, with this understanding)
 
 	// current allocation
 	// r0 - rk
 	// r1 -
 	// r2 - out_p
-	// r3 - [ 4 12 ] (int16) // bank 2 and 4
-	// r4 - pointer to shiftrows constants
+	// r3 -
+	// r5 - AES_shiftrows_d4T_final_gather_perm
 	// r12 - AES_d4Te
 	// r14 -
-	// q0 -
-	// q1 -
-	// q2 -
-	// q3 -
-	// q4:q7 - loop shiftrows, preserved in CTR mode
 
-	// scalar can be inserted into loop or prologue
-	adds r3, r3, #2 // recycle r3, target actual sbox in bank2
-	vldrb.8 q2, [r4, #16] // reach into AES_shiftrows_d4T_final_gather_perm
-
-	// 1 vector instruction is free here
-	vdup.i32 q3, r3
-
-	// current allocation
-	// r0 - rk
-	// r1 -
-	// r2 - out_p
-	// r3 - [ 4 12 ] (int16) // bank 2 and 4
 	// q0 - [] s00 | s10 | s20 | s30 [] s01 | s11 | s21 | s31 [] s02 | s12 | s22 | s32 [] s03 | s13 | s23 | s33 []
-	// q1 -
-	// q2 - [ 0 5 10 15 4 9 14 3 8 13 2 7 12 1 6 11 ] // shiftrows gather
-	// q3 - [ 6 12 6 12 6 12 6 12] (int16) // bank 2 and 4
 
 	// final
 	// q0 - [] s00`| s11`| s22`| s33`[] s01`| s12`| s23`| s30`[] s02`| s13`| s20`| s31`[] s03`| s10`| s21`| s32`[]
 
-	subs r1, r3, #0x00040004
+	vldrb.8 q2, [r5, #0] // AES_shiftrows_d4T_final_gather_perm
+
 	vstrb.8 q0, [sp, #0] // cant overlap into gather
 
-	// another vdup ?????
+	// 1 cycle free due to load to use latency of q2
+	vmov.u32 q3, #0x00060000
+
+	//mov.n r10, r10
+	vorr.u32 q3, #0x00000002 // [2 6 2 6 2 6 2 6]
 
 	vldrb.u8 q0, [sp, q2]
 
-	// prepare for sboxing
-	ldrd r4,lr, [sp, #32] // start unstacking
+	//mov.n r10, r10
 	vshllt.u8 q1, q0, #4
 
-	vldrw.32 q4, [sp, #32+8+0]
+	//mov.n r10, r10
 	vorr q1, q1, q3
 
-	vldrw.32 q5, [sp, #32+8+16]
-
 	vshllb.u8 q0, q0, #4
-	vldrw.32 q6, [sp, #32+8+32]
-	vadd.i32 q0, q0, r1 // even out DTCM bank accesses // needs vorr if can't overlap with epilogue
+	add sp, #16 // start unstacking
+
+	vorr q0, q0, q3
+	ldr r4, [sp, #32]
 
 	// current allocation
 	// q0 - [] s00 | s22 [] s01 | s23 [] s02 | s20 [] s03 | s21 [] // even rows
 	// q1 - [] s11 | s33 [] s12 | s30 [] s13 | s31 [] s10 | s32 [] // odd rows
 	// q2 -
-	// q7 -
 
 	vldrb.u16 q2, [r12, q1]
 	vldrb.u16 q1, [r12, q0]
@@ -236,19 +334,22 @@ CM85_d4T_AES_encrypt:
 	// q0 -
 	// q1 - [] s00`| s22`[] s01`| s23`[] s02`| s20`[] s03`| s21`[] // even rows
 	// q2 - [] s11`| s33`[] s12`| s30`[] s13`| s31`[] s10`| s32`[] // odd rows
-	// q7 -
 
-	vldrw.32 q7, [sp, #32+8+48]
-
+	ldrd r5,r6, [sp, #24]
 	vsli.16 q1, q2, #8 // insert odd rows
 
-	// apply rk
+	//mov.n r10, r10
 	vldrw.u32 q0, [r0]
-	veor q1, q1, q0
 
-	vstrb.8 q1, [r2]
+	veor q1, q1, q0 // rk
 
-	add sp, #32+8+64
+	ldrd r7,r8, [sp, #16]
+	vstr.64 d2, [r2, #0] // out
+
+	ldrd r9,r10, [sp, #8]
+	vstr.64 d3, [r2, #8] //out
+
+	ldrd r11,lr, [sp], #32+8
 	bx lr
 
 #endif

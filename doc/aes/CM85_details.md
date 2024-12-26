@@ -26,9 +26,9 @@ not optimized yet
 | `setEncKey<128>` | 120 |  |
 | `setEncKey<192>` |  |  |
 | `setEncKey<256>` |  |  |
-| `encrypt<128>`   | 263 | 299 |
-| `encrypt<192>`   | 313 | 355 |
-| `encrypt<256>`   | 363 | 411 |
+| `encrypt<128>`   | 263 | 273 |
+| `encrypt<192>`   | 313 | 325 |
+| `encrypt<256>`   | 363 | 377 |
 | `setDecKey<128>` |  |  |
 | `setDecKey<192>` |  |  |
 | `setDecKey<256>` |  |  |
@@ -42,4 +42,4 @@ not optimized yet
 |----------|--------------------|----------------------|-------|
 | `CM85_1T_AES128_keyschedule_enc` | 124 | 24 | uses Te2 table |
 | `CM85_1T_AES_encrypt` | 446 | 40 | uses Te2 table |
-| `CM85_d4T_AES_encrypt` | 276 | 72 | uses d4Te table, sensitive (partially processed) data visits stack |
+| `CM85_d4T_AES_encrypt` | 342 | 56 | uses d4Te table, sensitive (partially processed in final round) data visits stack |
