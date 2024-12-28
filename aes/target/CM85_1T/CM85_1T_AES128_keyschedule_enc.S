@@ -1,6 +1,6 @@
 /*!
  * \file CM85_1T_AES128_keyschedule_enc.S
- * \brief
+ * \brief cortex-m85 optimized aes128 key expansion
  *
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>

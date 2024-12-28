@@ -1,8 +1,9 @@
 /*!
  * \file CM85_d4T_AES_encrypt.S
- * \brief
+ * \brief cortex-m85 optimized aes encryption
  *
- *
+ * Utilizes diffused 4 Te tables, which protects from bank timming attacks, as each
+ * data dependent lookup can hit only within one bank.
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
@@ -18,7 +19,7 @@ AES_shiftrows_d4T_final_gather_perm:
 	.byte 0, 5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12, 1, 6, 11
 
 	// in memory layout
-	//  s00, s10, s20, s30, s01, s11, s21, s31, s02, s12, s22, s32, s03, s13, s23, s33
+	// s00, s10, s20, s30, s01, s11, s21, s31, s02, s12, s22, s32, s03, s13, s23, s33
 
 	// final layout after merge
 	// q0 - [] s00`| s11`| s22`| s33`[] s01`| s12`| s23`| s30`[] s02`| s13`| s20`| s31`[] s03`| s10`| s21`| s32`[]

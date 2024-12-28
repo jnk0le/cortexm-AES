@@ -1,12 +1,15 @@
 # cortex-m85
 
 
+Similarly to CM7, all lookup tables must be placed in DTCM memory.
 
 ## base impl
 
 ### CM85_1T
 
 scalar only
+
+Uses a single T table per enc/dec cipher and additional inv_sbox for final round in decryption.
 
 similarly to CM7, dtcm access pattern can be timed by DMA
 
@@ -15,9 +18,6 @@ similarly to CM7, dtcm access pattern can be timed by DMA
 uses diffused 4 T tables
 
 fully resistant to bank timming attacks
-
-
-not optimized yet
 
 ## perfomance
 
