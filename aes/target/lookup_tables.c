@@ -242,7 +242,7 @@ uint32_t AES_Td2[256] __attribute__((aligned(1024), section(".data.AES_Td2"))) =
 // starting at index i/4 we have:
 // Te0[i], Te1[i], Te2[i], Te3[i]
 
-uint32_t AES_d4Te[256*4] __attribute__((aligned(16), section(".data.AES_d4Te"))) =
+uint32_t AES_d4Te[256*4] __attribute__((aligned(1024*4), section(".data.AES_d4Te"))) =
 {
 	0xa56363c6, 0x6363c6a5, 0x63c6a563, 0xc6a56363,
 	0x847c7cf8, 0x7c7cf884, 0x7cf8847c, 0xf8847c7c,
