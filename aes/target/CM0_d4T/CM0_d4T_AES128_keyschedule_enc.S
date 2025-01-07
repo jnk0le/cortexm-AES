@@ -1,5 +1,5 @@
 /*!
- * \file CM0_sBOX_AES128_keyschedule_enc.S
+ * \file CM0_d4T_AES128_keyschedule_enc.S
  * \brief
  *
  *
@@ -18,37 +18,48 @@
 .text
 
 .balign 4
-// void CM0_sBOX_AES128_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
-.global CM0_sBOX_AES128_keyschedule_enc
-.type   CM0_sBOX_AES128_keyschedule_enc,%function
+// void CM0_d4T_AES128_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
+.global CM0_d4T_AES128_keyschedule_enc
+.type   CM0_d4T_AES128_keyschedule_enc,%function
 	nop // align loop entry
-CM0_sBOX_AES128_keyschedule_enc:
+CM0_d4T_AES128_keyschedule_enc:
 	push {r4-r7}
 
 	ldmia r1!, {r4-r7} // load key
 
 	movs r1, #1 // rcon
-	ldr r2, =AES_sbox
+
+	// sbox is at
+	// bank1 - +1 +2
+	// bank2 - +6 +7
+	// bank3 - +8 +11
+	// bank4 - +12 +13
+
+	ldr r2, =(AES_d4Te + 6)
 
 	stmia r0!, {r4-r7} //just copy a key
 
 1:	lsrs r3, r7, #8
 	uxtb r3, r3
+	lsls r3, #4
 	ldrb r3, [r2, r3]
 	eors r4, r3
 
 	lsrs r3, r7, #16
 	uxtb r3, r3
+	lsls r3, #4
 	ldrb r3, [r2, r3]
 	lsls r3, #8
 	eors r4, r3
 
 	lsrs r3, r7, #24
+	lsls r3, #4
 	ldrb r3, [r2, r3]
 	lsls r3, #16
 	eors r4, r3
 
 	uxtb r3, r7
+	lsls r3, #4
 	ldrb r3, [r2, r3]
 	lsls r3, #24
 	eors r4, r3

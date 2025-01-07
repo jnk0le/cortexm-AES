@@ -1,5 +1,5 @@
 /*!
- * \file CM0_sBOX_AES192_keyschedule_enc.S
+ * \file CM0_d4T_AES192_keyschedule_enc.S
  * \brief
  *
  *
@@ -17,11 +17,11 @@
 .text
 
 .balign 4
-// void CM0_sBOX_AES192_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
-.global CM0_sBOX_AES192_keyschedule_enc
-.type   CM0_sBOX_AES192_keyschedule_enc,%function
+// void CM0_d4T_AES192_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
+.global CM0_d4T_AES192_keyschedule_enc
+.type   CM0_d4T_AES192_keyschedule_enc,%function
 	nop // align loop enry
-CM0_sBOX_AES192_keyschedule_enc:
+CM0_d4T_AES192_keyschedule_enc:
 	push {r4-r7, lr}
 
 	ldmia r1!, {r2-r7} // load key
@@ -32,25 +32,35 @@ CM0_sBOX_AES192_keyschedule_enc:
 
 	mov r14, r0 // save rk
 
-	ldr r0, =AES_sbox
+	// sbox is at
+	// bank1 - +1 +2
+	// bank2 - +6 +7
+	// bank3 - +8 +11
+	// bank4 - +12 +13
+
+	ldr r0, =(AES_d4Te + 6)
 
 1:	lsrs r1, r7, #8
 	uxtb r1, r1
+	lsls r1, #4
 	ldrb r1, [r0, r1]
 	eors r2, r1
 
 	lsrs r1, r7, #16
 	uxtb r1, r1
+	lsls r1, #4
 	ldrb r1, [r0, r1]
 	lsls r1, #8
 	eors r2, r1
 
 	lsrs r1, r7, #24
+	lsls r1, #4
 	ldrb r1, [r0, r1]
 	lsls r1, #16
 	eors r2, r1
 
 	uxtb r1, r7
+	lsls r1, #4
 	ldrb r1, [r0, r1]
 	lsls r1, #24
 	eors r2, r1

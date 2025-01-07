@@ -120,7 +120,6 @@ CM85_d4T_AES_encrypt:
 	// q2 -
 	// q3 - rk
 
-	// can't do vector due to A port contention
 	add.w r10, r12, r4, lsr #16
 	add.w r11, r12, r5, lsr #16
 

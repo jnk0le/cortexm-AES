@@ -101,13 +101,13 @@ namespace target
 			switch(key_length)
 			{
 			case 128:
-				CM0_sBOX_AES128_keyschedule_enc(rk, key);
+				CM0_d4T_AES128_keyschedule_enc(rk, key);
 				break;
 			case 192:
-				CM0_sBOX_AES192_keyschedule_enc(rk, key);
+				CM0_d4T_AES192_keyschedule_enc(rk, key);
 				break;
 			case 256:
-				CM0_sBOX_AES256_keyschedule_enc(rk, key);
+				CM0_d4T_AES256_keyschedule_enc(rk, key);
 				break;
 			}
 		}

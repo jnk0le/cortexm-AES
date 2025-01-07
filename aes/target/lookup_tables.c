@@ -4,7 +4,7 @@
  *
  * If something is unused it will not waste memory.
  *
- * Alignment is required to avoid crossing 2 different memory busses. (minimum AHB granularity for bus slave in cortex-m is 1kiB)
+ * Alignment is required to avoid crossing 2 different memory areas. (minimum AHB granularity for bus slave in cortex-m is 1kiB)
  *
  * To avoid data dependent load time differences, those tables have to be placed in deterministic memory section. (usually TCM/SRAM)
  * You might want to create dedicated section in linker script for those, to make sure that the correct memory block is used.

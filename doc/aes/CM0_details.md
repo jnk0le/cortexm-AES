@@ -62,15 +62,15 @@ out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 
 | Cipher function  | STM32F0 (0ws/1ws) - CM0_sBOX | STM32F0 (0ws/1ws) - CM0_FASTMULsBOX | STM32F0 (0ws/1ws) - CM0_d4T |
 |------------------|------------------------------|-------------------------------------|------------------------------|
-| `setEncKey<128>` | 399/415 | (sBOX) |  |
-| `setEncKey<192>` | 375/389 | (sBOX) |  |
-| `setEncKey<256>` | 568/586 | (sBOX) |  |
+| `setEncKey<128>` | 399/415 | (sBOX) | 439/? |
+| `setEncKey<192>` | 375/389 | (sBOX) | 407/? |
+| `setEncKey<256>` | 568/580 | (sBOX) | 620/? |
 | `encrypt<128>`   | 1666/1680 | 1587/1600 | 1131/? |
-| `encrypt<192>`   | 2000/2016 | 1905/1920 |  |
+| `encrypt<192>`   | 2000/2016 | 1905/1920 | 1394/? |
 | `encrypt<256>`   | 2334/2352 | 2223/2240 | 1567/? |
-| `setDecKey<128>` | 0 | 0 | 0 |
-| `setDecKey<192>` | 0 | 0 | 0 |
-| `setDecKey<256>` | 0 | 0 | 0 |
+| `setDecKey<128>` | 0 | 0 |  |
+| `setDecKey<192>` | 0 | 0 |  |
+| `setDecKey<256>` | 0 | 0 |  |
 | `decrypt<128>`   | 2567/2580 | 2387/2400 |  |
 | `decrypt<192>`   | 3099/3114 | 2879/2894 |  |
 | `decrypt<256>`   | 3631/3648 | 3371/3388 |  |
@@ -84,11 +84,14 @@ STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% perfor
 |----------|--------------------|----------------------|-------| 
 | `CM0_sBOX_AES128_keyschedule_enc` | 80 | 16 | uses sbox table |
 | `CM0_sBOX_AES192_keyschedule_enc` | 88 | 20(24) | uses sbox table |
-| `CM0_sBOX_AES256_keyschedule_enc` | 164 | 32 | uses sbox table |
+| `CM0_sBOX_AES256_keyschedule_enc` | 166 | 32 | uses sbox table |
 | `CM0_sBOX_AES_encrypt` | 508 | 40 | uses sbox table |
 | `CM0_sBOX_AES_decrypt` | 712 | 40 | uses inv_sbox table |
 | `CM0_FASTMULsBOX_AES_encrypt` | 480 | 36(40) | uses sbox table, requires single cycle multiplier |
-| `CM0_FASTMULsBOX_AES_decrypt` | 672 | 40 | uses inv_sbox table, requires single cycle multiplier |4
+| `CM0_FASTMULsBOX_AES_decrypt` | 672 | 40 | uses inv_sbox table, requires single cycle multiplier |
+| `CM0_d4T_AES128_keyschedule_enc` |  | 16 | uses d4T table |
+| `CM0_d4T_AES192_keyschedule_enc` |  | 20(24) | uses d4T table |
+| `CM0_d4T_AES256_keyschedule_enc` |  | 32 | uses d4T table |
 | `CM0_d4T_AES_encrypt` |  |  | uses d4T and sbox table |
 
 code sizes include pc-rel constants and their padding
