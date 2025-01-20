@@ -89,10 +89,10 @@ STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% perfor
 | `CM0_sBOX_AES_decrypt` | 712 | 40 | uses inv_sbox table |
 | `CM0_FASTMULsBOX_AES_encrypt` | 480 | 36(40) | uses sbox table, requires single cycle multiplier |
 | `CM0_FASTMULsBOX_AES_decrypt` | 672 | 40 | uses inv_sbox table, requires single cycle multiplier |
-| `CM0_d4T_AES128_keyschedule_enc` |  | 16 | uses d4T table |
-| `CM0_d4T_AES192_keyschedule_enc` |  | 20(24) | uses d4T table |
-| `CM0_d4T_AES256_keyschedule_enc` |  | 32 | uses d4T table |
-| `CM0_d4T_AES_encrypt` |  |  | uses d4T and sbox table |
+| `CM0_d4T_AES128_keyschedule_enc` |  | 16 | uses d4Te table |
+| `CM0_d4T_AES192_keyschedule_enc` |  | 20(24) | uses d4Te table |
+| `CM0_d4T_AES256_keyschedule_enc` |  | 32 | uses d4Te table |
+| `CM0_d4T_AES_encrypt` |  |  | uses d4Te and sbox table |
 
 code sizes include pc-rel constants and their padding
 
