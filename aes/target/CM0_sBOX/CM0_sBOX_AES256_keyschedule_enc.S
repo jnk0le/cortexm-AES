@@ -20,7 +20,6 @@
 // void CM0_sBOX_AES256_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
 .global CM0_sBOX_AES256_keyschedule_enc
 .type   CM0_sBOX_AES256_keyschedule_enc,%function
-	nop // align loop entry
 CM0_sBOX_AES256_keyschedule_enc:
 	push {r4-r7, lr}
 	mov r4, r8
@@ -48,14 +47,15 @@ CM0_sBOX_AES256_keyschedule_enc:
 
 	ldr r0, =AES_sbox
 
-1:	// r8 - r3 part1
+	// r8 - r3 part1
 	// r9 - r4 part1
 	// r10 -
 	// r12 - rcon
 	// r14 - rk
 
+	mov r10, r3 // skewed unswap
+1:
 	// unswap to process first part
-	mov r10, r3
 	mov r3, r8
 
 	mov r8, r4
@@ -138,6 +138,8 @@ CM0_sBOX_AES256_keyschedule_enc:
 	mov r1, r14 // get rk
 	stmia r1!, {r3,r4,r6,r7}
 	mov r14, r1 // put rk back
+
+	mov r10, r3 // skewed unswap
 	b 1b
 
 2:	pop {r4-r6}
