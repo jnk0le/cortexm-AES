@@ -20,7 +20,6 @@
 // void CM0_sBOX_AES192_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
 .global CM0_sBOX_AES192_keyschedule_enc
 .type   CM0_sBOX_AES192_keyschedule_enc,%function
-	nop // align loop enry
 CM0_sBOX_AES192_keyschedule_enc:
 	push {r4-r7, lr}
 
@@ -34,7 +33,8 @@ CM0_sBOX_AES192_keyschedule_enc:
 
 	ldr r0, =AES_sbox
 
-1:	lsrs r1, r7, #8
+	lsrs r1, r7, #8 // skewed loop
+1:
 	uxtb r1, r1
 	ldrb r1, [r0, r1]
 	eors r2, r1
@@ -73,6 +73,8 @@ CM0_sBOX_AES192_keyschedule_enc:
 
 	stmia r1!, {r2-r7} // write full roundkey
 	mov r14, r1 // put rk back
+
+	lsrs r1, r7, #8 // skewed loop
 	b 1b
 
 2:	stmia r1!, {r2-r5} // only 4 entries have to be written

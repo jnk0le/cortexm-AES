@@ -21,7 +21,6 @@
 // void CM0_sBOX_AES128_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
 .global CM0_sBOX_AES128_keyschedule_enc
 .type   CM0_sBOX_AES128_keyschedule_enc,%function
-	nop // align loop entry
 CM0_sBOX_AES128_keyschedule_enc:
 	push {r4-r7}
 
@@ -32,7 +31,8 @@ CM0_sBOX_AES128_keyschedule_enc:
 
 	stmia r0!, {r4-r7} //just copy a key
 
-1:	lsrs r3, r7, #8
+	lsrs r3, r7, #8 // skewed loop
+1:
 	uxtb r3, r3
 	ldrb r3, [r2, r3]
 	eors r4, r3
@@ -62,6 +62,8 @@ CM0_sBOX_AES128_keyschedule_enc:
 
 	cmp r1, #0x36 // final condition
 	beq 2f
+
+	lsrs r3, r7, #8 // skewed loop
 
 	lsls r1, #1 // next rcon
 	cmp r1, #0x80
