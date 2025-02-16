@@ -283,8 +283,6 @@ CM0_d4T_AES_encrypt:
 
 	//final round
 
-	// using sbox is ~10 cycles faster, currently recycling keyschedules
-
 	// sbox is at
 	// bank1 - +1 +2
 	// bank2 - +6 +7
