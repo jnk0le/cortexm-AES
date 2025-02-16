@@ -284,11 +284,12 @@ CM0_d4T_AES_encrypt:
 	//final round
 
 	// using sbox is ~10 cycles faster, currently recycling keyschedules
-	//sbox 64x +2(3)
-	//d4t 77x +1
 
-	ldr r0, =AES_sbox
-	mov r9, r0 // AES_sbox
+	// sbox is at
+	// bank1 - +1 +2
+	// bank2 - +6 +7
+	// bank3 - +8 +11
+	// bank4 - +12 +13
 
 	// r4 - s00 | s10 | s20 | s30
 	// r5 - s01 | s11 | s21 | s31
@@ -301,225 +302,215 @@ CM0_d4T_AES_encrypt:
 	// r6 - s02`| s13`| s20`| s31`
 	// r7 - s03`| s10`| s21`| s32`
 
+	movs r3, #6 // bank 2
+	add r3, r9
+
+	uxtb r0, r4
+	lsls r0, #4
+	ldrb r0, [r3, r0]
+
 	lsrs r1, r7, #24
-	ldrb r1, [r0, r1]
+	lsls r1, #4
+	ldrb r1, [r3, r1]
 	lsls r1, #24
 
-	rev16 r3, r5
+	orrs r0, r1
 
-	// r0 - sbox
-	// r1 -                   s33`
+	//current allocaton
+	// r0 - s00`|     |     | s33`
+	// r1 -
 	// r2 -
-	// r3 - s11 |  -  |  -  | s21
-
-	// r4 - s00 | s10 | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
+	// r3 - AES_d4Te + 6
+	// r4 -  -  | s10 | s20 | s30
+	// r5 - s01 | s11 | s21 | s31
 	// r6 - s02 | s12 | s22 | s32
 	// r7 - s03 | s13 | s23 |  -
 
-	uxtb r2, r3
-	ldrb r2, [r0, r2]
+	rev16 r2, r6
+
+	lsrs r1, r2, #24
+	lsls r1, #4
+	ldrb r1, [r3, r1]
+	lsls r1, #16
+
+	orrs r0, r1
+
+	uxtb r2, r2
+	lsls r2, #4
+	ldrb r2, [r3, r2]
 	lsls r2, #8
+
+	uxtb r1, r5
+	lsls r1, #4
+	ldrb r1, [r3, r1]
 
 	orrs r1, r2
 
-	rev16 r2, r7
-	uxtb r7, r7
-	ldrb r7, [r0, r7]
+	//current allocaton
+	// r0 - s00`|     | s22`| s33`
+	// r1 - s01`| s12`|     |
+	// r2 -
+	// r3 - AES_d4Te + 6
+	// r4 -  -  | s10 | s20 | s30
+	// r5 -  -  | s11 | s21 | s31
+	// r6 - s02 |  -  |  -  | s32
+	// r7 - s03 | s13 | s23 |  -
 
-	// r0 - sbox
-	// r1 -     | s11`|     | s33`
-	// r2 - s13 |  -  |  -  | s23
-	// r3 -  -  |  -  |  -  | s21
+	lsrs r2, r4, #24
+	lsls r2, #4
+	ldrb r2, [r3, r2]
+	lsls r2, #24
 
-	// r4 - s00 | s10 | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 | s22 | s32
-	// r7 - s03`|     |     |
+	orrs r1, r2
 
-	lsrs r3, #24
-	ldrb r3, [r0, r3]
-	lsls r3, #16
+	uxtb r2, r6
+	lsls r2, #4
+	ldrb r2, [r3, r2]
 
-	orrs r7, r3
+	//current allocaton
+	// r0 - s00`|     | s22`| s33`
+	// r1 - s01`| s12`|     | s30`
+	// r2 - s02`|     |     |
+	// r3 - AES_d4Te + 6
+	// r4 -  -  | s10 | s20 |  -
+	// r5 -  -  | s11 | s21 | s31
+	// r6 -  -  |  -  |  -  | s32
+	// r7 - s03 | s13 | s23 |  -
 
-	// r0 - sbox
-	// r1 -     | s11`|     | s33`
-	// r2 - s13 |  -  |  -  | s23
-	// r3 -
+	lsrs r6, #24
+	lsls r6, #4
+	ldrb r6, [r3, r6]
+	lsls r6, #24
 
-	// r4 - s00 | s10 | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 | s22 | s32
-	// r7 - s03`|     | s21`|
+	rev16 r4, r4
 
-	lsrs r3, r6, #24
-	ldrb r3, [r0, r3]
-	lsls r3, #24
+	uxtb r3, r4 // too high pressure
+	lsls r3, #4
+	add r3, r9 // pointer spilled
+	ldrb r3, [r3, #8] // use different bank now
+	lsls r3, #8
 
-	orrs r7, r3
+	orrs r3, r6
 
-	// r0 - sbox
-	// r1 -     | s11`|     | s33`
-	// r2 - s13 |  -  |  -  | s23
-	// r3 -
+	//current allocaton
+	// r0 - s00`|     | s22`| s33`
+	// r1 - s01`| s12`|     | s30`
+	// r2 - s02`|     |     |
+	// r3 -     | s10`|     | s32`
+	// r4 -  -  |  -  |  -  | s20
+	// r5 -  -  | s11 | s21 | s31
+	// r6 -
+	// r7 - s03 | s13 | s23 |  -
 
-	// r4 - s00 | s10 | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 | s22 |  -
-	// r7 - s03`|     | s21`| s32`
+	movs r6, #8 // bank 3 (or bank 1 on dual banked)
+	add r6, r9
 
-	//give up on rev16
-
-	lsrs r3, r6, #16
-	uxtb r3, r3
-	ldrb r3, [r0, r3]
-	lsls r3, #16
-
-	orrs r1, r3
-
-	// r0 - sbox
-	// r1 -     | s11`| s22`| s33`
-	// r2 - s13 |  -  |  -  | s23
-	// r3 -
-
-	// r4 - s00 | s10 | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 |  -  |  -
-	// r7 - s03`|     | s21`| s32`
-
-	//give up on rev16 // column 0 goes into r3
-
-	uxtb r3, r4
-	ldrb r3, [r0, r3]
-
-	orrs r3, r1
-
-	lsrs r1, r4, #8
-	uxtb r1, r1
-	ldrb r1, [r0, r1]
-	lsls r1, #8
-
-	orrs r7, r1
-
-	// r0 - sbox
-	// r1 -
-	// r2 - s13 |  -  |  -  | s23
-	// r3 - s00`| s11`| s22`| s33`
-
-	// r4 -  -  |  -  | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 |  -  |  -
-	// r7 - s03`| s10`| s21`| s32`
-
-	lsrs r1, r4, #24
-	ldrb r1, [r0, r1]
-	lsls r1, #24
-
-	lsrs r4, #16
-	uxtb r4, r4
-	ldrb r4, [r0, r4]
+	lsrs r4, #24
+	lsls r4, #4
+	ldrb r4, [r6, r4]
 	lsls r4, #16
 
-	// r0 - sbox
-	// r1 -     |     |     | s30`
-	// r2 - s13 |  -  |  -  | s23
-	// r3 - s00`| s11`| s22`| s33`
+	orrs r2, r4
 
-	// r4 -     |     | s20`|
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 |  -  |  -
-	// r7 - s03`| s10`| s21`| s32`
+	//current allocaton
+	// r0 - s00`|     | s22`| s33`
+	// r1 - s01`| s12`|     | s30`
+	// r2 - s02`|     | s20`|
+	// r3 -     | s10`|     | s32`
+	// r4 -
+	// r5 -  -  | s11 | s21 | s31
+	// r6 - AES_d4Te + 8
+	// r7 - s03 | s13 | s23 |  -
 
-	lsrs r0, r5, #24 // too high pressure
+	uxtb r4, r7
+	lsls r4, #4
+	ldrb r4, [r6, r4]
 
-	uxtb r5, r5
-	add r5, r9 // add sbox base
-	ldrb r5, [r5]
+	orrs r3, r4
 
-	orrs r5, r1
+	lsrs r4, r5, #24
+	lsls r4, #4
+	ldrb r4, [r6, r4]
+	lsls r4, #24
 
-	mov r1, r9 // get sbox back
-	ldrb r0, [r1, r0]
-	lsls r0, #24
+	orrs r2, r4
 
-	// r0 -     |     |     | s31`
-	// r1 - sbox
-	// r2 - s13 |  -  |  -  | s23
-	// r3 - s00`| s11`| s22`| s33`
+	//current allocaton
+	// r0 - s00`|     | s22`| s33`
+	// r1 - s01`| s12`|     | s30`
+	// r2 - s02`|     | s20`| s31`
+	// r3 - s03`| s10`|     | s32`
+	// r4 -
+	// r5 -  -  | s11 | s21 |  -
+	// r6 - AES_d4Te + 8
+	// r7 -  -  | s13 | s23 |  -
 
-	// r4 -     |     | s20`|
-	// r5 - s01`|     |     | s30`
-	// r6 - s02 | s12 |  -  |  -
-	// r7 - s03`| s10`| s21`| s32`
+	rev16 r5, r5
 
-	orrs r4, r0
+	uxtb r4, r5
+	lsls r4, #4
+	ldrb r4, [r6, r4]
+	lsls r4, #8
 
-	lsrs r0, r2, #24
-	ldrb r0, [r1, r0]
-	lsls r0, #16
+	orrs r0, r4
 
-	orrs r5, r0
+	lsrs r5, #24
+	lsls r5, #4
+	ldrb r5, [r6, r5]
+	lsls r5, #16
 
-	// r0 -
-	// r1 - sbox
-	// r2 - s13 |  -  |  -  |  -
-	// r3 - s00`| s11`| s22`| s33`
+	orrs r3, r5
 
-	// r4 -     |     | s20`| s31`
-	// r5 - s01`|     | s23`| s30`
-	// r6 - s02 | s12 |  -  |  -
-	// r7 - s03`| s10`| s21`| s32`
+	//current allocaton
+	// r0 - s00`| s11`| s22`| s33`
+	// r1 - s01`| s12`|     | s30`
+	// r2 - s02`|     | s20`| s31`
+	// r3 - s03`| s10`| s21`| s32`
+	// r4 -
+	// r5 -
+	// r6 - AES_d4Te + 8
+	// r7 -  -  | s13 | s23 |  -
 
-	uxtb r2, r2
-	ldrb r2, [r1, r2]
-	lsls r2, #8
+	rev16 r7, r7
 
-	lsrs r0, r6, #8
-	uxtb r0, r0
-	ldrb r0, [r1, r0]
-	lsls r0, #8
+	uxtb r4, r7
+	lsls r4, #4
+	ldrb r4, [r6, r4]
+	lsls r4, #8
 
-	orrs r5, r0
+	orrs r2, r4
 
-	// r0 -
-	// r1 - sbox
-	// r2 -     | s13`|     |
-	// r3 - s00`| s11`| s22`| s33`
+	lsrs r7, #24
+	lsls r7, #4
+	ldrb r7, [r6, r7]
+	lsls r7, #16
 
-	// r4 -     |     | s20`| s31`
-	// r5 - s01`| s12`| s23`| s30`
-	// r6 - s02 |  -  |  -  |  -
-	// r7 - s03`| s10`| s21`| s32`
+	orrs r1, r7
 
-	uxtb r6, r6
-	ldrb r6, [r1, r6]
-
-	orrs r6, r2
-	orrs r6, r4
-
-	// r3 - s00`| s11`| s22`| s33`
-	// r5 - s01`| s12`| s23`| s30`
-	// r6 - s02`| s13`| s20`| s31`
-	// r7 - s03`| s10`| s21`| s32`
-
-	//mov r4, r3 // positioning fixed in epilogue
+	//current allocaton
+	// r0 - s00`| s11`| s22`| s33`
+	// r1 - s01`| s12`| s23`| s30`
+	// r2 - s02`| s13`| s20`| s31`
+	// r3 - s03`| s10`| s21`| s32`
+	// r4 -
+	// r5 -
+	// r6 - AES_d4Te + 8
+	// r7 -
 
 	//final addroundkey
-	mov r0, r14 // get current rk
+	mov r7, r14 // get current rk
 
-	ldm r0, {r0-r2, r4}
-	eors r3, r0
+	ldm r7, {r4-r7}
+	eors r4, r0
 	eors r5, r1
 	eors r6, r2
-	eors r7, r4
+	eors r7, r3
 
-	pop {r0-r1, r4} // pop to non data // unstack also out pointer
+	pop {r0-r1, r2} // pop to non data // unstack also out pointer
 	mov r8, r0
 	mov r9, r1
 
-	stmia r4!, {r3,r5-r7}
-
+	stmia r2!, {r4-r7}
 
 	pop {r4-r7, pc}
 

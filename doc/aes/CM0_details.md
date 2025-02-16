@@ -57,6 +57,11 @@ out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 
 ### CM0_d4T
 
+Uses the diffused 4 T tables, which is more efficient than 1T or 4T as it doesn't require
+rotations or increasing register pressure with 4 pointers.
+
+Forward encryption is fully resistant to bank timming attacks on 2 or 4 banked (by word
+striping) SRAM memories (e.g. SRAM0 in rp2040)
 
 ## perfomance
 
@@ -65,9 +70,9 @@ out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 | `setEncKey<128>` | 399/414 | (sBOX) | 439/? |
 | `setEncKey<192>` | 375/388 | (sBOX) | 407/? |
 | `setEncKey<256>` | 568/579 | (sBOX) | 620/? |
-| `encrypt<128>`   | 1666/1680 | 1587/1600 | 1131/? |
-| `encrypt<192>`   | 2000/2016 | 1905/1920 | 1349/? |
-| `encrypt<256>`   | 2334/2352 | 2223/2240 | 1567/? |
+| `encrypt<128>`   | 1666/1680 | 1587/1600 | 1145/? |
+| `encrypt<192>`   | 2000/2016 | 1905/1920 | 1363/? |
+| `encrypt<256>`   | 2334/2352 | 2223/2240 | 1581/? |
 | `setDecKey<128>` | 0 | 0 |  |
 | `setDecKey<192>` | 0 | 0 |  |
 | `setDecKey<256>` | 0 | 0 |  |
@@ -92,7 +97,7 @@ STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% perfor
 | `CM0_d4T_AES128_keyschedule_enc` | 88 | 16 | uses d4Te table |
 | `CM0_d4T_AES192_keyschedule_enc` | 94 | 20(24) | uses d4Te table |
 | `CM0_d4T_AES256_keyschedule_enc` | 182 | 32 | uses d4Te table |
-| `CM0_d4T_AES_encrypt` |  |  | uses d4Te and sbox table |
+| `CM0_d4T_AES_encrypt` | 398 | 32 | uses d4Te table |
 
 code sizes include pc-rel constants and their padding
 
