@@ -45,6 +45,9 @@ CM0_d4T_AES_encrypt:
 	eors r6, r2
 	eors r7, r3
 
+	// state elements will be represented with big endian representation (transposed canonical state representation)
+	// columns are loaded in little endian so right/left in shifts is in reverse wrt transposed canonical state representation
+
 	// global allocation
 	// r8 - increment constant
 	// r9 - AES_d4Te
@@ -401,7 +404,7 @@ CM0_d4T_AES_encrypt:
 	// r7 - s03 | s13 | s23 |  -
 
 	movs r6, #8 // bank 3 (or bank 1 on dual banked)
-	add r6, r9
+	add r6, r9 // get d4Te back
 
 	lsrs r4, #24
 	lsls r4, #4
