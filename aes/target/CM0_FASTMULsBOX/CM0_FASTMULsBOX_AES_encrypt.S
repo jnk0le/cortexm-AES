@@ -14,7 +14,7 @@
 .thumb
 .text
 
-.align 2
+.balign 4
 // void CM0_FASTMULsBOX_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
 .global CM0_FASTMULsBOX_AES_encrypt
 .type   CM0_FASTMULsBOX_AES_encrypt,%function
@@ -50,6 +50,10 @@ CM0_FASTMULsBOX_AES_encrypt:
 	eors r6, r2
 	eors r7, r3
 
+	// state elements will be represented with big endian representation (transposed canonical state representation)
+	// columns are loaded in little endian so right/left in shifts is in reverse wrt transposed canonical state representation
+
+	// global allocation
 	// r8 - increment constant
 	// r9 - sbox
 	// r10 - 0x01010101
@@ -57,12 +61,9 @@ CM0_FASTMULsBOX_AES_encrypt:
 	// r12 - final ptr
 	// r14 - current ptr
 
-	mov r0, r9 // get sbox here to align loop entry, next getter is at the end of loop
+	mov r3, r9 // get sbox here to align loop entry, next getter is at the end of loop
 
 1:	//shiftrows and subbytes
-
-	//r1,r2,r3 are free //saved 2 cycles on rev 16// lost 2 cycles on sbox pressured out // maybe try it more straightforward
-	//columns are kept as little endian so right/left in shifts is in reverse wrt transposed canonical state representation
 
 	// r4 - s00 | s10 | s20 | s30
 	// r5 - s01 | s11 | s21 | s31
@@ -70,214 +71,181 @@ CM0_FASTMULsBOX_AES_encrypt:
 	// r7 - s03 | s13 | s23 | s33
 
 	//final
-	// r4 - s00`| s11`| s22`| s33`
-	// r5 - s01`| s12`| s23`| s30`
-	// r6 - s02`| s13`| s20`| s31`
-	// r7 - s03`| s10`| s21`| s32`
+	// r0 - s00`| s11`| s22`| s33`
+	// r1 - s01`| s12`| s23`| s30`
+	// r2 - s02`| s13`| s20`| s31`
+	// r3 - s03`| s10`| s21`| s32`
+
+	uxtb r0, r4
+	ldrb r0, [r3, r0]
 
 	lsrs r1, r7, #24
-	ldrb r1, [r0, r1]
+	ldrb r1, [r3, r1]
 	lsls r1, #24
 
-	rev16 r3, r5
+	orrs r0, r1
 
-	// r0 - sbox
-	// r1 -                   s33`
+	//current allocation
+	// r0 - s00`|     |     | s33`
+	// r1 -
 	// r2 -
-	// r3 - s11 |  -  |  -  | s21
-
-	// r4 - s00 | s10 | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
+	// r3 - sbox
+	// r4 -  -  | s10 | s20 | s30
+	// r5 - s01 | s11 | s21 | s31
 	// r6 - s02 | s12 | s22 | s32
 	// r7 - s03 | s13 | s23 |  -
 
-	uxtb r2, r3
-	ldrb r2, [r0, r2]
+	rev16 r2, r6
+
+	lsrs r1, r2, #24
+	ldrb r1, [r3, r1]
+	lsls r1, #16
+
+	orrs r0, r1
+
+	uxtb r2, r2
+	ldrb r2, [r3, r2]
 	lsls r2, #8
+
+	uxtb r1, r5
+	ldrb r1, [r3, r1]
 
 	orrs r1, r2
 
-	rev16 r2, r7
-	uxtb r7, r7
-	ldrb r7, [r0, r7]
+	//current allocation
+	// r0 - s00`|     | s22`| s33`
+	// r1 - s01`| s12`|     |
+	// r2 -
+	// r3 - sbox
+	// r4 -  -  | s10 | s20 | s30
+	// r5 -  -  | s11 | s21 | s31
+	// r6 - s02 |  -  |  -  | s32
+	// r7 - s03 | s13 | s23 |  -
 
-	// r0 - sbox
-	// r1 -     | s11`|     | s33`
-	// r2 - s13 |  -  |  -  | s23
-	// r3 -  -  |  -  |  -  | s21
+	lsrs r2, r4, #24
+	ldrb r2, [r3, r2]
+	lsls r2, #24
 
-	// r4 - s00 | s10 | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 | s22 | s32
-	// r7 - s03`|     |     |
+	orrs r1, r2
 
-	lsrs r3, #24
-	ldrb r3, [r0, r3]
-	lsls r3, #16
+	uxtb r2, r6
+	ldrb r2, [r3, r2]
 
-	orrs r7, r3
+	//current allocation
+	// r0 - s00`|     | s22`| s33`
+	// r1 - s01`| s12`|     | s30`
+	// r2 - s02`|     |     |
+	// r3 - sbox
+	// r4 -  -  | s10 | s20 |  -
+	// r5 -  -  | s11 | s21 | s31
+	// r6 -  -  |  -  |  -  | s32
+	// r7 - s03 | s13 | s23 |  -
 
-	// r0 - sbox
-	// r1 -     | s11`|     | s33`
-	// r2 - s13 |  -  |  -  | s23
-	// r3 -
+	lsrs r6, #24
+	ldrb r6, [r3, r6]
+	lsls r6, #24
 
-	// r4 - s00 | s10 | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 | s22 | s32
-	// r7 - s03`|     | s21`|
+	rev16 r4, r4
 
-	lsrs r3, r6, #24
-	ldrb r3, [r0, r3]
-	lsls r3, #24
+	uxtb r3, r4 // too high pressure
+	add r3, r9 // pointer spilled
+	ldrb r3, [r3]
+	lsls r3, #8
 
-	orrs r7, r3
+	orrs r3, r6
 
-	// r0 - sbox
-	// r1 -     | s11`|     | s33`
-	// r2 - s13 |  -  |  -  | s23
-	// r3 -
+	//current allocation
+	// r0 - s00`|     | s22`| s33`
+	// r1 - s01`| s12`|     | s30`
+	// r2 - s02`|     |     |
+	// r3 -     | s10`|     | s32`
+	// r4 -  -  |  -  |  -  | s20
+	// r5 -  -  | s11 | s21 | s31
+	// r6 -
+	// r7 - s03 | s13 | s23 |  -
 
-	// r4 - s00 | s10 | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 | s22 |  -
-	// r7 - s03`|     | s21`| s32`
+	mov r6, r9 // get sbox back
 
-	//give up on rev16
-
-	lsrs r3, r6, #16
-	uxtb r3, r3
-	ldrb r3, [r0, r3]
-	lsls r3, #16
-
-	orrs r1, r3
-
-	// r0 - sbox
-	// r1 -     | s11`| s22`| s33`
-	// r2 - s13 |  -  |  -  | s23
-	// r3 -
-
-	// r4 - s00 | s10 | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 |  -  |  -
-	// r7 - s03`|     | s21`| s32`
-
-	//give up on rev16 // column 0 goes into r3 // correct later in mixcolumns??
-
-	uxtb r3, r4
-	ldrb r3, [r0, r3]
-
-	orrs r3, r1
-
-	lsrs r1, r4, #8
-	uxtb r1, r1
-	ldrb r1, [r0, r1]
-	lsls r1, #8
-
-	orrs r7, r1
-
-	// r0 - sbox
-	// r1 -
-	// r2 - s13 |  -  |  -  | s23
-	// r3 - s00`| s11`| s22`| s33`
-
-	// r4 -  -  |  -  | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 |  -  |  -
-	// r7 - s03`| s10`| s21`| s32`
-
-	lsrs r1, r4, #24
-	ldrb r1, [r0, r1]
-	lsls r1, #24
-
-	lsrs r4, #16
-	uxtb r4, r4
-	ldrb r4, [r0, r4]
+	lsrs r4, #24
+	ldrb r4, [r6, r4]
 	lsls r4, #16
 
-	// r0 - sbox
-	// r1 -     |     |     | s30`
-	// r2 - s13 |  -  |  -  | s23
-	// r3 - s00`| s11`| s22`| s33`
+	orrs r2, r4
 
-	// r4 -     |     | s20`|
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 |  -  |  -
-	// r7 - s03`| s10`| s21`| s32`
+	//current allocation
+	// r0 - s00`|     | s22`| s33`
+	// r1 - s01`| s12`|     | s30`
+	// r2 - s02`|     | s20`|
+	// r3 -     | s10`|     | s32`
+	// r4 -
+	// r5 -  -  | s11 | s21 | s31
+	// r6 - sbox
+	// r7 - s03 | s13 | s23 |  -
 
-	lsrs r0, r5, #24 // too high pressure
+	uxtb r4, r7
+	ldrb r4, [r6, r4]
 
-	uxtb r5, r5
-	add r5, r9 // add sbox base
-	ldrb r5, [r5]
+	orrs r3, r4
 
-	orrs r5, r1
+	lsrs r4, r5, #24
+	ldrb r4, [r6, r4]
+	lsls r4, #24
 
-	mov r1, r9 // get sbox back
-	ldrb r0, [r1, r0]
-	lsls r0, #24
+	orrs r2, r4
 
-	// r0 -     |     |     | s31`
-	// r1 - sbox
-	// r2 - s13 |  -  |  -  | s23
-	// r3 - s00`| s11`| s22`| s33`
+	//current allocation
+	// r0 - s00`|     | s22`| s33`
+	// r1 - s01`| s12`|     | s30`
+	// r2 - s02`|     | s20`| s31`
+	// r3 - s03`| s10`|     | s32`
+	// r4 -
+	// r5 -  -  | s11 | s21 |  -
+	// r6 - sbox
+	// r7 -  -  | s13 | s23 |  -
 
-	// r4 -     |     | s20`|
-	// r5 - s01`|     |     | s30`
-	// r6 - s02 | s12 |  -  |  -
-	// r7 - s03`| s10`| s21`| s32`
+	rev16 r5, r5
 
-	orrs r4, r0
+	uxtb r4, r5
+	ldrb r4, [r6, r4]
+	lsls r4, #8
 
-	lsrs r0, r2, #24
-	ldrb r0, [r1, r0]
-	lsls r0, #16
+	orrs r0, r4
 
-	orrs r5, r0
+	lsrs r5, #24
+	ldrb r5, [r6, r5]
+	lsls r5, #16
 
-	// r0 -     |     |     |
-	// r1 - sbox
-	// r2 - s13 |  -  |  -  |  -
-	// r3 - s00`| s11`| s22`| s33`
+	orrs r3, r5
 
-	// r4 -     |     | s20`| s31`
-	// r5 - s01`|     | s23`| s30`
-	// r6 - s02 | s12 |  -  |  -
-	// r7 - s03`| s10`| s21`| s32`
+	//current allocation
+	// r0 - s00`| s11`| s22`| s33`
+	// r1 - s01`| s12`|     | s30`
+	// r2 - s02`|     | s20`| s31`
+	// r3 - s03`| s10`| s21`| s32`
+	// r4 -
+	// r5 -
+	// r6 - sbox
+	// r7 -  -  | s13 | s23 |  -
 
-	uxtb r2, r2
-	ldrb r2, [r1, r2]
-	lsls r2, #8
+	rev16 r7, r7
 
-	lsrs r0, r6, #8
-	uxtb r0, r0
-	ldrb r0, [r1, r0]
-	lsls r0, #8
+	uxtb r4, r7
+	ldrb r4, [r6, r4]
+	lsls r4, #8
 
-	orrs r5, r0
+	orrs r2, r4
 
-	// r0 -
-	// r1 - sbox
-	// r2 -     | s13`|     |
-	// r3 - s00`| s11`| s22`| s33`
+	lsrs r7, #24
+	ldrb r7, [r6, r7]
+	lsls r7, #16
 
-	// r4 -     |     | s20`| s31`
-	// r5 - s01`| s12`| s23`| s30`
-	// r6 - s02 |  -  |  -  |  -
-	// r7 - s03`| s10`| s21`| s32`
+	orrs r1, r7
 
-	uxtb r6, r6
-	ldrb r6, [r1, r6]
-
-	orrs r6, r2
-	orrs r6, r4
-
-	// r3 - s00`| s11`| s22`| s33`
-	// r5 - s01`| s12`| s23`| s30`
-	// r6 - s02`| s13`| s20`| s31`
-	// r7 - s03`| s10`| s21`| s32`
-
-	//mov r4, r3 // position fixed later in mixcolums
+	//current allocation
+	// r0 - s00`| s11`| s22`| s33`
+	// r1 - s01`| s12`| s23`| s30`
+	// r2 - s02`| s13`| s20`| s31`
+	// r3 - s03`| s10`| s21`| s32`
 
 	// do mix columns as
 	// tmp = s0 ^ s1 ^ s2 ^ s3
@@ -288,23 +256,23 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 	// use approach with 1 more xor instead of rotation
 
-	mov r0, r10 // 0x01010101
-	movs r1, #0x1b
+	mov r4, r10 // 0x01010101
+	movs r5, #0x1b
 
 	// 2 registers + 1 in/out are free // column 0 comes in r3 insteadof r4, need to correct it's position before mul
 
 	//col 0
-	lsrs r2, r3, #8
-	lsls r4, r3, #24
-	orrs r2, r4
+	lsrs r6, r0, #8 // need to preserve input, so rors makes no diff
+	lsls r7, r0, #24
+	orrs r6, r7
 
-	eors r2, r3 // s0^s1 | s1^s2 | s2^s3 | s3^s0
+	eors r6, r0 // s0^s1 | s1^s2 | s2^s3 | s3^s0
 
-	rev16 r4, r2 //ror #16
-	rev r4, r4 //ror #16
+	rev16 r7, r6 // ror #16
+	rev r7, r7 // ror #16
 
-	eors r4, r2 // s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
-	eors r4, r3 // s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
+	eors r7, r6 // s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
+	eors r0, r7 // s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
 
 	/*now mult r2 and eors it into r4 // r3 free
 
@@ -315,96 +283,96 @@ CM0_FASTMULsBOX_AES_encrypt:
 	// out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 	*/
 
-	lsrs r3, r2, #7
-	ands r3, r0 // mask
-	muls r3, r1 // get predicated reduction
+	lsrs r7, r6, #7
+	ands r7, r4 // mask
+	muls r7, r5 // get predicated reduction
 
-	lsls r2, #1
-	bics r2, r0 // & 0xfe
+	lsls r6, #1
+	bics r6, r4 // & 0xfe // can also eors with r7
 
-	eors r2, r3 // reduce
-	eors r4, r2 // final
+	eors r6, r7 // reduce
+	eors r0, r6 // final
 
 	//col 1
-	lsrs r2, r5, #8
-	lsls r3, r5, #24
-	orrs r2, r3
+	lsrs r6, r1, #8 // need to preserve input, so rors makes no diff
+	lsls r7, r1, #24
+	orrs r6, r7
 
-	eors r2, r5 // s0^s1 | s1^s2 | s2^s3 | s3^s0
+	eors r6, r1 // s0^s1 | s1^s2 | s2^s3 | s3^s0
 
-	rev16 r3, r2
-	rev r3, r3
+	rev16 r7, r6 // ror #16
+	rev r7, r7 // ror #16
 
-	eors r3, r2 // s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
-	eors r5, r3 // s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
+	eors r7, r6 // s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
+	eors r1, r7 // s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
 
-	lsrs r3, r2, #7
-	ands r3, r0 // mask
-	muls r3, r1 // get predicated reduction
+	lsrs r7, r6, #7
+	ands r7, r4 // mask
+	muls r7, r5 // get predicated reduction
 
-	lsls r2, #1
-	bics r2, r0 // & 0xfe // can also eors with r3
+	lsls r6, #1
+	bics r6, r4 // & 0xfe // can also eors with r7
 
-	eors r2, r3 // reduce
-	eors r5, r2 // final
+	eors r6, r7 // reduce
+	eors r1, r6 // final
 
 	//col 2
-	lsrs r2, r6, #8
-	lsls r3, r6, #24
-	orrs r2, r3
+	lsrs r6, r2, #8 // need to preserve input, so rors makes no diff
+	lsls r7, r2, #24
+	orrs r6, r7
 
-	eors r2, r6 // s0^s1 | s1^s2 | s2^s3 | s3^s0
+	eors r6, r2 // s0^s1 | s1^s2 | s2^s3 | s3^s0
 
-	rev16 r3, r2
-	rev r3, r3
+	rev16 r7, r6 // ror #16
+	rev r7, r7 // ror #16
 
-	eors r3, r2 // s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
-	eors r6, r3 // s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
+	eors r7, r6 // s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
+	eors r2, r7 // s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
 
-	lsrs r3, r2, #7
-	ands r3, r0 // mask
-	muls r3, r1 // get predicated reduction
+	lsrs r7, r6, #7
+	ands r7, r4 // mask
+	muls r7, r5 // get predicated reduction
 
-	lsls r2, #1
-	bics r2, r0 // & 0xfe // can also eors with r3
+	lsls r6, #1
+	bics r6, r4 // & 0xfe // can also eors with r7
 
-	eors r2, r3 // reduce
-	eors r6, r2 // final
+	eors r6, r7 // reduce
+	eors r2, r6 // final
 
 	//col 3
-	lsrs r2, r7, #8
-	lsls r3, r7, #24
-	orrs r2, r3
+	lsrs r6, r3, #8 // need to preserve input, so rors makes no diff
+	lsls r7, r3, #24
+	orrs r6, r7
 
-	eors r2, r7 // s0^s1 | s1^s2 | s2^s3 | s3^s0
+	eors r6, r3 // s0^s1 | s1^s2 | s2^s3 | s3^s0
 
-	rev16 r3, r2
-	rev r3, r3
+	rev16 r7, r6 // ror #16
+	rev r7, r7 // ror #16
 
-	eors r3, r2 // s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
-	eors r7, r3 // s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
+	eors r7, r6 // s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
+	eors r3, r7 // s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
 
-	lsrs r3, r2, #7
-	ands r3, r0 // mask
-	muls r3, r1 // get predicated reduction
+	lsrs r7, r6, #7
+	ands r7, r4 // mask
+	muls r7, r5 // get predicated reduction
 
-	lsls r2, #1
-	bics r2, r0 // & 0xfe // can also eors with r3
+	lsls r6, #1
+	bics r6, r4 // & 0xfe // can also eors with r7
 
-	eors r2, r3 // reduce
-	eors r7, r2 // final
+	eors r6, r7 // reduce
+	eors r3, r6 // final
 
 	//addroundkey
-	mov r0, r14 // get current rk
+	mov r7, r14 // get current rk
 	add r14, r8 // increment rk by 16
 
-	ldm r0, {r0-r3}
+	ldm r7, {r4-r7}
 	eors r4, r0
 	eors r5, r1
 	eors r6, r2
 	eors r7, r3
 
-	mov r0, r9 // get sbox for next round or final round
+	mov r3, r9 // get sbox for next round or final round
 
 	cmp r14, r12
 	beq 2f // if rk reached final condition
@@ -412,239 +380,203 @@ CM0_FASTMULsBOX_AES_encrypt:
 
 2:	//final round
 
-	//r1,r2,r3 are free //saved 2 cycles on rev 16// lost 2 cycles on sbox pressured out // maybe try it more straightforward
-	//columns are kept as little endian so right/left in shifts is in reverse wrt transposed canonical state representation
-
 	// r4 - s00 | s10 | s20 | s30
 	// r5 - s01 | s11 | s21 | s31
 	// r6 - s02 | s12 | s22 | s32
 	// r7 - s03 | s13 | s23 | s33
 
 	//final
-	// r4 - s00`| s11`| s22`| s33`
-	// r5 - s01`| s12`| s23`| s30`
-	// r6 - s02`| s13`| s20`| s31`
-	// r7 - s03`| s10`| s21`| s32`
+	// r0 - s00`| s11`| s22`| s33`
+	// r1 - s01`| s12`| s23`| s30`
+	// r2 - s02`| s13`| s20`| s31`
+	// r3 - s03`| s10`| s21`| s32`
+
+	uxtb r0, r4
+	ldrb r0, [r3, r0]
 
 	lsrs r1, r7, #24
-	ldrb r1, [r0, r1]
+	ldrb r1, [r3, r1]
 	lsls r1, #24
 
-	rev16 r3, r5
+	orrs r0, r1
 
-	// r0 - sbox
-	// r1 -                   s33`
+	//current allocation
+	// r0 - s00`|     |     | s33`
+	// r1 -
 	// r2 -
-	// r3 - s11 |  -  |  -  | s21
-
-	// r4 - s00 | s10 | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
+	// r3 - sbox
+	// r4 -  -  | s10 | s20 | s30
+	// r5 - s01 | s11 | s21 | s31
 	// r6 - s02 | s12 | s22 | s32
 	// r7 - s03 | s13 | s23 |  -
 
-	uxtb r2, r3
-	ldrb r2, [r0, r2]
+	rev16 r2, r6
+
+	lsrs r1, r2, #24
+	ldrb r1, [r3, r1]
+	lsls r1, #16
+
+	orrs r0, r1
+
+	uxtb r2, r2
+	ldrb r2, [r3, r2]
 	lsls r2, #8
+
+	uxtb r1, r5
+	ldrb r1, [r3, r1]
 
 	orrs r1, r2
 
-	rev16 r2, r7
-	uxtb r7, r7
-	ldrb r7, [r0, r7]
+	//current allocation
+	// r0 - s00`|     | s22`| s33`
+	// r1 - s01`| s12`|     |
+	// r2 -
+	// r3 - sbox
+	// r4 -  -  | s10 | s20 | s30
+	// r5 -  -  | s11 | s21 | s31
+	// r6 - s02 |  -  |  -  | s32
+	// r7 - s03 | s13 | s23 |  -
 
-	// r0 - sbox
-	// r1 -     | s11`|     | s33`
-	// r2 - s13 |  -  |  -  | s23
-	// r3 -  -  |  -  |  -  | s21
+	lsrs r2, r4, #24
+	ldrb r2, [r3, r2]
+	lsls r2, #24
 
-	// r4 - s00 | s10 | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 | s22 | s32
-	// r7 - s03`|     |     |
+	orrs r1, r2
 
-	lsrs r3, #24
-	ldrb r3, [r0, r3]
-	lsls r3, #16
+	uxtb r2, r6
+	ldrb r2, [r3, r2]
 
-	orrs r7, r3
+	//current allocation
+	// r0 - s00`|     | s22`| s33`
+	// r1 - s01`| s12`|     | s30`
+	// r2 - s02`|     |     |
+	// r3 - sbox
+	// r4 -  -  | s10 | s20 |  -
+	// r5 -  -  | s11 | s21 | s31
+	// r6 -  -  |  -  |  -  | s32
+	// r7 - s03 | s13 | s23 |  -
 
-	// r0 - sbox
-	// r1 -     | s11`|     | s33`
-	// r2 - s13 |  -  |  -  | s23
-	// r3 -
+	lsrs r6, #24
+	ldrb r6, [r3, r6]
+	lsls r6, #24
 
-	// r4 - s00 | s10 | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 | s22 | s32
-	// r7 - s03`|     | s21`|
+	rev16 r4, r4
 
-	lsrs r3, r6, #24
-	ldrb r3, [r0, r3]
-	lsls r3, #24
+	uxtb r3, r4 // too high pressure
+	add r3, r9 // pointer spilled
+	ldrb r3, [r3]
+	lsls r3, #8
 
-	orrs r7, r3
+	orrs r3, r6
 
-	// r0 - sbox
-	// r1 -     | s11`|     | s33`
-	// r2 - s13 |  -  |  -  | s23
-	// r3 -
+	//current allocation
+	// r0 - s00`|     | s22`| s33`
+	// r1 - s01`| s12`|     | s30`
+	// r2 - s02`|     |     |
+	// r3 -     | s10`|     | s32`
+	// r4 -  -  |  -  |  -  | s20
+	// r5 -  -  | s11 | s21 | s31
+	// r6 -
+	// r7 - s03 | s13 | s23 |  -
 
-	// r4 - s00 | s10 | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 | s22 |  -
-	// r7 - s03`|     | s21`| s32`
+	mov r6, r9 // get sbox back
 
-	//give up on rev16
-
-	lsrs r3, r6, #16
-	uxtb r3, r3
-	ldrb r3, [r0, r3]
-	lsls r3, #16
-
-	orrs r1, r3
-
-	// r0 - sbox
-	// r1 -     | s11`| s22`| s33`
-	// r2 - s13 |  -  |  -  | s23
-	// r3 -
-
-	// r4 - s00 | s10 | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 |  -  |  -
-	// r7 - s03`|     | s21`| s32`
-
-	//give up on rev16 // column 0 goes into r3
-
-	uxtb r3, r4
-	ldrb r3, [r0, r3]
-
-	orrs r3, r1
-
-	lsrs r1, r4, #8
-	uxtb r1, r1
-	ldrb r1, [r0, r1]
-	lsls r1, #8
-
-	orrs r7, r1
-
-	// r0 - sbox
-	// r1 -
-	// r2 - s13 |  -  |  -  | s23
-	// r3 - s00`| s11`| s22`| s33`
-
-	// r4 -  -  |  -  | s20 | s30
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 |  -  |  -
-	// r7 - s03`| s10`| s21`| s32`
-
-	lsrs r1, r4, #24
-	ldrb r1, [r0, r1]
-	lsls r1, #24
-
-	lsrs r4, #16
-	uxtb r4, r4
-	ldrb r4, [r0, r4]
+	lsrs r4, #24
+	ldrb r4, [r6, r4]
 	lsls r4, #16
 
-	// r0 - sbox
-	// r1 -     |     |     | s30`
-	// r2 - s13 |  -  |  -  | s23
-	// r3 - s00`| s11`| s22`| s33`
+	orrs r2, r4
 
-	// r4 -     |     | s20`|
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 | s12 |  -  |  -
-	// r7 - s03`| s10`| s21`| s32`
+	//current allocation
+	// r0 - s00`|     | s22`| s33`
+	// r1 - s01`| s12`|     | s30`
+	// r2 - s02`|     | s20`|
+	// r3 -     | s10`|     | s32`
+	// r4 -
+	// r5 -  -  | s11 | s21 | s31
+	// r6 - sbox
+	// r7 - s03 | s13 | s23 |  -
 
-	lsrs r0, r5, #24 // too high pressure
+	uxtb r4, r7
+	ldrb r4, [r6, r4]
 
-	uxtb r5, r5
-	add r5, r9 // add sbox base
-	ldrb r5, [r5]
+	orrs r3, r4
 
-	orrs r5, r1
+	lsrs r4, r5, #24
+	ldrb r4, [r6, r4]
+	lsls r4, #24
 
-	mov r1, r9 // get sbox back
-	ldrb r0, [r1, r0]
-	lsls r0, #24
+	orrs r2, r4
 
-	// r0 -     |     |     | s31`
-	// r1 - sbox
-	// r2 - s13 |  -  |  -  | s23
-	// r3 - s00`| s11`| s22`| s33`
+	//current allocation
+	// r0 - s00`|     | s22`| s33`
+	// r1 - s01`| s12`|     | s30`
+	// r2 - s02`|     | s20`| s31`
+	// r3 - s03`| s10`|     | s32`
+	// r4 -
+	// r5 -  -  | s11 | s21 |  -
+	// r6 - sbox
+	// r7 -  -  | s13 | s23 |  -
 
-	// r4 -     |     | s20`|
-	// r5 - s01`|     |     | s30`
-	// r6 - s02 | s12 |  -  |  -
-	// r7 - s03`| s10`| s21`| s32`
+	rev16 r5, r5
 
-	orrs r4, r0
+	uxtb r4, r5
+	ldrb r4, [r6, r4]
+	lsls r4, #8
 
-	lsrs r0, r2, #24
-	ldrb r0, [r1, r0]
-	lsls r0, #16
+	orrs r0, r4
 
-	orrs r5, r0
+	lsrs r5, #24
+	ldrb r5, [r6, r5]
+	lsls r5, #16
 
-	// r0 -
-	// r1 - sbox
-	// r2 - s13 |  -  |  -  |  -
-	// r3 - s00`| s11`| s22`| s33`
+	orrs r3, r5
 
-	// r4 -     |     | s20`| s31`
-	// r5 - s01`|     | s23`| s30`
-	// r6 - s02 | s12 |  -  |  -
-	// r7 - s03`| s10`| s21`| s32`
+	//current allocation
+	// r0 - s00`| s11`| s22`| s33`
+	// r1 - s01`| s12`|     | s30`
+	// r2 - s02`|     | s20`| s31`
+	// r3 - s03`| s10`| s21`| s32`
+	// r4 -
+	// r5 -
+	// r6 - sbox
+	// r7 -  -  | s13 | s23 |  -
 
-	uxtb r2, r2
-	ldrb r2, [r1, r2]
-	lsls r2, #8
+	rev16 r7, r7
 
-	lsrs r0, r6, #8
-	uxtb r0, r0
-	ldrb r0, [r1, r0]
-	lsls r0, #8
+	uxtb r4, r7
+	ldrb r4, [r6, r4]
+	lsls r4, #8
 
-	orrs r5, r0
+	orrs r2, r4
 
-	// r0 -
-	// r1 - sbox
-	// r2 -     | s13`|     |
-	// r3 - s00`| s11`| s22`| s33`
+	lsrs r7, #24
+	ldrb r7, [r6, r7]
+	lsls r7, #16
 
-	// r4 -     |     | s20`| s31`
-	// r5 - s01`| s12`| s23`| s30`
-	// r6 - s02 |  -  |  -  |  -
-	// r7 - s03`| s10`| s21`| s32`
+	orrs r1, r7
 
-	uxtb r6, r6
-	ldrb r6, [r1, r6]
-
-	orrs r6, r2
-	orrs r6, r4
-
-	// r3 - s00`| s11`| s22`| s33`
-	// r5 - s01`| s12`| s23`| s30`
-	// r6 - s02`| s13`| s20`| s31`
-	// r7 - s03`| s10`| s21`| s32`
-
-	//mov r4, r3 // positioning fixed in epilogue
+	//current allocation
+	// r0 - s00`| s11`| s22`| s33`
+	// r1 - s01`| s12`| s23`| s30`
+	// r2 - s02`| s13`| s20`| s31`
+	// r3 - s03`| s10`| s21`| s32`
 
 	//final addroundkey
-	mov r0, r14 // get current rk
+	mov r7, r14 // get current rk
 
-	ldm r0, {r0-r2, r4}
-	eors r3, r0
+	ldm r7, {r4-r7}
+	eors r4, r0
 	eors r5, r1
 	eors r6, r2
-	eors r7, r4
+	eors r7, r3
 
-	pop {r0-r2, r4} // pop to non data // unstack also out pointer
+	pop {r0-r2, r3} // pop to non data // unstack also out pointer
 	mov r8, r0
 	mov r9, r1
 	mov r10, r2
 
-	stmia r4!, {r3,r5-r7}
+	stmia r3!, {r4-r7}
 
 	pop {r4-r7, pc}
 
