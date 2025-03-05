@@ -15,7 +15,7 @@
 .thumb
 .text
 
-.align 2
+.balign 4
 // void CM0_FASTMULsBOX_AES_decrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
 .global CM0_FASTMULsBOX_AES_decrypt
 .type   CM0_FASTMULsBOX_AES_decrypt,%function
@@ -63,11 +63,9 @@ CM0_FASTMULsBOX_AES_decrypt:
 	// r12 - final ptr // rk+16
 	// r14 - current ptr
 
-	mov r0, r9 // get inv_sbox here to align loop entry, next getter is at the end of loop
+	mov r3, r9 // get inv_sbox here to align loop entry, next getter is at the end of loop
 
 1:	//inv shiftrows and invsubbytes
-
-	//saved 2 cycles on rev16 // lost 2 cycles on inv_sbox pressured out, 1 on extra mov
 
 	// r4 - s00 | s10 | s20 | s30
 	// r5 - s01 | s11 | s21 | s31
@@ -75,203 +73,191 @@ CM0_FASTMULsBOX_AES_decrypt:
 	// r7 - s03 | s13 | s23 | s33
 
 	//final
-	// r4 - s00`| s13`| s22`| s31`
-	// r5 - s01`| s10`| s23`| s32`
-	// r6 - s02`| s11`| s20`| s33`
-	// r7 - s03`| s12`| s21`| s30`
+	// r0 - s00`| s13`| s22`| s31`
+	// r1 - s01`| s10`| s23`| s32`
+	// r2 - s02`| s11`| s20`| s33`
+	// r3 - s03`| s12`| s21`| s30`
 
-	lsrs r1, r4, #24
-	ldrb r1, [r0, r1]
+	uxtb r0, r4
+	ldrb r0, [r3, r0]
+
+	lsrs r1, r5, #24
+	ldrb r1, [r3, r1]
 	lsls r1, #24
 
-	rev16 r3, r7
+	orrs r0, r1
 
-	// r0 - inv_sbox
-	// r1 -     |     |     | s30`
+	//current allocation
+	// r0 - s00`|     |     | s31`
+	// r1 -
 	// r2 -
-	// r3 - s13 |  -  |  -  | s23
+	// r3 - inv_sbox
+	// r4 -  -  | s10 | s20 | s30
+	// r5 - s01 | s11 | s21 |  -
+	// r6 - s02 | s12 | s22 | s32
+	// r7 - s03 | s13 | s23 | s33
 
-	// r4 - s00 | s10 | s20 |  -
-	// r5 - s01 | s11 | s21 | s31
+	rev16 r2, r7
+
+	uxtb r1, r2
+	ldrb r1, [r3, r1]
+	lsls r1, #8
+
+	orrs r0, r1
+
+	lsrs r2, r2, #24
+	ldrb r2, [r3, r2]
+	lsls r2, #16
+
+	uxtb r1, r5
+	ldrb r1, [r3, r1]
+
+	orrs r1, r2
+
+	//current allocation
+	// r0 - s00`| s13`|     | s31`
+	// r1 - s01`|     | s23`|
+	// r2 -
+	// r3 - inv_sbox
+	// r4 -  -  | s10 | s20 | s30
+	// r5 -  -  | s11 | s21 |  -
 	// r6 - s02 | s12 | s22 | s32
 	// r7 - s03 |  -  |  -  | s33
 
-	lsrs r2, r7, #24
-	ldrb r2, [r0, r2]
+	lsrs r2, r6, #24
+	ldrb r2, [r3, r2]
 	lsls r2, #24
 
+	orrs r1, r2
+
+	lsrs r2, r7, #24
+	ldrb r2, [r3, r2]
+	lsls r2, #24
+
+	//current allocation
+	// r0 - s00`| s13`|     | s31`
+	// r1 - s01`|     | s23`| s32`
+	// r2 -     |     |     | s33`
+	// r3 - inv_sbox
+	// r4 -  -  | s10 | s20 | s30
+	// r5 -  -  | s11 | s21 |  -
+	// r6 - s02 | s12 | s22 |  -
+	// r7 - s03 |  -  |  -  |  -
+
 	uxtb r7, r7
-	ldrb r7, [r0, r7]
+	ldrb r7, [r3, r7]
 
-	orrs r7, r1
+	rev16 r5, r5
 
-	// r0 - inv_sbox
-	// r1 -
-	// r2 -     |     |     | s33`
-	// r3 - s13 |  -  |  -  | s23
-
-	// r4 - s00 | s10 | s20 |  -
-	// r5 - s01 | s11 | s21 | s31
-	// r6 - s02 | s12 | s22 | s32
-	// r7 - s03`|  -  |  -  | s30`
-
-	lsrs r1, r6, #8
-	uxtb r1, r1
-	ldrb r1, [r0, r1]
-	lsls r1, #8
-
-	orrs r7, r1
-
-	lsrs r1, r5, #16
-	uxtb r1, r1
-	ldrb r1, [r0, r1]
-	lsls r1, #16
-
-	orrs r7, r1
-
-	// r0 - inv_sbox
-	// r1 -
-	// r2 -     |     |     | s33`
-	// r3 - s13 |  -  |  -  | s23
-
-	// r4 - s00 | s10 | s20 |  -
-	// r5 - s01 | s11 |  -  | s31
-	// r6 - s02 |  -  | s22 | s32
-	// r7 - s03`| s12`| s21`| s30`
-
-	lsrs r1, r5, #8
-	uxtb r1, r1
-	ldrb r1, [r0, r1]
-	lsls r1, #8
-
-	orrs r2, r1
-
-	// r0 - inv_sbox
-	// r1 -
-	// r2 -     | s11`|     | s33`
-	// r3 - s13 |  -  |  -  | s23
-
-	// r4 - s00 | s10 | s20 |  -
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 |  -  | s22 | s32
-	// r7 - s03`| s12`| s21`| s30`
-
-	mov r1, r6 // free up s02
-
-	uxtb r6, r6
-	ldrb r6, [r0, r6]
-
-	orrs r6, r2
-
-	// r0 - inv_sbox
-	// r1 -  -  |  -  | s22 | s32
-	// r2 -
-	// r3 - s13 |  -  |  -  | s23
-
-	// r4 - s00 | s10 | s20 |  -
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02`| s11`|  -  | s33`
-	// r7 - s03`| s12`| s21`| s30`
-
-	lsrs r2, r3, #24
-	ldrb r2, [r0, r2]
-	lsls r2, #16
-
-	uxtb r3, r3
-	ldrb r3, [r0, r3]
-	lsls r3, #8
-
-	// r0 - inv_sbox
-	// r1 -  -  |  -  | s22 | s32
-	// r2 -     |     | s23`|
-	// r3 -     | s13`|     |
-
-	// r4 - s00 | s10 | s20 |  -
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02`| s11`|  -  | s33`
-	// r7 - s03`| s12`| s21`| s30`
-
-	lsrs r0, r1, #24 // too high pressure
-	add r0, r9 // add inv_sbox base
-	ldrb r0, [r0]
-	lsls r0, #24
-
-	orrs r2, r0
-
-	mov r0, r9 // get inv_sbox back
-
-	// r0 - inv_sbox
-	// r1 -  -  |  -  | s22 |  -
-	// r2 -     |     | s23`| s32`
-	// r3 -     | s13`|     |
-
-	// r4 - s00 | s10 | s20 |  -
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02`| s11`|  -  | s33`
-	// r7 - s03`| s12`| s21`| s30`
-
-	lsrs r1, #16
-	uxtb r1, r1
-	ldrb r1, [r0, r1]
-	lsls r1, #16
-
-	orrs r3, r1
-
-	// r0 - inv_sbox
-	// r1 -
-	// r2 -     |     | s23`| s32`
-	// r3 -     | s13`| s22`|
-
-	// r4 - s00 | s10 | s20 |  -
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02`| s11`|  -  | s33`
-	// r7 - s03`| s12`| s21`| s30`
-
-	rev16 r1, r4
-
-	uxtb r4, r4
-	ldrb r4, [r0, r4]
-
-	orrs r4, r3
-
-	lsrs r3, r5, #24
-	ldrb r3, [r0, r3]
-	lsls r3, #24
-
-	orrs r4, r3
-
-	// r0 - inv_sbox
-	// r1 - s10 |  -  |  -  | s20
-	// r2 -     |     | s23`| s32`
-	// r3 -
-
-	// r4 - s00`| s13`| s22`| s31`
-	// r5 - s01 |  -  |  -  |  -
-	// r6 - s02`| s11`|  -  | s33`
-	// r7 - s03`| s12`| s21`| s30`
-
-	uxtb r5, r5
-	ldrb r5, [r0, r5]
-
-	orrs r5, r2
-
-	lsrs r3, r1, #24
-	ldrb r3, [r0, r3]
+	lsrs r3, r5, #24 // too high pressure
+	add r3, r9 // pointer spilled
+	ldrb r3, [r3]
 	lsls r3, #16
 
-	orrs r6, r3
+	orrs r3, r7
 
-	uxtb r1, r1
-	ldrb r1, [r0, r1]
-	lsls r1, #8
+	//current allocation
+	// r0 - s00`| s13`|     | s31`
+	// r1 - s01`|     | s23`| s32`
+	// r2 -     |     |     | s33`
+	// r3 - s03`|     | s21`|
+	// r4 -  -  | s10 | s20 | s30
+	// r5 - s11 |  -  |  -  |  -
+	// r6 - s02 | s12 | s22 |  -
+	// r7 - inv_sbox
 
-	orrs r5, r1
+	mov r7, r9 // get inv_sbox back
+
+	uxtb r5, r5
+	ldrb r5, [r7, r5]
+	lsls r5, #8
+
+	orrs r2, r5
+
+	//current allocation
+	// r0 - s00`| s13`|     | s31`
+	// r1 - s01`|     | s23`| s32`
+	// r2 -     | s11`|     | s33`
+	// r3 - s03`|     | s21`|
+	// r4 -  -  | s10 | s20 | s30
+	// r5 -
+	// r6 - s02 | s12 | s22 |  -
+	// r7 - inv_sbox
+
+	uxtb r5, r6
+	ldrb r5, [r7, r5]
+
+	orrs r2, r5
+
+	lsrs r5, r4, #24
+	ldrb r5, [r7, r5]
+	lsls r5, #24
+
+	orrs r3, r5
+
+	//current allocation
+	// r0 - s00`| s13`|     | s31`
+	// r1 - s01`|     | s23`| s32`
+	// r2 - s02`| s11`|     | s33`
+	// r3 - s03`|     | s21`| s30`
+	// r4 -  -  | s10 | s20 |  -
+	// r5 -
+	// r6 -  -  | s12 | s22 |  -
+	// r7 - inv_sbox
+
+	rev16 r4, r4
+
+	uxtb r5, r4
+	ldrb r5, [r7, r5]
+	lsls r5, #8
+
+	orrs r1, r5
+
+	lsrs r4, r4, #24
+	ldrb r4, [r7, r4]
+	lsls r4, #16
+
+	orrs r2, r4
+
+	//current allocation
+	// r0 - s00`| s13`|     | s31`
+	// r1 - s01`| s10`| s23`| s32`
+	// r2 - s02`| s11`| s20`| s33`
+	// r3 - s03`|     | s21`| s30`
+	// r4 -
+	// r5 -
+	// r6 -  -  | s12 | s22 |  -
+	// r7 - inv_sbox
+
+	rev16 r6, r6
+
+	uxtb r5, r6
+	ldrb r5, [r7, r5]
+	lsls r5, #8
+
+	orrs r3, r5
+
+	lsrs r6, r6, #24
+	ldrb r6, [r7, r6]
+	lsls r6, #16
+
+	orrs r0, r6
+
+	//current allocation
+	// r0 - s00`| s13`| s22`| s31`
+	// r1 - s01`| s10`| s23`| s32`
+	// r2 - s02`| s11`| s20`| s33`
+	// r3 - s03`| s12`| s21`| s30`
+	// r4 -
+	// r5 -
+	// r6 -
+	// r7 - inv_sbox
 
 	//addroundkey
 	add r14, r8 // decrement rk
-	mov r0, r14 // get rk
+	mov r7, r14 // get rk
 
-	ldm r0, {r0-r3}
+	ldm r7, {r4-r7}
 	eors r4, r0
 	eors r5, r1
 	eors r6, r2
@@ -537,7 +523,7 @@ CM0_FASTMULsBOX_AES_decrypt:
 
 	eors r7, r3// s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
 
-	mov r0, r9 // get inv_sbox for next round or final round
+	mov r3, r9 // get inv_sbox for next round or final round
 
 	cmp r14, r12
 	beq 2f // if rk reached final condition
@@ -545,211 +531,197 @@ CM0_FASTMULsBOX_AES_decrypt:
 
 2:	//final round
 
-	//saved 2 cycles on rev16 // lost 2 cycles on inv_sbox pressured out, 1 on extra mov
-
 	// r4 - s00 | s10 | s20 | s30
 	// r5 - s01 | s11 | s21 | s31
 	// r6 - s02 | s12 | s22 | s32
 	// r7 - s03 | s13 | s23 | s33
 
 	//final
-	// r4 - s00`| s13`| s22`| s31`
-	// r5 - s01`| s10`| s23`| s32`
-	// r6 - s02`| s11`| s20`| s33`
-	// r7 - s03`| s12`| s21`| s30`
+	// r0 - s00`| s13`| s22`| s31`
+	// r1 - s01`| s10`| s23`| s32`
+	// r2 - s02`| s11`| s20`| s33`
+	// r3 - s03`| s12`| s21`| s30`
 
-	lsrs r1, r4, #24
-	ldrb r1, [r0, r1]
+	uxtb r0, r4
+	ldrb r0, [r3, r0]
+
+	lsrs r1, r5, #24
+	ldrb r1, [r3, r1]
 	lsls r1, #24
 
-	rev16 r3, r7
+	orrs r0, r1
 
-	// r0 - inv_sbox
-	// r1 -     |     |     | s30`
+	//current allocation
+	// r0 - s00`|     |     | s31`
+	// r1 -
 	// r2 -
-	// r3 - s13 |  -  |  -  | s23
+	// r3 - inv_sbox
+	// r4 -  -  | s10 | s20 | s30
+	// r5 - s01 | s11 | s21 |  -
+	// r6 - s02 | s12 | s22 | s32
+	// r7 - s03 | s13 | s23 | s33
 
-	// r4 - s00 | s10 | s20 |  -
-	// r5 - s01 | s11 | s21 | s31
+	rev16 r2, r7
+
+	uxtb r1, r2
+	ldrb r1, [r3, r1]
+	lsls r1, #8
+
+	orrs r0, r1
+
+	lsrs r2, r2, #24
+	ldrb r2, [r3, r2]
+	lsls r2, #16
+
+	uxtb r1, r5
+	ldrb r1, [r3, r1]
+
+	orrs r1, r2
+
+	//current allocation
+	// r0 - s00`| s13`|     | s31`
+	// r1 - s01`|     | s23`|
+	// r2 -
+	// r3 - inv_sbox
+	// r4 -  -  | s10 | s20 | s30
+	// r5 -  -  | s11 | s21 |  -
 	// r6 - s02 | s12 | s22 | s32
 	// r7 - s03 |  -  |  -  | s33
 
-	lsrs r2, r7, #24
-	ldrb r2, [r0, r2]
+	lsrs r2, r6, #24
+	ldrb r2, [r3, r2]
 	lsls r2, #24
 
+	orrs r1, r2
+
+	lsrs r2, r7, #24
+	ldrb r2, [r3, r2]
+	lsls r2, #24
+
+	//current allocation
+	// r0 - s00`| s13`|     | s31`
+	// r1 - s01`|     | s23`| s32`
+	// r2 -     |     |     | s33`
+	// r3 - inv_sbox
+	// r4 -  -  | s10 | s20 | s30
+	// r5 -  -  | s11 | s21 |  -
+	// r6 - s02 | s12 | s22 |  -
+	// r7 - s03 |  -  |  -  |  -
+
 	uxtb r7, r7
-	ldrb r7, [r0, r7]
+	ldrb r7, [r3, r7]
 
-	orrs r7, r1
+	rev16 r5, r5
 
-	// r0 - inv_sbox
-	// r1 -
-	// r2 -     |     |     | s33`
-	// r3 - s13 |  -  |  -  | s23
-
-	// r4 - s00 | s10 | s20 |  -
-	// r5 - s01 | s11 | s21 | s31
-	// r6 - s02 | s12 | s22 | s32
-	// r7 - s03`|  -  |  -  | s30`
-
-	lsrs r1, r6, #8
-	uxtb r1, r1
-	ldrb r1, [r0, r1]
-	lsls r1, #8
-
-	orrs r7, r1
-
-	lsrs r1, r5, #16
-	uxtb r1, r1
-	ldrb r1, [r0, r1]
-	lsls r1, #16
-
-	orrs r7, r1
-
-	// r0 - inv_sbox
-	// r1 -
-	// r2 -     |     |     | s33`
-	// r3 - s13 |  -  |  -  | s23
-
-	// r4 - s00 | s10 | s20 |  -
-	// r5 - s01 | s11 |  -  | s31
-	// r6 - s02 |  -  | s22 | s32
-	// r7 - s03`| s12`| s21`| s30`
-
-	lsrs r1, r5, #8
-	uxtb r1, r1
-	ldrb r1, [r0, r1]
-	lsls r1, #8
-
-	orrs r2, r1
-
-	// r0 - inv_sbox
-	// r1 -
-	// r2 -     | s11`|     | s33`
-	// r3 - s13 |  -  |  -  | s23
-
-	// r4 - s00 | s10 | s20 |  -
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02 |  -  | s22 | s32
-	// r7 - s03`| s12`| s21`| s30`
-
-	mov r1, r6 // free up s02
-
-	uxtb r6, r6
-	ldrb r6, [r0, r6]
-
-	orrs r6, r2
-
-	// r0 - inv_sbox
-	// r1 -  -  |  -  | s22 | s32
-	// r2 -
-	// r3 - s13 |  -  |  -  | s23
-
-	// r4 - s00 | s10 | s20 |  -
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02`| s11`|  -  | s33`
-	// r7 - s03`| s12`| s21`| s30`
-
-	lsrs r2, r3, #24
-	ldrb r2, [r0, r2]
-	lsls r2, #16
-
-	uxtb r3, r3
-	ldrb r3, [r0, r3]
-	lsls r3, #8
-
-	// r0 - inv_sbox
-	// r1 -  -  |  -  | s22 | s32
-	// r2 -     |     | s23`|
-	// r3 -     | s13`|     |
-
-	// r4 - s00 | s10 | s20 |  -
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02`| s11`|  -  | s33`
-	// r7 - s03`| s12`| s21`| s30`
-
-	lsrs r0, r1, #24 // too high pressure
-	add r0, r9 // add inv_sbox base
-	ldrb r0, [r0]
-	lsls r0, #24
-
-	orrs r2, r0
-
-	mov r0, r9 // get inv_sbox back
-
-	// r0 - inv_sbox
-	// r1 -  -  |  -  | s22 |  -
-	// r2 -     |     | s23`| s32`
-	// r3 -     | s13`|     |
-
-	// r4 - s00 | s10 | s20 |  -
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02`| s11`|  -  | s33`
-	// r7 - s03`| s12`| s21`| s30`
-
-	lsrs r1, #16
-	uxtb r1, r1
-	ldrb r1, [r0, r1]
-	lsls r1, #16
-
-	orrs r3, r1
-
-	// r0 - inv_sbox
-	// r1 -
-	// r2 -     |     | s23`| s32`
-	// r3 -     | s13`| s22`|
-
-	// r4 - s00 | s10 | s20 |  -
-	// r5 - s01 |  -  |  -  | s31
-	// r6 - s02`| s11`|  -  | s33`
-	// r7 - s03`| s12`| s21`| s30`
-
-	rev16 r1, r4
-
-	uxtb r4, r4
-	ldrb r4, [r0, r4]
-
-	orrs r4, r3
-
-	lsrs r3, r5, #24
-	ldrb r3, [r0, r3]
-	lsls r3, #24
-
-	orrs r4, r3
-
-	// r0 - inv_sbox
-	// r1 - s10 |  -  |  -  | s20
-	// r2 -     |     | s23`| s32`
-	// r3 -
-
-	// r4 - s00`| s13`| s22`| s31`
-	// r5 - s01 |  -  |  -  |  -
-	// r6 - s02`| s11`|  -  | s33`
-	// r7 - s03`| s12`| s21`| s30`
-
-	uxtb r5, r5
-	ldrb r5, [r0, r5]
-
-	orrs r5, r2
-
-	lsrs r3, r1, #24
-	ldrb r3, [r0, r3]
+	lsrs r3, r5, #24 // too high pressure
+	add r3, r9 // pointer spilled
+	ldrb r3, [r3]
 	lsls r3, #16
 
-	orrs r6, r3
+	orrs r3, r7
 
-	uxtb r1, r1
-	ldrb r1, [r0, r1]
-	lsls r1, #8
+	//current allocation
+	// r0 - s00`| s13`|     | s31`
+	// r1 - s01`|     | s23`| s32`
+	// r2 -     |     |     | s33`
+	// r3 - s03`|     | s21`|
+	// r4 -  -  | s10 | s20 | s30
+	// r5 - s11 |  -  |  -  |  -
+	// r6 - s02 | s12 | s22 |  -
+	// r7 - inv_sbox
 
-	orrs r5, r1
+	mov r7, r9 // get inv_sbox back
+
+	uxtb r5, r5
+	ldrb r5, [r7, r5]
+	lsls r5, #8
+
+	orrs r2, r5
+
+	//current allocation
+	// r0 - s00`| s13`|     | s31`
+	// r1 - s01`|     | s23`| s32`
+	// r2 -     | s11`|     | s33`
+	// r3 - s03`|     | s21`|
+	// r4 -  -  | s10 | s20 | s30
+	// r5 -
+	// r6 - s02 | s12 | s22 |  -
+	// r7 - inv_sbox
+
+	uxtb r5, r6
+	ldrb r5, [r7, r5]
+
+	orrs r2, r5
+
+	lsrs r5, r4, #24
+	ldrb r5, [r7, r5]
+	lsls r5, #24
+
+	orrs r3, r5
+
+	//current allocation
+	// r0 - s00`| s13`|     | s31`
+	// r1 - s01`|     | s23`| s32`
+	// r2 - s02`| s11`|     | s33`
+	// r3 - s03`|     | s21`| s30`
+	// r4 -  -  | s10 | s20 |  -
+	// r5 -
+	// r6 -  -  | s12 | s22 |  -
+	// r7 - inv_sbox
+
+	rev16 r4, r4
+
+	uxtb r5, r4
+	ldrb r5, [r7, r5]
+	lsls r5, #8
+
+	orrs r1, r5
+
+	lsrs r4, r4, #24
+	ldrb r4, [r7, r4]
+	lsls r4, #16
+
+	orrs r2, r4
+
+	//current allocation
+	// r0 - s00`| s13`|     | s31`
+	// r1 - s01`| s10`| s23`| s32`
+	// r2 - s02`| s11`| s20`| s33`
+	// r3 - s03`|     | s21`| s30`
+	// r4 -
+	// r5 -
+	// r6 -  -  | s12 | s22 |  -
+	// r7 - inv_sbox
+
+	rev16 r6, r6
+
+	uxtb r5, r6
+	ldrb r5, [r7, r5]
+	lsls r5, #8
+
+	orrs r3, r5
+
+	lsrs r6, r6, #24
+	ldrb r6, [r7, r6]
+	lsls r6, #16
+
+	orrs r0, r6
+
+	//current allocation
+	// r0 - s00`| s13`| s22`| s31`
+	// r1 - s01`| s10`| s23`| s32`
+	// r2 - s02`| s11`| s20`| s33`
+	// r3 - s03`| s12`| s21`| s30`
+	// r4 -
+	// r5 -
+	// r6 -
+	// r7 - inv_sbox
 
 	//final addroundkey
 	add r14, r8 // decrement rk
-	mov r0, r14 // get rk
+	mov r7, r14 // get rk
 
-	ldm r0, {r0-r3}
+	ldm r7, {r4-r7}
 	eors r4, r0
 	eors r5, r1
 	eors r6, r2
@@ -768,7 +740,7 @@ CM0_FASTMULsBOX_AES_decrypt:
 
 	pop {r4-r7, pc}
 
-.align 2
+.balign 4
 aes_dec_constants:
 	.long AES_inv_sbox
 	.long 0x01010101
