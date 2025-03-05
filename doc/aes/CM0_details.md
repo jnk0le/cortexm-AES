@@ -76,9 +76,9 @@ striping) SRAM memories (e.g. SRAM0 in rp2040)
 | `setDecKey<128>` | 0 | 0 |  |
 | `setDecKey<192>` | 0 | 0 |  |
 | `setDecKey<256>` | 0 | 0 |  |
-| `decrypt<128>`   | 2567/2580 | 2387/2400 |  |
-| `decrypt<192>`   | 3099/3114 | 2879/2894 |  |
-| `decrypt<256>`   | 3631/3648 | 3371/3388 |  |
+| `decrypt<128>`   | 2537/2551 | 2387/2400 |  |
+| `decrypt<192>`   | 3063/3079 | 2879/2894 |  |
+| `decrypt<256>`   | 3589/3607 | 3371/3388 |  |
 
 STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% performance degradation)
 
@@ -91,7 +91,7 @@ STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% perfor
 | `CM0_sBOX_AES192_keyschedule_enc` | 88 | 20(24) | uses sbox table |
 | `CM0_sBOX_AES256_keyschedule_enc` | 168 | 32 | uses sbox table |
 | `CM0_sBOX_AES_encrypt` | 500 | 40 | uses sbox table |
-| `CM0_sBOX_AES_decrypt` | 712 | 40 | uses inv_sbox table |
+| `CM0_sBOX_AES_decrypt` | 700 | 40 | uses inv_sbox table |
 | `CM0_FASTMULsBOX_AES_encrypt` | 472 | 36(40) | uses sbox table, requires single cycle multiplier |
 | `CM0_FASTMULsBOX_AES_decrypt` | 672 | 40 | uses inv_sbox table, requires single cycle multiplier |
 | `CM0_d4T_AES128_keyschedule_enc` | 88 | 16 | uses d4Te table |
