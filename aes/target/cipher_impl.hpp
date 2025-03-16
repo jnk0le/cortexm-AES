@@ -113,7 +113,7 @@ namespace target
 		}
 
 		void key_schedule_dec(uint8_t* rk) {
-			(void)rk; //nothing to expand, the addroundkey stage is its own inverse
+			CM0_d4T_AES_keyschedule_dec(rk, this->key_rounds);
 		}
 
 		void encrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
@@ -121,7 +121,7 @@ namespace target
 		}
 
 		void decrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
-			CM0_FASTMULsBOX_AES_decrypt(rk, data_in, data_out, this->key_rounds);
+			CM0_d4T_AES_decrypt(rk, data_in, data_out, this->key_rounds);
 		}
 
 	protected:
