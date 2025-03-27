@@ -68,16 +68,12 @@ striping) SRAM memories (e.g. SRAM0 in rp2040)
 | Cipher function  | STM32F0 (0ws/1ws) - CM0_sBOX | STM32F0 (0ws/1ws) - CM0_FASTMULsBOX | STM32F0 (0ws/1ws) - CM0_d4T |
 |------------------|------------------------------|-------------------------------------|------------------------------|
 | `setEncKey<128>` | 399/414 | (sBOX) | 439/? |
-| `setEncKey<192>` | 375/388 | (sBOX) | 407/? |
 | `setEncKey<256>` | 568/579 | (sBOX) | 620/? |
 | `encrypt<128>`   | 1646/1659 | 1567/1579 | 1145/? |
-| `encrypt<192>`   | 1976/1991 | 1881/1895 | 1363/? |
 | `encrypt<256>`   | 2306/2323 | 2195/2211 | 1581/? |
 | `setDecKey<128>` | 0 | 0 | 2047 |
-| `setDecKey<192>` | 0 | 0 |  |
 | `setDecKey<256>` | 0 | 0 | 2932 |
 | `decrypt<128>`   | 2537/2551 | 2357/2371 | 1132/? |
-| `decrypt<192>`   | 3063/3079 | 2843/2859 |  |
 | `decrypt<256>`   | 3589/3607 | 3329/3347 | 1568/? |
 
 STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% performance degradation)

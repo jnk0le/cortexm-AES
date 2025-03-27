@@ -76,22 +76,16 @@ s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3
 | Cipher function  | STM32F1 (0ws/2ws) - CM3_1T | STM32F1 (0ws/2ws) - CM3_sBOX | STM32F4 (0ws/5ws) - CM3_1T | STM32F4 - CM4_DSPsBOX |
 |------------------|----------------------------|------------------------------|----------------------------|-----------------------|
 | `setEncKey<128>`        | 302/354  |  | 302 | 302 |
-| `setEncKey<192>`        | 276/312  |  | 276 | 276 |
 | `setEncKey<256>`        | 378/485  |  | 378 | 378 |
 | `encrypt<128>`          | 627/841  |  | 626 | 844 |
-| `encrypt<192>`          | 743/996 |  | 742 | 1008 |
 | `encrypt<256>`          | 859/1157 |  | 858 | 1172 |
 | `encrypt_unrolled<128>` | 599/769 |   | 601/715 | - |
-| `encrypt_unrolled<192>` | 709/916 |   | 711/844 | - |
 | `encrypt_unrolled<256>` | 819/1058 |   | 821/975 | - |
 | `setDecKey<128>`        | 813/1101 | 0 | 811 | 0 |
-| `setDecKey<192>`        | 987/1341 | 0 | 987 | 0 |
 | `setDecKey<256>`        | 1163/1580 | 0 | 1164 | 0 |
 | `decrypt<128>`          | 629/843 |   | 629 | 1240 |
-| `decrypt<192>`          | 745/1001 |   | 745 | 1492 |
 | `decrypt<256>`          | 861/1159 |   | 863 | 1744 |
 | `decrypt_unrolled<128>` | 600/772  |   | 602/716 | - |
-| `decrypt_unrolled<192>` | 710/918 |   | 712/845 | - |
 | `decrypt_unrolled<256>` | 820/1061  |   | 822/978 | - |
 
 results assume that input, expanded round key and stack lie in the same memory block (e.g. SRAM1 vs SRAM2 and CCM on f407)

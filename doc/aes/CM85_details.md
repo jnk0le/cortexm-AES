@@ -24,16 +24,12 @@ fully resistant to bank timming attacks
 | Cipher function  | RA8D1 - CM85_1T  | RA8D1 - CM85_d4T |
 |------------------|------------------|------------------|
 | `setEncKey<128>` | 120 |  |
-| `setEncKey<192>` |  |  |
 | `setEncKey<256>` |  |  |
 | `encrypt<128>`   | 263 | 273 |
-| `encrypt<192>`   | 313 | 325 |
 | `encrypt<256>`   | 363 | 377 |
 | `setDecKey<128>` |  |  |
-| `setDecKey<192>` |  |  |
 | `setDecKey<256>` |  |  |
 | `decrypt<128>`   |  |  |
-| `decrypt<192>`   |  |  |
 | `decrypt<256>`   |  |  |
 
 ## specific function size
