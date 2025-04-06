@@ -1,7 +1,6 @@
 /*!
  * \file CM3_1T_AES_common.inc
- * \brief
- *
+ * \brief common sequences for unrolling, optimized for cortex-m3/4
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT

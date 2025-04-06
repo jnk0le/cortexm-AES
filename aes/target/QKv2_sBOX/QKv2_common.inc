@@ -1,6 +1,6 @@
 /*!
  * \file QKv2_common.inc
- * \brief
+ * \brief common sequences and macros for qkv2
  *
  * implements some of the xw instructions without requirement of proprietary GCC
  * uses "xw_" prefix as to not collide with eventualy upstreamable names with more normal syntax

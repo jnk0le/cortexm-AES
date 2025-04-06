@@ -1,8 +1,9 @@
 /*!
  * \file CM0_sBOX_AES_decrypt.S
- * \brief
+ * \brief cortex-m0 optimized aes DECRYPTION
  *
- * key goes backward
+ * utilizes basic inv_sbox table
+ * requires backward expanded key
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT

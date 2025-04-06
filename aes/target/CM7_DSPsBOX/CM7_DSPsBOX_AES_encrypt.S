@@ -1,7 +1,8 @@
 /*!
  * \file CM7_DSPsBOX_AES_encrypt.S
- * \brief
+ * \brief cortex-m7 optimized aes encryption
  *
+ * utilizes basic sbox table
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
@@ -14,7 +15,7 @@
 .thumb
 .text
 
-.align 3
+.balign 8
 // void CM7_DSPsBOX_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
 .global CM7_DSPsBOX_AES_encrypt
 .type   CM7_DSPsBOX_AES_encrypt,%function

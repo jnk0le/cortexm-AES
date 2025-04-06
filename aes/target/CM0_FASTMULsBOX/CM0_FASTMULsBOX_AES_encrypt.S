@@ -1,7 +1,9 @@
 /*!
  * \file CM0_FASTMULsBOX_AES_encrypt.S
- * \brief faster than standard version, only when running on core with 1 cycle multiplier
+ * \brief cortex-m0 optimized aes encryption
  *
+ * utilizes basic sbox table
+ * requires single cycle multiplier, otherwise it's slower than standard version
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
@@ -50,7 +52,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 	eors r6, r2
 	eors r7, r3
 
-	// state elements will be represented with big endian representation (transposed canonical state representation)
+	// state elements will be represented with big endian order (transposed canonical state representation)
 	// columns are loaded in little endian so right/left in shifts is in reverse wrt transposed canonical state representation
 
 	// global allocation

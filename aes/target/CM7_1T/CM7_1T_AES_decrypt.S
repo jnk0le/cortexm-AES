@@ -1,8 +1,9 @@
 /*!
  * \file CM7_1T_AES_decrypt.S
- * \brief
+ * \brief cortex-m7 optimized aes decryption
  *
- *  uses backward expanded round key
+ * utilizes Td2 table and inv_sbox in final round
+ * requires backward expanded key
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
@@ -16,7 +17,7 @@
 .text
 //.section .itcm.text, "x"
 
-.align 3
+.balign 8
 // void CM7_1T_AES_decrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
 .global CM7_1T_AES_decrypt
 .type   CM7_1T_AES_decrypt,%function

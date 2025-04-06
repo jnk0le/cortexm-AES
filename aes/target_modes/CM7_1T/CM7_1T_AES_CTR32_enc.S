@@ -1,14 +1,15 @@
 /*!
  * \file CM7_1T_AES_CTR32_enc.S
- * \brief
+ * \brief cortex-m7 optimized aes CTR32 mode encryption
  *
+ * counter mode, SP 800-38A compliant (32bit, big endian ctr), can start from any counter value
+ * counter is written back and can be used to continue encryption later
+ *
+ * utilizes Te2 table
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
  */
-
-// counter mode, SP 800-38A compliant (32bit, big endian ctr), can start from any counter value
-// counter is written back and can be used to continue encryption later, preloads input data
 
 // currently requires pointer to ctx struct in form:
 //typedef struct {

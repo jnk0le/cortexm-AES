@@ -1,7 +1,8 @@
 /*!
  * \file CM7_1T_AES_encrypt.S
- * \brief
+ * \brief cortex-m7 optimized aes decryption
  *
+ * utilizes Te2 table
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
@@ -15,7 +16,7 @@
 .text
 //.section .itcm.text, "x"
 
-.align 3
+.balign 8
 // void CM7_1T_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
 .global CM7_1T_AES_encrypt
 .type   CM7_1T_AES_encrypt,%function

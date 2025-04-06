@@ -1,8 +1,10 @@
 /*!
  * \file CM0_FASTMULsBOX_AES_decrypt.S
- * \brief faster than standard version, only when running on core with 1 cycle multiplier
+ * \brief cortex-m0 optimized aes decryption
  *
- * key goes backward
+ * utilizes basic inv_sbox table
+ * requires single cycle multiplier, otherwise it's slower than standard version
+ * requires backward expanded key
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
@@ -403,7 +405,7 @@ CM0_FASTMULsBOX_AES_decrypt:
 	rev16 r3, r3
 	rev r3, r3
 
-	eors r5, r3// s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
+	eors r5, r3 // s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
 
 	//col 2
 	mov r0, r10 // 0x01010101

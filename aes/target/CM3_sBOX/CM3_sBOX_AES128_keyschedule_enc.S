@@ -1,7 +1,8 @@
 /*!
  * \file CM3_sBOX_AES128_keyshedule_enc.S
- * \brief
+ * \brief cortex-m3/4 optimized aes128 key expansion
  *
+ * utilizes basic sbox table
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT

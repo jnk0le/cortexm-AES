@@ -1,6 +1,8 @@
 /*!
  * \file CM4_DSPsBOX_AES_encrypt.S
- * \brief
+ * \brief cortex-m4 optimized aes encryption
+ *
+ * utilizes basic sbox table
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT

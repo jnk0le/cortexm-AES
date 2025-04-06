@@ -1,7 +1,9 @@
 /*!
  * \file CM3_1T_AES_decrypt.S
- * \brief
+ * \brief cortex-m3/4 optimized aes decryption
  *
+ * utilizes Td2 table and inv_sbox in final round
+ * requires backward expanded key
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * Peter Schwabe & Ko Stoffelen @2016

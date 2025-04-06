@@ -1,9 +1,11 @@
 /*!
  * \file CM3_1T_AES_keyschedule_dec.S
- * \brief
+ * \brief cortex-m3/4 optimized aes decryption keyschedule
  *
  * performs equivalent inverse cipher transformation on expanded encryption key
  * order of round keys is not inverted - decryption will read it in reverse
+ *
+ * utilizes Te2 and Td2 tables
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
@@ -16,7 +18,7 @@
 .thumb
 .text
 
-.align 3
+.balign 8
 // void CM3_1T_AES_keyschedule_dec(uint8_t* rk, size_t rounds) {
 .global CM3_1T_AES_keyschedule_dec
 .type   CM3_1T_AES_keyschedule_dec,%function

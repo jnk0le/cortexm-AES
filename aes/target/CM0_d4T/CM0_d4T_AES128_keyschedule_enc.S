@@ -1,7 +1,8 @@
 /*!
  * \file CM0_d4T_AES128_keyschedule_enc.S
- * \brief
+ * \brief cortex-m0 optimized aes128 key expansion
  *
+ * Utilizes d4Te table to be used alongside d4T encryption
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT

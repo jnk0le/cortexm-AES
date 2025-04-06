@@ -1,7 +1,8 @@
 /*!
  * \file CM7_1T_AES192_keyschedule_enc.S
- * \brief
+ * \brief cortex-m7 optimized aes192 key expansion
  *
+ * utilizes Te2 table
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
@@ -17,7 +18,7 @@
 .text
 //.section .itcm.text, "x"
 
-.align 3
+.balign 8
 // void CM7_1T_AES192_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
 .global CM7_1T_AES192_keyschedule_enc
 .type   CM7_1T_AES192_keyschedule_enc,%function

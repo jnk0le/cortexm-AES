@@ -1,7 +1,8 @@
 /*!
  * \file CM0_sBOX_AES256_keyschedule_enc.S
- * \brief
+ * \brief cortex-m0 optimized aes256 key expansion
  *
+ * utilizes basic sBOX table
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT

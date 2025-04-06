@@ -2,7 +2,8 @@
  * \file CM85_1T_AES_encrypt.S
  * \brief cortex-m85 optimized aes encryption
  *
- * Scalar only, utilizes single Te2 table
+ * Scalar only
+ * utilizes single Te2 table
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT

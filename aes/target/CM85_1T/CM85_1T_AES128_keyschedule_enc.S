@@ -2,6 +2,7 @@
  * \file CM85_1T_AES128_keyschedule_enc.S
  * \brief cortex-m85 optimized aes128 key expansion
  *
+ * utilizes Te2 table
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT

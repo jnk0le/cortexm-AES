@@ -1,7 +1,11 @@
 /*!
  * \file CM0_d4T_AES_decrypt.S
- * \brief
+ * \brief cortex-m0 optimized aes decryption
  *
+ * Utilizes diffused 4 Td tables, no protection from bank timming
+ * attacks due to use of inv_sbox in final round
+ *
+ * requires backward expanded key
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
@@ -49,7 +53,7 @@ CM0_d4T_AES_decrypt:
 	eors r6, r2
 	eors r7, r3
 
-	// state elements will be represented with big endian representation (transposed canonical state representation)
+	// state elements will be represented with big endian order (transposed canonical state representation)
 	// columns are loaded in little endian so right/left in shifts is in reverse wrt transposed canonical state representation
 
 	// global allocation

@@ -1,9 +1,11 @@
 /*!
  * \file CM7_1T_AES_keyschedule_dec.S
- * \brief
+ * \brief cortex-m7 optimized aes decryption keyschedule
  *
  * performs equivalent inverse cipher transformation on expanded encryption key
  * order of round keys is not inverted - decryption will read it in reverse
+ *
+ * utilizes Te2 and Td2 tables
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
@@ -17,7 +19,7 @@
 .text
 //.section .itcm.text, "x"
 
-.align 3
+.balign 8
 // void CM7_1T_AES_keyschedule_dec(uint8_t* rk, size_t rounds) {
 .global CM7_1T_AES_keyschedule_dec
 .type   CM7_1T_AES_keyschedule_dec,%function

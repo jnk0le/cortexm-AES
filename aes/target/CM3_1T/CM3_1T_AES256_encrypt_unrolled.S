@@ -1,7 +1,8 @@
 /*!
  * \file CM3_1T_AES256_encrypt_unrolled.S
- * \brief
+ * \brief cortex-m3/4 optimized, unrolled aes256 encryption
  *
+ * utilizes Te2 table
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * Peter Schwabe & Ko Stoffelen @2016

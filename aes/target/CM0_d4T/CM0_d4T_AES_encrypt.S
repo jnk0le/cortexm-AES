@@ -1,7 +1,9 @@
 /*!
  * \file CM0_d4T_AES_encrypt.S
- * \brief
+ * \brief cortex-m0 optimized aes encryption
  *
+ * Utilizes diffused 4 Te tables, which protects from bank timming
+ * attacks on 4 banked (striped) SRAMS (e.g. SRAM0 on RP2040)
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
@@ -45,7 +47,7 @@ CM0_d4T_AES_encrypt:
 	eors r6, r2
 	eors r7, r3
 
-	// state elements will be represented with big endian representation (transposed canonical state representation)
+	// state elements will be represented with big endian order (transposed canonical state representation)
 	// columns are loaded in little endian so right/left in shifts is in reverse wrt transposed canonical state representation
 
 	// global allocation

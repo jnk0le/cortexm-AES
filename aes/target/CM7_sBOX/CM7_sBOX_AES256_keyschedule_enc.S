@@ -1,7 +1,8 @@
 /*!
  * \file CM7_sBOX_AES256_keyshedule_enc.S
- * \brief
+ * \brief cortex-m7 optimized aes256 key expansion
  *
+ * utilizes basic sbox table
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
@@ -17,7 +18,7 @@
 .text
 //.section .itcm.text, "x"
 
-.align 3
+.balign 8
 // void CM7_sBOX_AES256_keyschedule_enc(uint8_t *rk, const uint8_t *key) {
 .global CM7_sBOX_AES256_keyschedule_enc
 .type   CM7_sBOX_AES256_keyschedule_enc,%function

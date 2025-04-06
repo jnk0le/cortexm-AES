@@ -1,6 +1,6 @@
 /*!
  * \file CM0_d4T_AES_keyschedule_dec.S
- * \brief
+ * \brief cortex-m0 optimized aes decryption keyschedule
  *
  * performs equivalent inverse cipher transformation on expanded encryption key
  * order of round keys is not inverted - decryption will read it in reverse

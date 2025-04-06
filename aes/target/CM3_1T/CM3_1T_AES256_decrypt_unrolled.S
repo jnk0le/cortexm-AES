@@ -1,7 +1,8 @@
 /*!
  * \file CM3_1T_AES256_decrypt_unrolled.S
- * \brief
+ * \brief cortex-m3/4 optimized, unrolled aes256 decryption
  *
+ * utilizes Td2 table and inv_sbox in final round
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * Peter Schwabe & Ko Stoffelen @2016

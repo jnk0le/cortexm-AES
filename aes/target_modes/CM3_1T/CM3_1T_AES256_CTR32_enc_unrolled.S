@@ -1,14 +1,23 @@
 /*!
  * \file CM3_1T_AES256_CTR32_enc_unrolled.S
- * \brief
+ * \brief cortex-m3/4 optimized unrolled aes256 CTR32 mode encryption
  *
  * counter mode, SP 800-38A compliant (32bit, big endian ctr), can start from any counter value
  * counter is written back and can be used to continue encryption later
+ *
+ * utilizes Te2 table
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * Peter Schwabe & Ko Stoffelen @2016
  * \license SPDX-License-Identifier: MIT
  */
+
+// currently requires pointer to ctx struct in form:
+//typedef struct {
+//    uint8_t nonce[16];
+//    uint8_t rk[(n+1)*16];
+//} ctx;
+
 
 // compile for compatible targets only
 #if __ARM_EABI__ && __thumb2__

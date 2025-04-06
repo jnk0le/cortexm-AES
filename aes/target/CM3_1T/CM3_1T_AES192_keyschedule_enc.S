@@ -1,7 +1,8 @@
 /*!
  * \file CM3_1T_AES192_keyschedule_enc.S
- * \brief
+ * \brief cortex-m3/4 optimized aes192 key expansion
  *
+ * utilizes Te2 table
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
