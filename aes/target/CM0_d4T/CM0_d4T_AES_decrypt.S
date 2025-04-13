@@ -2,8 +2,8 @@
  * \file CM0_d4T_AES_decrypt.S
  * \brief cortex-m0 optimized aes decryption
  *
- * Utilizes diffused 4 Td tables, no protection from bank timming
- * attacks due to use of inv_sbox in final round
+ * Utilizes diffused 4 Td and d4Td4 tables, which protects from bank timming
+ * attacks on 4 banked (striped) SRAMS (e.g. SRAM0 on RP2040)
  *
  * requires backward expanded key
  *
@@ -296,13 +296,15 @@ CM0_d4T_AES_decrypt:
 	// r2 - s02`| s11`| s20`| s33`
 	// r3 - s03`| s12`| s21`| s30`
 
-	ldr r3, =AES_inv_sbox
+	ldr r3, =(AES_d4Td4 + 4) // can be anywhere within 16 bytes // use bank 2
 	mov r9, r3
 
 	uxtb r0, r4
+	lsls r0, #4
 	ldrb r0, [r3, r0]
 
 	lsrs r1, r5, #24
+	lsls r1, #4
 	ldrb r1, [r3, r1]
 	lsls r1, #24
 
@@ -321,16 +323,19 @@ CM0_d4T_AES_decrypt:
 	rev16 r2, r7
 
 	uxtb r1, r2
+	lsls r1, #4
 	ldrb r1, [r3, r1]
 	lsls r1, #8
 
 	orrs r0, r1
 
 	lsrs r2, r2, #24
+	lsls r2, #4
 	ldrb r2, [r3, r2]
 	lsls r2, #16
 
 	uxtb r1, r5
+	lsls r1, #4
 	ldrb r1, [r3, r1]
 
 	orrs r1, r2
@@ -346,12 +351,14 @@ CM0_d4T_AES_decrypt:
 	// r7 - s03 |  -  |  -  | s33
 
 	lsrs r2, r6, #24
+	lsls r2, #4
 	ldrb r2, [r3, r2]
 	lsls r2, #24
 
 	orrs r1, r2
 
 	lsrs r2, r7, #24
+	lsls r2, #4
 	ldrb r2, [r3, r2]
 	lsls r2, #24
 
@@ -366,11 +373,13 @@ CM0_d4T_AES_decrypt:
 	// r7 - s03 |  -  |  -  |  -
 
 	uxtb r7, r7
+	lsls r7, #4
 	ldrb r7, [r3, r7]
 
 	rev16 r5, r5
 
 	lsrs r3, r5, #24 // too high pressure
+	lsls r3, #4
 	add r3, r9 // pointer spilled
 	ldrb r3, [r3]
 	lsls r3, #16
@@ -390,6 +399,7 @@ CM0_d4T_AES_decrypt:
 	mov r7, r9 // get inv_sbox back
 
 	uxtb r5, r5
+	lsls r5, #4
 	ldrb r5, [r7, r5]
 	lsls r5, #8
 
@@ -406,11 +416,13 @@ CM0_d4T_AES_decrypt:
 	// r7 - inv_sbox
 
 	uxtb r5, r6
+	lsls r5, #4
 	ldrb r5, [r7, r5]
 
 	orrs r2, r5
 
 	lsrs r5, r4, #24
+	lsls r5, #4
 	ldrb r5, [r7, r5]
 	lsls r5, #24
 
@@ -429,12 +441,14 @@ CM0_d4T_AES_decrypt:
 	rev16 r4, r4
 
 	uxtb r5, r4
+	lsls r5, #4
 	ldrb r5, [r7, r5]
 	lsls r5, #8
 
 	orrs r1, r5
 
 	lsrs r4, r4, #24
+	lsls r4, #4
 	ldrb r4, [r7, r4]
 	lsls r4, #16
 
@@ -453,12 +467,14 @@ CM0_d4T_AES_decrypt:
 	rev16 r6, r6
 
 	uxtb r5, r6
+	lsls r5, #4
 	ldrb r5, [r7, r5]
 	lsls r5, #8
 
 	orrs r3, r5
 
 	lsrs r6, r6, #24
+	lsls r6, #4
 	ldrb r6, [r7, r6]
 	lsls r6, #16
 
