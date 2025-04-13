@@ -60,21 +60,29 @@ out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 Uses the diffused 4 T tables, which is more efficient than 1T or 4T as it doesn't require
 rotations or increasing register pressure with 4 pointers.
 
-Forward encryption is fully resistant to bank timming attacks on 2 or 4 banked (by word
+Fully resistant to bank timming attacks on 2 or 4 banked (by word
 striping) SRAM memories (e.g. SRAM0 in rp2040)
+
+### CM0_d4T_FAST
+
+Same as d4T but uses basic sbox/inv_sbox in final round.
+Forward encryption consumes extra 256 bytes. (sbox)
+
+Can be used on typical unstriped memories.
+
 
 ## perfomance
 
-| Cipher function  | STM32F0 (0ws/1ws) - CM0_sBOX | STM32F0 (0ws/1ws) - CM0_FASTMULsBOX | STM32F0 (0ws/1ws) - CM0_d4T |
-|------------------|------------------------------|-------------------------------------|------------------------------|
-| `setEncKey<128>` | 399/414 | (sBOX) | 439/? |
-| `setEncKey<256>` | 568/579 | (sBOX) | 620/? |
-| `encrypt<128>`   | 1646/1659 | 1567/1579 | 1145/? |
-| `encrypt<256>`   | 2306/2323 | 2195/2211 | 1581/? |
-| `setDecKey<128>` | 0 | 0 | 2047 |
-| `setDecKey<256>` | 0 | 0 | 2932 |
-| `decrypt<128>`   | 2537/2551 | 2357/2371 | 1132/? |
-| `decrypt<256>`   | 3589/3607 | 3329/3347 | 1568/? |
+| Cipher function  | STM32F0 (0ws/1ws) - CM0_sBOX | STM32F0 (0ws/1ws) - CM0_FASTMULsBOX | STM32F0 (0ws/1ws) - CM0_d4T | STM32F0 (0ws/1ws) - CM0_d4T_FAST |
+|------------------|------------------------------|-------------------------------------|------------------------------|------------------------------|
+| `setEncKey<128>` | 399/414 | (sBOX) | 439/? | (d4T) |
+| `setEncKey<256>` | 568/579 | (sBOX) | 620/? | (d4T) |
+| `encrypt<128>`   | 1646/1659 | 1567/1579 | 1152/? | 1138/? |
+| `encrypt<256>`   | 2306/2323 | 2195/2211 | 1588/? | 1574/? |
+| `setDecKey<128>` | 0 | 0 | 2047 | |
+| `setDecKey<256>` | 0 | 0 | 2932 | |
+| `decrypt<128>`   | 2537/2551 | 2357/2371 | 1155/? | 1132/? |
+| `decrypt<256>`   | 3589/3607 | 3329/3347 | 1591/? | 1568/? |
 
 STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% performance degradation)
 
@@ -82,7 +90,7 @@ STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% perfor
 ## specific function size
 
 | Function | code size in bytes | stack usage in bytes | notes |
-|----------|--------------------|----------------------|-------| 
+|----------|--------------------|----------------------|-------|
 | `CM0_sBOX_AES128_keyschedule_enc` | 80 | 16 | uses sbox table |
 | `CM0_sBOX_AES192_keyschedule_enc` | 88 | 20(24) | uses sbox table |
 | `CM0_sBOX_AES256_keyschedule_enc` | 168 | 32 | uses sbox table |
@@ -95,8 +103,9 @@ STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% perfor
 | `CM0_d4T_AES256_keyschedule_enc` | 182 | 32 | uses d4Te table |
 | `CM0_d4T_keyschedule_dec` | 88 | 16 | uses d4Te and d4Td tables |
 | `CM0_d4T_AES_encrypt` | 398 | 32 | uses d4Te table |
-| `CM0_d4T_AES_decrypt` | 374 | 32 | uses d4Td and inv_sbox table |
-
+| `CM0_d4T_AES_decrypt` | 408 | 32 | uses d4Td and d4Td4 tables |
+| `CM0_d4T_FAST_AES_encrypt` | 368 | 32 | uses d4Te and sbox table |
+| `CM0_d4T_FAST_AES_decrypt` | 376 | 32 | uses d4Td and inv_sbox tables |
 code sizes include pc-rel constants and their padding
 
 extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.

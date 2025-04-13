@@ -124,6 +124,26 @@ namespace target {
 		static constexpr size_t key_rounds = (key_length == 128) ? 10 : ((key_length == 192) ? 12 : 14);
 	};
 
+	template<size_t key_length>
+	class CM0_d4T_FAST : public CM0_d4T<key_length>
+	{
+	public:
+		void key_schedule_dec(uint8_t* rk) {
+			CM0_d4T_AES_keyschedule_dec(rk, this->key_rounds); // recycle for now
+		}
+
+		void encrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
+			CM0_d4T_FAST_AES_encrypt(rk, data_in, data_out, this->key_rounds);
+		}
+
+		void decrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
+			CM0_d4T_FAST_AES_decrypt(rk, data_in, data_out, this->key_rounds);
+		}
+
+	protected:
+		static constexpr size_t key_rounds = (key_length == 128) ? 10 : ((key_length == 192) ? 12 : 14);
+	};
+
 } //namespace target
 } //namespace aes
 
