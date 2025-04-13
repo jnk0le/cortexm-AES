@@ -5,6 +5,9 @@
  * performs equivalent inverse cipher transformation on expanded encryption key
  * order of round keys is not inverted - decryption will read it in reverse
  *
+ * Utilizes diffused 4 Te and Td tables, which protects from bank timming
+ * attacks on 4 banked (striped) SRAMS (e.g. SRAM0 on RP2040)
+ *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
  */
@@ -38,20 +41,23 @@ CM0_d4T_AES_keyschedule_dec:
 	ldr r5, =(AES_d4Te + 1)
 	ldr r6, =AES_d4Td
 
-	// 31 insn nomul inv ???
-	// 26 insn fastmul inv ????
+	// cycles per inv mix columns
+	// 40 insn nomul
+	// 34(-2?) insn fastmul
+	// 35 insn Td[sbox[x]]
+
 1:
 	ldr r2, [r0]
 
 	uxtb r3, r2
 	lsls r3, #4
-	ldrb r3, [r5, r3] // load sbox from Te2
+	ldrb r3, [r5, r3] // load sbox from d4Te
 	lsls r3, #4
 	ldr r3, [r6, r3]
 
 	lsrs r4, r2, #24
 	lsls r4, #4
-	ldrb r4, [r5, r4] // load sbox from Te2
+	ldrb r4, [r5, r4] // load sbox from d4Te
 	lsls r4, #4
 	adds r4, #12 // Td3 offset
 	ldr r4, [r6, r4]
@@ -62,7 +68,7 @@ CM0_d4T_AES_keyschedule_dec:
 
 	uxtb r4, r2
 	lsls r4, #4
-	ldrb r4, [r5, r4] // load sbox from Te2
+	ldrb r4, [r5, r4] // load sbox from d4Te
 	lsls r4, #4
 	adds r4, #4 // Td1 offset
 	ldr r4, [r6, r4]
@@ -71,7 +77,7 @@ CM0_d4T_AES_keyschedule_dec:
 
 	lsrs r4, r2, #24
 	lsls r4, #4
-	ldrb r4, [r5, r4] // load sbox from Te2
+	ldrb r4, [r5, r4] // load sbox from d4Te
 	lsls r4, #4
 	adds r4, #8 // Td2 offset
 	ldr r4, [r6, r4]

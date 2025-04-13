@@ -93,7 +93,7 @@ STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% perfor
 | `CM0_d4T_AES128_keyschedule_enc` | 88 | 16 | uses d4Te table |
 | `CM0_d4T_AES192_keyschedule_enc` | 94 | 20(24) | uses d4Te table |
 | `CM0_d4T_AES256_keyschedule_enc` | 182 | 32 | uses d4Te table |
-| `CM0_d4T_keyschedule_dec` |  |  | uses d4Te and d4Td |
+| `CM0_d4T_keyschedule_dec` | 88 | 16 | uses d4Te and d4Td tables |
 | `CM0_d4T_AES_encrypt` | 398 | 32 | uses d4Te table |
 | `CM0_d4T_AES_decrypt` | 374 | 32 | uses d4Td and inv_sbox table |
 
