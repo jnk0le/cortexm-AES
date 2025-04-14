@@ -24,8 +24,6 @@
 	void CM0_d4T_AES192_keyschedule_enc(uint8_t* rk, const uint8_t* key);
 	void CM0_d4T_AES256_keyschedule_enc(uint8_t* rk, const uint8_t* key);
 
-	void CM0_d4T_AES_keyschedule_dec(uint8_t* rk, size_t rounds);
-
 	void CM0_sBOX_AES_encrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
 	void CM0_sBOX_AES_decrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
 
@@ -37,6 +35,9 @@
 
 	void CM0_d4T_FAST_AES_encrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
 	void CM0_d4T_FAST_AES_decrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
+
+	void CM0_d4T_AES_keyschedule_dec(uint8_t* rk, size_t rounds);
+	void CM0_FASTMUL_AES_keyschedule_dec(uint8_t* rk, size_t rounds);
 
 #ifdef __cplusplus
 	}

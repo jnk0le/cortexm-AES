@@ -70,6 +70,7 @@ Forward encryption consumes extra 256 bytes. (sbox)
 
 Can be used on typical unstriped memories.
 
+Requires single cycle multipler for inverse keyschedule
 
 ## perfomance
 
@@ -79,8 +80,8 @@ Can be used on typical unstriped memories.
 | `setEncKey<256>` | 568/579 | (sBOX) | 620/? | (d4T) |
 | `encrypt<128>`   | 1646/1659 | 1567/1579 | 1152/? | 1138/? |
 | `encrypt<256>`   | 2306/2323 | 2195/2211 | 1588/? | 1574/? |
-| `setDecKey<128>` | 0 | 0 | 2047 | |
-| `setDecKey<256>` | 0 | 0 | 2932 | |
+| `setDecKey<128>` | 0 | 0 | 2045/? | 1941/? |
+| `setDecKey<256>` | 0 | 0 | 2930/? | 2778/? |
 | `decrypt<128>`   | 2537/2551 | 2357/2371 | 1155/? | 1132/? |
 | `decrypt<256>`   | 3589/3607 | 3329/3347 | 1591/? | 1568/? |
 
@@ -101,11 +102,13 @@ STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% perfor
 | `CM0_d4T_AES128_keyschedule_enc` | 88 | 16 | uses d4Te table |
 | `CM0_d4T_AES192_keyschedule_enc` | 94 | 20(24) | uses d4Te table |
 | `CM0_d4T_AES256_keyschedule_enc` | 182 | 32 | uses d4Te table |
-| `CM0_d4T_keyschedule_dec` | 88 | 16 | uses d4Te and d4Td tables |
+| `CM0_d4T_AES_keyschedule_dec` | 88 | 12(16) | uses d4Te and d4Td tables |
+| `CM0_FASTMUL_AES_keyschedule_dec` | 96 | 20(24) | requires single cycle multiplier |
 | `CM0_d4T_AES_encrypt` | 398 | 32 | uses d4Te table |
 | `CM0_d4T_AES_decrypt` | 408 | 32 | uses d4Td and d4Td4 tables |
 | `CM0_d4T_FAST_AES_encrypt` | 368 | 32 | uses d4Te and sbox table |
 | `CM0_d4T_FAST_AES_decrypt` | 376 | 32 | uses d4Td and inv_sbox tables |
+
 code sizes include pc-rel constants and their padding
 
 extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.

@@ -129,7 +129,7 @@ namespace target {
 	{
 	public:
 		void key_schedule_dec(uint8_t* rk) {
-			CM0_d4T_AES_keyschedule_dec(rk, this->key_rounds); // recycle for now
+			CM0_FASTMUL_AES_keyschedule_dec(rk, this->key_rounds); // recycle for now
 		}
 
 		void encrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {

@@ -24,7 +24,7 @@
 .global CM0_d4T_AES_keyschedule_dec
 .type   CM0_d4T_AES_keyschedule_dec,%function
 CM0_d4T_AES_keyschedule_dec:
-	push {r4-r6, lr}
+	push {r4-r6}
 
 	//first and last block is ommited
 	//rk_end-16 = rk + rounds * 16
@@ -43,7 +43,7 @@ CM0_d4T_AES_keyschedule_dec:
 
 	// cycles per inv mix columns
 	// 40 insn nomul
-	// 34(-2?) insn fastmul
+	// 32 insn fastmul
 	// 35 insn Td[sbox[x]]
 
 1:
@@ -90,6 +90,7 @@ CM0_d4T_AES_keyschedule_dec:
 	cmp r1, r0
 	bne 1b
 
-	pop {r4-r6, pc}
+	pop {r4-r6}
+	bx lr
 
 #endif

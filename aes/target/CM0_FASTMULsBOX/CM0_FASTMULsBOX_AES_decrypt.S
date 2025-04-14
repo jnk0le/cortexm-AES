@@ -294,7 +294,7 @@ CM0_FASTMULsBOX_AES_decrypt:
 	lsls r3, r2, #1
 	bics r3, r0
 
-	mov r0, r11 // lsls r0, #7 // need 0x80808080 anyway
+	mov r0, r11 // need 0x80808080 anyway
 
 	ands r0, r2 // mask
 	lsrs r0, #7
@@ -346,7 +346,7 @@ CM0_FASTMULsBOX_AES_decrypt:
 	rev16 r3, r3
 	rev r3, r3
 
-	eors r4, r3// s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
+	eors r4, r3 // s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
 
 	//col 1
 	mov r0, r10 // 0x01010101
@@ -364,7 +364,7 @@ CM0_FASTMULsBOX_AES_decrypt:
 	lsls r3, r2, #1
 	bics r3, r0
 
-	mov r0, r11 // lsls r0, #7 // need 0x80808080 anyway
+	mov r0, r11 // need 0x80808080 anyway
 
 	ands r0, r2 // mask
 	lsrs r0, #7
@@ -423,7 +423,7 @@ CM0_FASTMULsBOX_AES_decrypt:
 	lsls r3, r2, #1
 	bics r3, r0
 
-	mov r0, r11 // lsls r0, #7 // need 0x80808080 anyway
+	mov r0, r11 // need 0x80808080 anyway
 
 	ands r0, r2 // mask
 	lsrs r0, #7
@@ -464,7 +464,7 @@ CM0_FASTMULsBOX_AES_decrypt:
 	rev16 r3, r3
 	rev r3, r3
 
-	eors r6, r3// s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
+	eors r6, r3 // s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
 
 	//col 3
 	mov r0, r10 // 0x01010101
@@ -482,7 +482,7 @@ CM0_FASTMULsBOX_AES_decrypt:
 	lsls r3, r2, #1
 	bics r3, r0
 
-	mov r0, r11 // lsls r0, #7 // need 0x80808080 anyway
+	mov r0, r11 // need 0x80808080 anyway
 
 	ands r0, r2 // mask
 	lsrs r0, #7
@@ -523,7 +523,7 @@ CM0_FASTMULsBOX_AES_decrypt:
 	rev16 r3, r3
 	rev r3, r3
 
-	eors r7, r3// s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
+	eors r7, r3 // s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
 
 	mov r3, r9 // get inv_sbox for next round or final round
 
