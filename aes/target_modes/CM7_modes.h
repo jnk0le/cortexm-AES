@@ -6,8 +6,8 @@
  * \license SPDX-License-Identifier: MIT
  */
 
-#ifndef AES_CM7_MODES_H
-#define AES_CM7_MODES_H
+#ifndef AES_TARGET_MODES_CM7_MODES_H
+#define AES_TARGET_MODES_CM7_MODES_H
 
 #include <stdint.h>
 
@@ -32,4 +32,4 @@
 	}
 #endif
 
-#endif // AES_CM7_MODES_H
+#endif // AES_TARGET_MODES_CM7_MODES_H

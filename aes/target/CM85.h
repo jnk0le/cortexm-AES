@@ -6,8 +6,8 @@
  * \license SPDX-License-Identifier: MIT
  */
 
-#ifndef AES_CM85_H
-#define AES_CM85_H
+#ifndef AES_TARGET_CM85_H
+#define AES_TARGET_CM85_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -30,4 +30,4 @@
 	}
 #endif
 
-#endif // AES_CM85_H
+#endif // AES_TARGET_CM85_H

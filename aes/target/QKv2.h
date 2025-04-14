@@ -6,8 +6,8 @@
  * \license SPDX-License-Identifier: MITs
  */
 
-#ifndef AES_QKV2_H
-#define AES_QKV2_H
+#ifndef AES_TARGET_QKV2_H
+#define AES_TARGET_QKV2_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -27,4 +27,4 @@
 	}
 #endif
 
-#endif // AES_QKV2_H
+#endif // AES_TARGET_QKV2_H

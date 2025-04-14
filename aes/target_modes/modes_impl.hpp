@@ -6,8 +6,8 @@
  * \license SPDX-License-Identifier: MIT
  */
 
-#ifndef AES_MODES_IMPL_HPP
-#define AES_MODES_IMPL_HPP
+#ifndef AES_TARGET_MODES_MODES_IMPL_HPP
+#define AES_TARGET_MODES_MODES_IMPL_HPP
 
 #include <stdint.h>
 #include <stddef.h>
@@ -213,4 +213,4 @@ namespace target {
 }
 }
 
-#endif //AES_MODES_IMPL_HPP
+#endif //AES_TARGET_MODES_MODES_IMPL_HPP
