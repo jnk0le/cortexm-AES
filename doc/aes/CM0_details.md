@@ -82,8 +82,8 @@ Requires single cycle multipler for inverse keyschedule
 | `encrypt<256>`   | 2306/2323 | 2195/2211 | 1588/? | 1574/? |
 | `setDecKey<128>` | 0 | 0 | 2045/? | 1941/? |
 | `setDecKey<256>` | 0 | 0 | 2930/? | 2778/? |
-| `decrypt<128>`   | 2537/2551 | 2357/2371 | 1155/? | 1132/? |
-| `decrypt<256>`   | 3589/3607 | 3329/3347 | 1591/? | 1568/? |
+| `decrypt<128>`   | 2537/2551 | 2351/2364 | 1155/? | 1132/? |
+| `decrypt<256>`   | 3589/3607 | 3323/3339 | 1591/? | 1568/? |
 
 STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% performance degradation)
 

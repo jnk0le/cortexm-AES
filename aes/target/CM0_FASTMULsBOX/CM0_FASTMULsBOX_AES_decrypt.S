@@ -29,9 +29,12 @@ CM0_FASTMULsBOX_AES_decrypt:
 	mov r7, r11
 	push {r4-r7}
 
-	adr r2, aes_dec_constants
-	ldmia r2!, {r5,r6,r7}
-	mov r9, r5 // AES_inv_sbox
+	ldr r5, =AES_inv_sbox
+	mov r9, r5
+
+	ldr r6, =0x01010101
+	lsls r7, r6, #7 // 0x80808080
+
 	mov r10, r6 // 0x01010101
 	mov r11, r7 // 0x80808080
 
@@ -65,8 +68,6 @@ CM0_FASTMULsBOX_AES_decrypt:
 	// r12 - final ptr // rk+16
 	// r14 - current ptr
 
-	mov r3, r9 // get inv_sbox here to align loop entry, next getter is at the end of loop
-
 1:	//inv shiftrows and invsubbytes
 
 	// r4 - s00 | s10 | s20 | s30
@@ -79,6 +80,8 @@ CM0_FASTMULsBOX_AES_decrypt:
 	// r1 - s01`| s10`| s23`| s32`
 	// r2 - s02`| s11`| s20`| s33`
 	// r3 - s03`| s12`| s21`| s30`
+
+	mov r3, r9 // get inv_sbox
 
 	uxtb r0, r4
 	ldrb r0, [r3, r0]
@@ -525,8 +528,6 @@ CM0_FASTMULsBOX_AES_decrypt:
 
 	eors r7, r3 // s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3{e}^s0{b}^s1{d}^s2{9}
 
-	mov r3, r9 // get inv_sbox for next round or final round
-
 	cmp r14, r12
 	beq 2f // if rk reached final condition
 	b 1b // out of range for conditional branch
@@ -543,6 +544,8 @@ CM0_FASTMULsBOX_AES_decrypt:
 	// r1 - s01`| s10`| s23`| s32`
 	// r2 - s02`| s11`| s20`| s33`
 	// r3 - s03`| s12`| s21`| s30`
+
+	mov r3, r9 // get inv_sbox
 
 	uxtb r0, r4
 	ldrb r0, [r3, r0]
@@ -741,11 +744,5 @@ CM0_FASTMULsBOX_AES_decrypt:
 	stmia r3!, {r4-r7}
 
 	pop {r4-r7, pc}
-
-.balign 4
-aes_dec_constants:
-	.long AES_inv_sbox
-	.long 0x01010101
-	.long 0x80808080
 
 #endif
