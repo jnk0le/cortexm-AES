@@ -15,22 +15,22 @@ No cmake yet.
 
 ## notes
 
+- asm functions (and CM*.h headers) can be extracted and used as C only code, but that may require extra boilerplate code (structures etc.)
+- C++ API doesn't use exceptions nor dynamic memory allocation
 - Do not use ECB cipher mode for any serious encryption. It's provided for building proper modes.
 - Do not blindly trust in timming constantness of LUT based ciphers since it depends on many factors that are 
 unknown or just implementation defined like section placement or pipeline suprises (you need to verify it, especially where is `.data` 
 section).
 - LUT tables have to be placed in deterministic memory section, usally TCMs and non-waitstated SRAMs (by default it lands in .data section)
 - FLASH memory is unsafe even on simplest cortex m0(+) as there might be a prefetcher with a few entry cache (like stm32f0/l0).
-However it's still possible when running at reduced clock, with flash configured to 0ws and explicitly disabled prefetch.
+However in some cases it's still possible when running at reduced clock, with flash configured to 0ws and explicitly disabled prefetch.
 - None of the currently available implementations protects against power/EMI analysis or glitch attacks.
-- do not use cortex-m3 and cortex-m4 implementations on cortex-m7/m85 since it is slower and will introduce timming leaks.
+- using implementations on wrong microarchitecture might introduce timming leaks (e.g. CM3_1T run on CM7).
 - Unrolled ciphers might perform slower than looped versions due to (usually LRU) cache pressure and flash waitstates. (like STM32F4 with 1K ART cache and up to 8WS)
 - input/output buffers might have to be word aligned due to use of ldm,stm,ldrd and strd instructions.
 - for optimization gimmicks refer to [pipeline cycle test repo](https://github.com/jnk0le/random/tree/master/pipeline%20cycle%20test)
 - included unit tests don't cover timming leaks (performance difference on different runs may not be a data dependent ones,
 there are special tools like dudect for that)
-- asm functions (and CM*.h headers) can be extracted and used as C only code, but that may require extra boilerplate code (structures etc.)
-- C++ API doesn't use exceptions nor dynamic memory allocation
 
 ## cryptoanalysis 
 
@@ -48,76 +48,4 @@ https://webthesis.biblio.polito.it/secure/26870/1/tesi.pdf - (CM3_1T on cortex-m
 
 ## modes implementations
 
-### generic
-
-#### CBC_GENERIC
-
-#### CTR32_GENERIC
-
-### cortex-m0/m0+
-
-### cortex-m3/m4
-
-#### CTR32_CM3_1T
-
-Implements counter mode caching. Do not use if IV/counter is secret as it will lead to a timming leak of a single byte, every 256 aligned counter steps.
-
-#### CTR32_CM3_1T_unrolled
-
-unrolled version of CTR32_CM3_1T
-
-#### performance (in cycles per byte)
-
-| Mode cipher function       | STM32F1 (0ws/2ws) - CM3_1T | STM32F4 (0ws/5ws) - CM3_1T |
-|----------------------------|------------------|------------------|
-| CBC_GENERIC<>              |                  |                  |
-| CTR32_GENERIC<>            |                  |                  |
-| CTR32<128>                 | 32.09/43.79      | 32.09            |
-| CTR32<256>                 | 46.59/63.79      | 46.59            |
-| CTR32_unrolled<128>        | 30.59/41.60      | 30.59/38.48      |
-| CTR32_unrolled<256>        | 44.34/59.98      | 44.34/55.73      |
-
-results assume that input, expanded round key and stack lie in the same memory block (e.g. SRAM1 vs SRAM2 and CCM on f407)
-
-#### specific function sizes
-
-| Function | code size in bytes | stack usage in bytes | notes |
-|----------|--------------------|----------------------|-------|
-| `CM3_1T_AES_CTR32_enc` | 862 | 68(72) (+1 arg passed on stack) | uses Te2 table |
-| `CM3_1T_AES128_CTR32_enc_unrolled` | 1996 | 64 | uses Te2 table |
-| `CM3_1T_AES192_CTR32_enc_unrolled` | 2366 | 64 | uses Te2 table |
-| `CM3_1T_AES256_CTR32_enc_unrolled` | 2734 | 64 | uses Te2 table |
-
-extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
-
-### cortex-m7
-
-#### CTR32_CM7_1T
-
-Implements counter mode caching. Do not use if IV/counter is secret as it will lead to a timming leak of a single byte, every 256 aligned counter steps.
-
-Preloads input data in case it's in SDRAM or QSPI memory.
-
-#### CTR32_CM7_1T_unrolled
-
-unrolled version of CTR32_CM7_1T, doesn't preload input data except first cacheline.
-
-#### performance (in cycles per byte)
-
-| Mode cipher function       | STM32H7 - CM7_1T |
-|----------------------------|------------------|
-| CBC_GENERIC<>              |                  |
-| CTR32_GENERIC<>            |                  |
-| CTR32<128>                 | 15.21            |
-| CTR32<256>                 | 21.96            |
-| CTR32_unrolled<128>        | 14.46            |
-| CTR32_unrolled<256>        | 20.95            |
-
-#### specific function sizes
-
-| Function | code size in bytes | stack usage in bytes | notes |
-|----------|--------------------|----------------------|-------|
-| `CM7_1T_AES_CTR32_enc` | 860 | 72 (+1 arg passed on stack) | uses Te2 table |
-| `CM7_1T_AES128_CTR32_enc_unrolled` | | | uses Te2 table |
-| `CM7_1T_AES192_CTR32_enc_unrolled` | | | uses Te2 table |
-| `CM7_1T_AES256_CTR32_enc_unrolled` | | | uses Te2 table |
+- [old](doc/aes/modes_old.md)
