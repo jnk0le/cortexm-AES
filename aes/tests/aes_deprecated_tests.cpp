@@ -90,7 +90,7 @@ void aes_ecb_test(void)
 
 	cycles_sum = 0;
 
-	t128.setDecKey(key_128); // no idea how it worked with an 5x context reuse
+	t128.setDecKey(key_128);
 
 	printf("decrypt --- ");
 	t128.decrypt(expected_ciphertext_128, tmp); //cache train run
@@ -159,7 +159,7 @@ void aes_ecb_test(void)
 	}
 	printf("%f\n", (double)cycles_sum/1024.0f);
 
-	t192.setDecKey(key_192); // no idea how it worked with an 5x context reuse
+	t192.setDecKey(key_192);
 
 	cycles_sum = 0;
 
