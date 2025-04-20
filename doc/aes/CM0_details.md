@@ -76,8 +76,8 @@ Requires single cycle multipler for inverse keyschedule
 
 | Cipher function  | STM32F0 (0ws/1ws) - CM0_sBOX | STM32F0 (0ws/1ws) - CM0_FASTMULsBOX | STM32F0 (0ws/1ws) - CM0_d4T | STM32F0 (0ws/1ws) - CM0_d4T_FAST |
 |------------------|------------------------------|-------------------------------------|------------------------------|------------------------------|
-| `setEncKey<128>` | 399/414 | (sBOX) | 439/? | (d4T) |
-| `setEncKey<256>` | 568/579 | (sBOX) | 620/? | (d4T) |
+| `setEncKey<128>` | 399/414 | (sBOX) | 439/? | (sBOX) |
+| `setEncKey<256>` | 568/579 | (sBOX) | 620/? | (sBOX) |
 | `encrypt<128>`   | 1646/1659 | 1567/1579 | 1152/? | 1138/? |
 | `encrypt<256>`   | 2306/2323 | 2195/2211 | 1588/? | 1574/? |
 | `setDecKey<128>` | 0 | 0 | 1604/? | 1500/? |

@@ -125,9 +125,24 @@ namespace target {
 	};
 
 	template<size_t key_length>
-	class CM0_d4T_FAST : public CM0_d4T<key_length>
+	class CM0_d4T_FAST
 	{
 	public:
+		void key_schedule_enc(uint8_t* rk, const uint8_t* key) {
+			switch(key_length)
+			{
+			case 128:
+				CM0_sBOX_AES128_keyschedule_enc(rk, key);
+				break;
+			case 192:
+				CM0_sBOX_AES192_keyschedule_enc(rk, key);
+				break;
+			case 256:
+				CM0_sBOX_AES256_keyschedule_enc(rk, key);
+				break;
+			}
+		}
+
 		void key_schedule_dec(uint8_t* rk) {
 			CM0_FASTMUL_AES_keyschedule_dec(rk, this->key_rounds); // recycle for now
 		}
