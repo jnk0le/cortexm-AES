@@ -43,6 +43,7 @@ https://webthesis.biblio.polito.it/secure/26870/1/tesi.pdf - (CM3_1T on cortex-m
 - [cortex-m0/m0+](doc/aes/CM0_details.md)
 - [cortex-m3/m4](doc/aes/CM3_CM4_details.md)
 - [cortex-m7](doc/aes/CM7_details.md)
+- [cortex-m33](doc/aes/CM33_details.md)
 - [cortex-m85](doc/aes/CM85_details.md)
 - [QingKe v2 (ch32v003)](doc/aes/QKv2_details.md)
 
