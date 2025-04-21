@@ -81,7 +81,7 @@ namespace mode {
 		 * Doesn't update the IV cache after execution
 		 *
 		 * \param data_in pointer to palaintext to encrypt, it is not read past the specified length
-		 * \param data_out pointer to (append) output ciphertext, allocated area must be 16 bytes larger than input
+		 * \param data_out pointer to (append) output ciphertext, allocated area must be up to 16 bytes larger than input (for padding)
 		 * \param len length in bytes of plaintext to encrypt
 		 * \return size of encrypted (appended) ciphertext including padding, in bytes
 		 */
