@@ -122,7 +122,7 @@ namespace mode {
 		}
 
 		/*!
-		 * \brief Decryptss and unpads the ciphertext data
+		 * \brief Decrypts and unpads the ciphertext data
 		 * \warning This function was not protected/analyzed against padding oracle attacks
 		 *
 		 * Doesn't update the IV cache after execution
@@ -130,7 +130,7 @@ namespace mode {
 		 * \param data_in pointer to ciphertext to decrypt
 		 * \param data_out pointer to (append) output plaintext, allocated area must equal to the input
 		 * \param len length in bytes of ciphertext to decrypt, must be multiple of 16
-		 * \return size of decrypted (appended) plaintext (stripped from padding), 0 if ciphertext is malformed
+		 * \return size of decrypted (appended) plaintext (stripped from padding), -1 if ciphertext is malformed
 		 */
 
 		uint32_t decryptAppendFinalize(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
@@ -139,7 +139,7 @@ namespace mode {
 			uint32_t last_pad = data_out[len - 1];
 
 			if(last_pad > 16)
-				return 0;
+				return -1;
 
 			uint32_t padding_sum = 0;
 
@@ -148,7 +148,7 @@ namespace mode {
 			}
 
 			if(last_pad*last_pad != padding_sum)
-				return 0;
+				return -1;
 
 			return len - last_pad;
 		}
