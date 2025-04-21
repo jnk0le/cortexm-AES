@@ -15,9 +15,12 @@ similarly to CM7, dtcm access pattern can still be timed by DMA
 
 ### CM85_d4T
 
-uses diffused 4 T tables
+Vectorized, shiftrows and T boxing goes through scalar due to lacking performance of scatter/gather. 
+(unpipelineable with other vector insns)
 
-fully resistant to bank timming attacks (within DTCM)
+uses diffused 4 T tables, which is fully resistant to bank timming attacks (within DTCM).
+
+(only encryption is available at the moment, no keyschedules yet)
 
 ## perfomance
 
