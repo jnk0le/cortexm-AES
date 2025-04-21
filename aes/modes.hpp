@@ -292,7 +292,6 @@ namespace mode {
 		/*!
 		 * \brief sets 12 byte gcm iv
 		 *
-		 *
 		 * \param iv0 first word of iv, endianess is not swapped
 		 * \param iv1 second word of iv, endianess is not swapped
 		 * \param iv2 third word of iv, endianess is not swapped
@@ -304,9 +303,9 @@ namespace mode {
 		/*!
 		 * \brief sets new TLS sequence number
 		 *
-		 *	It's not recommended to use fully random sequence numbers (in TLS 1.2) due to birthday paradox.
-		 *	Instead you can use a counter (initialized with random data). Endianess doesn't matter
-		 *	(as per the TLS 1.2) as long as it's kept consistent with the sequence fields in transmitted packets.
+		 * It's not recommended to use fully random sequence numbers (in TLS 1.2) due to birthday paradox.
+		 * Instead you can use a counter (initialized with random data). Endianess doesn't matter
+		 * (as per the TLS 1.2) as long as it's kept consistent with the sequence fields in transmitted packets.
 		 *
 		 * \param[in] seq sequence to be written into nonce
 		 */
@@ -318,9 +317,9 @@ namespace mode {
 		/*!
 		 * \brief sets new TLS sequence number
 		 *
-		 *	It's not recommended to use fully random sequence numbers (in TLS 1.2) due to birthday paradox.
-		 *	Instead you can use a counter (initialized with random data). Endianess doesn't matter
-		 *	(as per the TLS 1.2) as long as it's kept consistent with the sequence fields in transmitted records.
+		 * It's not recommended to use fully random sequence numbers (in TLS 1.2) due to birthday paradox.
+		 * Instead you can use a counter (initialized with random data). Endianess doesn't matter
+		 * (as per the TLS 1.2) as long as it's kept consistent with the sequence fields in transmitted records.
 		 *
 		 * \param seq sequence to be written into nonce, endianess is not swapped
 		 */
@@ -332,7 +331,7 @@ namespace mode {
 		/*!
 		 * \brief increments TLS 1.3 sequence number, it is capable of only incrementing by one
 		 *
-		 *	A new sequence number is assumed to be 1 more than the previous one as per the TLS 1.3
+		 * A new sequence number is assumed to be 1 more than the previous one as per the TLS 1.3
 		 *
 		 * \param new_seq_cnt new sequence number to be xored into nonce, must be in machine native endianess (little endian)
 		 */
@@ -385,7 +384,7 @@ namespace mode {
 		 * \param len length in bytes of data to decrypt
 		 */
 		void decryptAppend(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
-			ghashData(data_out, len);
+			ghashData(data_in, len);
 
 			len_C += len*8;
 			ctr_ctx.encrypt(data_in, data_out, len);
@@ -482,7 +481,6 @@ namespace mode {
 		/*!
 		 * \brief verifies provided tag against internal state
 		 *
-		 *
 		 * \param[in] tag to verify
 		 * \return true if tag was validated correctly
 		 */
@@ -508,7 +506,6 @@ namespace mode {
 		/*!
 		 * \brief verifies provided tag and prepares for new encryption
 		 *
-		 *
 		 * \param[in] tag to verify
 		 * \return true if tag was validated correctly
 		 */
@@ -521,7 +518,6 @@ namespace mode {
 
 		/*!
 		 * \brief verifies provided tag against internal state
-		 *
 		 *
 		 * \param[in] tag to verify
 		 * \param len tag length
@@ -553,7 +549,6 @@ namespace mode {
 
 		/*!
 		 * \brief verifies provided tag and prepares for new encryption
-		 *
 		 *
 		 * \param[in] tag to verify
 		 * \param len tag length
