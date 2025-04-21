@@ -11,13 +11,13 @@ scalar only
 
 Uses a single T table per enc/dec cipher and additional inv_sbox for final round in decryption.
 
-similarly to CM7, dtcm access pattern can be timed by DMA
+similarly to CM7, dtcm access pattern can still be timed by DMA
 
 ### CM85_d4T
 
 uses diffused 4 T tables
 
-fully resistant to bank timming attacks
+fully resistant to bank timming attacks (within DTCM)
 
 ## perfomance
 
