@@ -48,4 +48,43 @@ https://webthesis.biblio.polito.it/secure/26870/1/tesi.pdf - (CM3_1T on cortex-m
 
 ## modes implementations
 
-- [old](doc/aes/modes_old.md)
+Available implementations, by C++ wrapper, consist of the following modes: 
+
+### `CBC_PKCS7`
+
+Handles PKCS7 padding, unpadded encryption can be achieved by not calling `xxxAppendFinalize()` function.
+
+- `CBC_GENERIC`
+
+### `CTR_32`
+
+SP 800-38A compliant, with 32 bit (big endian) counter.
+Can be used to build more common AEAD modes.
+
+- `CTR32_GENERIC`
+- target specific implementations ?????
+
+### `GCM`
+
+SP 800-38D compliant, GCM mode. Typially used in TLS.
+
+The `BEAR_CT{32}` implementations come from bearSSL package and are constant time with
+single cycle multipliers (use CT32 for cortex-m0 and cortex-m3).
+See https://www.bearssl.org/constanttime.html for details.
+
+
+- `GCM_GHASH_GENERIC_BEAR_CT`
+- `GCM_GHASH_GENERIC_BEAR_CT32`
+- `GCM_GHASH_GENERIC_SHOUP_M4` (not yet)
+- `GCM_GHASH_GENERIC_SHOUP_M8` (not yet)
+- `GCM_GHASH_GENERIC_FULL_M4` (not yet)
+
+
+
+
+
+
+target specific implementations:
+
+
+- [old, will be replaced later](doc/aes/modes_old.md)
