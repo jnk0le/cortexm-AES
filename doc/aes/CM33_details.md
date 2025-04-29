@@ -25,12 +25,12 @@
 
 | Function | code size in bytes | stack usage in bytes | notes |
 |----------|--------------------|----------------------|-------|
-| `CM3_1T_AES128_keyschedule_enc` | | | uses Te2 table |
-| `CM3_1T_AES192_keyschedule_enc` | | | uses Te2 table |
-| `CM3_1T_AES256_keyschedule_enc` | | | uses Te2 table |
-| `CM3_1T_AES_keyschedule_dec` | | | uses Te2 and Td2 table |
-| `CM3_1T_AES_keyschedule_dec_noTe` | | | uses sbox and Td2 table |
-| `CM3_1T_AES_encrypt` | | | uses Te2 table |
-| `CM3_1T_AES_decrypt` | | | uses Td2 and inv_sbox table |
+| `CM33_1T_AES128_keyschedule_enc` | | | uses Te2 table |
+| `CM33_1T_AES192_keyschedule_enc` | | | uses Te2 table |
+| `CM33_1T_AES256_keyschedule_enc` | | | uses Te2 table |
+| `CM33_1T_AES_keyschedule_dec` | | | uses Te2 and Td2 table |
+| `CM33_1T_AES_keyschedule_dec_noTe` | | | uses sbox and Td2 table |
+| `CM33_1T_AES_encrypt` | | | uses Te2 table |
+| `CM33_1T_AES_decrypt` | | | uses Td2 and inv_sbox table |
 
 extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
