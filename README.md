@@ -17,7 +17,7 @@ No cmake yet.
 
 - asm functions (and CM*.h headers) can be extracted and used as C only code, but that may require extra boilerplate code (structures etc.)
 - C++ API doesn't use exceptions nor dynamic memory allocation
-- Do not use ECB cipher mode for any serious encryption. It's provided for building proper modes.
+- Do not use base implementations (ECB mode) for any serious encryption. It's provided for building proper modes.
 - Do not blindly trust in timming constantness of LUT based ciphers since it depends on many factors that are 
 unknown or just implementation defined like section placement or pipeline suprises (you need to verify it, especially where is `.data` 
 section).
