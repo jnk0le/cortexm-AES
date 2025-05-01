@@ -61,12 +61,27 @@ Handles PKCS7 padding, unpadded encryption can be achieved by not calling `xxxAp
 SP 800-38A compliant, with 32 bit (big endian) counter.
 Can be used to build more common AEAD modes.
 
+All implementations internally require nonce placed before expanded roundkey.
+
+```
+typedef struct {
+    uint8_t nonce[16];
+    uint8_t rk[(n+1)*16];
+} ctx;
+```
+
 - `CTR32_GENERIC`
 - target specific implementations ?????
+
 
 ### `GCM`
 
 SP 800-38D compliant, GCM mode. Typially used in TLS.
+
+All implementations are currently based on CTR_32 class. (there will be fused ctr+ghash encryption which will require some redesign)
+
+Table based implementations are implemented accoding to:
+https://luca-giuzzi.unibs.it/corsi/Support/papers-cryptography/gcm-spec.pdf
 
 The `BEAR_CT{32}` implementations come from bearSSL package and are constant time with
 single cycle multipliers (use CT32 for cortex-m0 and cortex-m3).
@@ -78,13 +93,21 @@ See https://www.bearssl.org/constanttime.html for details.
 - `GCM_GHASH_GENERIC_SHOUP_M4` (not yet)
 - `GCM_GHASH_GENERIC_SHOUP_M8` (not yet)
 - `GCM_GHASH_GENERIC_FULL_M4` (not yet)
+- target specific implementations ?????
+
+#### memory reqirements
+
+| bytes of memory used by | per session | constants |
+|-------------------------|-------------|-----------|
+| `BEAR_*`          | 32 + AES roundkey | 0 + AES   |
+| `SHOUP_M4`       | 272 + AES roundkey | 64 + AES  |
+| `SHOUP_M8`       | 4112 + AES roundkey | 1024 + AES |
+| `FULL_M4`        | 8208 + AES roundkey | 0 + AES    |
 
 
 
 
-
-
-target specific implementations:
+### target specific implementations:
 
 
 - [old, will be replaced later](doc/aes/modes_old.md)
