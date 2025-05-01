@@ -18,13 +18,12 @@
 .thumb
 .text
 
-.balign 8
-	nop // pre padding to maintain 4 byte alignment
+.balign 4
 // void CM3_1T_AES_keyschedule_dec_noTe(uint8_t* rk, size_t rounds) {
 .global CM3_1T_AES_keyschedule_dec_noTe
 .type   CM3_1T_AES_keyschedule_dec_noTe,%function
 CM3_1T_AES_keyschedule_dec_noTe:
-	push {r4-r5, lr}
+	push.w {r4-r5, lr} // align loop entry
 
 	//first and last block are ommited
 	//rk_end-16 = rk + rounds * 16

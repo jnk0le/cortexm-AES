@@ -18,7 +18,7 @@
 .thumb
 .text
 
-.balign 8
+.balign 4
 // void CM3_1T_AES_keyschedule_dec(uint8_t* rk, size_t rounds) {
 .global CM3_1T_AES_keyschedule_dec
 .type   CM3_1T_AES_keyschedule_dec,%function
