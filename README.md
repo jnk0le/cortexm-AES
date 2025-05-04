@@ -99,10 +99,10 @@ See https://www.bearssl.org/constanttime.html for details.
 
 | bytes of memory used by | per session | constants |
 |-------------------------|-------------|-----------|
-| `BEAR_*`          | 32 + AES roundkey | 0 + AES   |
-| `SHOUP_M4`       | 272 + AES roundkey | 64 + AES  |
-| `SHOUP_M8`       | 4112 + AES roundkey | 1024 + AES |
-| `FULL_M4`        | 8208 + AES roundkey | 0 + AES    |
+| `BEAR_*`          | 64 + AES roundkey | 0 + AES   |
+| `SHOUP_M4`       | 304 + AES roundkey | 64 + AES  |
+| `SHOUP_M8`       | 4144 + AES roundkey | 1024 + AES |
+| `FULL_M4`        | 8240 + AES roundkey | 0 + AES    |
 
 
 
