@@ -74,7 +74,7 @@ typedef struct {
 - target specific implementations ?????
 
 
-### `GCM`
+### `GCM`, `GCM_FUSED`
 
 SP 800-38D compliant, GCM mode. Typially used in TLS.
 
@@ -88,11 +88,11 @@ single cycle multipliers (use CT32 for cortex-m0 and cortex-m3).
 See https://www.bearssl.org/constanttime.html for details.
 
 
-- `GCM_GHASH_GENERIC_BEAR_CT`
-- `GCM_GHASH_GENERIC_BEAR_CT32`
-- `GCM_GHASH_GENERIC_SHOUP_M4` (not yet)
-- `GCM_GHASH_GENERIC_SHOUP_M8` (not yet)
-- `GCM_GHASH_GENERIC_FULL_M4` (not yet)
+- `GHASH_GENERIC_BEAR_CT`
+- `GHASH_GENERIC_BEAR_CT32`
+- `GHASH_GENERIC_SHOUP_M4` (not yet)
+- `GHASH_GENERIC_SHOUP_M8` (not yet)
+- `GHASH_GENERIC_FULL_M4` (not yet)
 - target specific implementations ?????
 
 #### memory reqirements

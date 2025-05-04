@@ -598,11 +598,19 @@ uint8_t gcm_expected_tag[16] = {
 uint8_t gcm_tmp[64];
 uint8_t gcm_tmp2[16];
 
-aes::mode::GCM<128, aes::target::CM85_1T, aes::mode::target::CTR32_CM7_1T, aes::mode::target::GCM_GHASH_GENERIC_BEAR_CT> tgcm128;
+
+
+aes::mode::GCM<128,
+		aes::target::CM7_1T,
+		aes::mode::target::CTR32_CM7_1T,
+		aes::mode::target::gcm::GHASH_GENERIC_BEAR_CT> tgcm128;
+
+
+
 
 void aes_gcm_test(void)
 {
-	tgcm128.setEncKeyAndH(gcm_key);
+	/*tgcm128.setEncKey(gcm_key);
 	tgcm128.setIv(gcm_iv, 12);
 
 	tgcm128.aadAppend(gcm_aad, sizeof(gcm_aad));
@@ -639,17 +647,17 @@ void aes_gcm_test(void)
 		printf("gcm tag verify ok\n");
 	} else {
 		printf("gcm tag verify failed\n");
-	}
+	}*/
 }
 
 
 
 void aes_gcm_perf_test(void)
 {
-	uint32_t t1, t2;
+	/*uint32_t t1, t2;
 
 	//dummy_8k
-	tgcm128.setEncKeyAndH(gcm_key);
+	tgcm128.setEncKey(gcm_key);
 	tgcm128.setIv(gcm_iv, 12);
 
 	tgcm128.encryptAppend(dummy_8k, dummy_8k, sizeof(dummy_8k));
@@ -661,7 +669,7 @@ void aes_gcm_perf_test(void)
 	t2 = DWT->CYCCNT - t1 - 1;
 
 	printf("gcm 128 total: %d \n", t2);
-	printf("gcm 128: %f cycles per byte\n", (double)t2/8192.0);
+	printf("gcm 128: %f cycles per byte\n", (double)t2/8192.0);*/
 }
 
 

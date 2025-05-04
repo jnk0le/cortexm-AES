@@ -1,5 +1,5 @@
 /*!
- * \file aes_modes.hpp
+ * \file ghash_impl.hpp
  * \brief block mode implementations
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
@@ -18,9 +18,10 @@
 namespace aes {
 namespace mode {
 namespace target {
+namespace gcm {
 
 
-	class GCM_GHASH_GENERIC_BEAR_CT
+	class GHASH_GENERIC_BEAR_CT
 	{
 	public:
 		// init H for precomputed ??
@@ -40,7 +41,7 @@ namespace target {
 	};
 
 	// for cortex m0 and m3 which can't do long multiplication in constant time
-	class GCM_GHASH_GENERIC_BEAR_CT32
+	class GHASH_GENERIC_BEAR_CT32
 	{
 	public:
 		// init H for precomputed ??
@@ -60,6 +61,7 @@ namespace target {
 	};
 
 
+}
 }
 }
 }

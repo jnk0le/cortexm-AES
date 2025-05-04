@@ -20,6 +20,7 @@
 #include "cipher.hpp"
 #include "target_modes/modes_impl.hpp"
 #include "target_modes/ghash_impl.hpp"
+#include "target_modes/gcm_impl.hpp"
 
 namespace aes {
 namespace mode {
@@ -229,15 +230,13 @@ namespace mode {
 	};
 
 
-	//ctr+ghash fused impl????
-
 	//designed for typical TLS usage where "internal" CTR is not continued throughout session
 
 	//SP 800-38D compliant
 	template<size_t key_length,
 			template<size_t> class base_impl = aes::target::CM3_1T,
 			template<size_t key_len, template<size_t> class base> class ctr_mode_impl = aes::mode::target::CTR32_GENERIC,
-			class ghash_impl = aes::mode::target::GCM_GHASH_GENERIC_BEAR_CT32>
+			class ghash_impl = aes::mode::target::gcm::GHASH_GENERIC_BEAR_CT32>
 	class GCM
 	{
 	public:
@@ -251,7 +250,7 @@ namespace mode {
 		 *
 		 * \param[in] key pointer to the key to expand
 		 */
-		void setEncKeyAndH(const uint8_t* key) {
+		void setEncKey(const uint8_t* key) {
 			ctr_ctx.setEncKey(key);
 
 			memset(g_ctx.H, 0, 16);
@@ -593,6 +592,21 @@ namespace mode {
 		CTR32<key_length, base_impl, ctr_mode_impl> ctr_ctx;
 		ghash_impl g_ctx;
 	};
+
+
+
+	/*template<size_t key_length,
+			template<size_t> class base_impl = aes::target::CM3_1T,
+			template<size_t key_len, template<size_t> class base> class gcm_impl = aes::mode::target::GCM_CM3_FUSED_SHOUP_M4>
+	class GCM_FUSED
+	{
+	public:
+		GCM_FUSED() {}
+		~GCM_FUSED() {}
+
+	private:
+		gcm_impl<key_length, base_impl> gcm_ctx;
+	};*/
 
 }
 }
