@@ -610,7 +610,7 @@ aes::mode::GCM<128,
 
 void aes_gcm_test(void)
 {
-	/*tgcm128.setEncKey(gcm_key);
+	tgcm128.setEncKey(gcm_key);
 	tgcm128.setIv(gcm_iv, 12);
 
 	tgcm128.aadAppend(gcm_aad, sizeof(gcm_aad));
@@ -647,14 +647,14 @@ void aes_gcm_test(void)
 		printf("gcm tag verify ok\n");
 	} else {
 		printf("gcm tag verify failed\n");
-	}*/
+	}
 }
 
 
 
 void aes_gcm_perf_test(void)
 {
-	/*uint32_t t1, t2;
+	uint32_t t1, t2;
 
 	//dummy_8k
 	tgcm128.setEncKey(gcm_key);
@@ -669,7 +669,7 @@ void aes_gcm_perf_test(void)
 	t2 = DWT->CYCCNT - t1 - 1;
 
 	printf("gcm 128 total: %d \n", t2);
-	printf("gcm 128: %f cycles per byte\n", (double)t2/8192.0);*/
+	printf("gcm 128: %f cycles per byte\n", (double)t2/8192.0);
 }
 
 

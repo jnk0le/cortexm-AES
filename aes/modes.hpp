@@ -253,10 +253,9 @@ namespace mode {
 		void setEncKey(const uint8_t* key) {
 			ctr_ctx.setEncKey(key);
 
-			memset(g_ctx.H, 0, 16);
-
-			ctr_ctx.setNonce(0, 0, 0, 0);
-			ctr_ctx.encrypt(g_ctx.H, g_ctx.H, 16);
+			memset(partial_tag_cache, 0, 16); // recycle for H
+			ctr_ctx.encryptByExposedBase(partial_tag_cache, partial_tag_cache); // H
+			g_ctx.setH(partial_tag_cache);
 
 			// prepare for first encryption
 			memset(partial_tag_cache, 0, 16);
@@ -264,7 +263,7 @@ namespace mode {
 			len_A = 0;
 			len_C = 0;
 
-			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)2));
+			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)2)); // set to "counter 1"
 		}
 
 		/*!
@@ -366,7 +365,7 @@ namespace mode {
 		 * \param len length in bytes of data to encrypt
 		 */
 		void encryptAppend(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
-			len_C += len*8;
+			len_C += len*8; // counting bits
 			ctr_ctx.encrypt(data_in, data_out, len);
 			ghashData(data_out, len);
 		}
@@ -385,7 +384,7 @@ namespace mode {
 		void decryptAppend(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
 			ghashData(data_in, len);
 
-			len_C += len*8;
+			len_C += len*8; // counting bits
 			ctr_ctx.encrypt(data_in, data_out, len);
 		}
 
@@ -403,10 +402,10 @@ namespace mode {
 			g_ctx.gmulH(lenAC, partial_tag_cache, 1); // need non xoring gmul ??
 
 			// handle "counter 0" aka J0 aka HF, recycle partial_tag_cache for output
-			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)1)); // after J0 encryption ctr will be set to "counter 1"
+			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)1));
 
-			memset(partial_tag_cache, 0, 16);
-			ctr_ctx.encrypt(partial_tag_cache, partial_tag_cache, 16);
+			ctr_ctx.encryptByExposedBase((uint8_t*)ctr_ctx.getNoncePtr(), partial_tag_cache);
+			// "counter 1" is set later
 
 			uint32_t* tag32 = reinterpret_cast<uint32_t*>(tag);
 			uint32_t* partial_tag_cache32 = reinterpret_cast<uint32_t*>(partial_tag_cache);
@@ -433,39 +432,24 @@ namespace mode {
 		/*!
 		 * \brief generates GCM tag and prepares for new encryption
 		 *
+		 * use when tag is trimmed/truncated, otherwise it costs additional memcpy
+		 *
 		 * \warning in order to continue encryption under the same key, the sequence field must be changed
 		 *
 		 * \param[out] tag pointer to write the tag
-		 * \param len length of the tag to generate , allows non standard lengths
+		 * \param len length of the tag to generate, allows non standard lengths
 		 */
 		void finalizeTagLast(uint8_t* tag, uint32_t len) {
-			uint8_t lenAC[16];
+			uint8_t full_tag[16];
+			finalizeTagLast(full_tag);
 
-			*reinterpret_cast<uint64_t*>(&lenAC[0]) = aux::byteswap(len_A);
-			*reinterpret_cast<uint64_t*>(&lenAC[8]) = aux::byteswap(len_C);
-
-			g_ctx.gmulH(lenAC, partial_tag_cache, 1); // need non xoring gmul ??
-
-			// handle "counter 0" aka J0 aka HF, recycle partial_tag_cache for output
-			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)1)); // after J0 encryption ctr will be set to "counter 1"
-
-			memset(partial_tag_cache, 0, 16);
-			ctr_ctx.encrypt(partial_tag_cache, partial_tag_cache, 16);
-
-			uint32_t* partial_tag_cache32 = reinterpret_cast<uint32_t*>(partial_tag_cache);
-			uint32_t* lenAC32 = reinterpret_cast<uint32_t*>(lenAC);
-
-			// gcm allows tags with 1 byte granularity at upper end
-			partial_tag_cache32[0] ^= lenAC32[0];
-			partial_tag_cache32[1] ^= lenAC32[1];
-			partial_tag_cache32[2] ^= lenAC32[2];
-			partial_tag_cache32[3] ^= lenAC32[3];
-
-			memcpy(tag, partial_tag_cache, len); // output tag
+			memcpy(tag, full_tag, len); // output tag
 		}
 
 		/*!
 		 * \brief generates GCM tag and prepares for new encryption
+		 *
+		 * use when tag is trimmed/truncated, otherwise it costs additional memcpy
 		 *
 		 * \warning in order to continue TLS encryption under the same key, the sequence field must be changed
 		 *
@@ -567,6 +551,8 @@ namespace mode {
 			len_C = 0;
 
 			memset(partial_tag_cache, 0, 16);
+
+			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)2)); // set to "counter 1"
 		}
 
 		void ghashData(const uint8_t* data_in, uint32_t len) {

@@ -24,7 +24,9 @@ namespace gcm {
 	class GHASH_GENERIC_BEAR_CT
 	{
 	public:
-		// init H for precomputed ??
+		void setH(uint8_t* H_in) {
+			memcpy(H, H_in, 16);
+		}
 
 		/*!
 		 * \brief multiplies 128 bit blocks by H (ghash)
@@ -44,7 +46,9 @@ namespace gcm {
 	class GHASH_GENERIC_BEAR_CT32
 	{
 	public:
-		// init H for precomputed ??
+		void setH(uint8_t* H_in) {
+			memcpy(H, H_in, 16);
+		}
 
 		/*!
 		 * \brief multiplies 128 bit blocks by H (ghash)
@@ -60,6 +64,25 @@ namespace gcm {
 		uint8_t H[16];
 	};
 
+	/*class GHASH_GENERIC_SHOUP_M4
+	{
+	public:
+		void setH(uint8_t* H_in) {
+
+		}*/
+
+		/*!
+		 * \brief multiplies 128 bit blocks by H (ghash)
+		 *
+		 * \param[in/out] partial_tag
+		 * \param[in] data pointer to data to hash
+		 * \param  blocks_cnt number of blocks to hash from source
+		 */
+		/*void gmulH(uint8_t* partial_tag, const uint8_t* data, uint32_t blocks_cnt) {
+		}
+
+		uint32_t M[16*4]; // 16 * 16 byte entries
+	};*/
 
 }
 }
