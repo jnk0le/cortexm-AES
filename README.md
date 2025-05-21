@@ -85,7 +85,7 @@ https://luca-giuzzi.unibs.it/corsi/Support/papers-cryptography/gcm-spec.pdf
 
 The `BEAR_CT{32}` implementations come from bearSSL package and are constant time with
 single cycle multipliers (use CT32 for cortex-m0 and cortex-m3).
-See https://www.bearssl.org/constanttime.html for details.
+See https://www.bearssl.org/constanttime.html#ghash-for-gcm for details.
 
 
 - `GHASH_GENERIC_BEAR_CT`
