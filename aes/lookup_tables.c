@@ -1031,3 +1031,21 @@ uint32_t AES_d4Td4[256*4] __attribute__((aligned(1024*4), section(".data.AES_d4T
 	0x0c0c0c0c, 0x0c0c0c0c, 0x0c0c0c0c, 0x0c0c0c0c,
 	0x7d7d7d7d, 0x7d7d7d7d, 0x7d7d7d7d, 0x7d7d7d7d,
 };
+
+
+// reduction table for ghash shoup's method
+
+uint32_t ghash_shoup4_R[16] __attribute__((aligned(16*4), section(".data.ghash_shoup4_R"))) =
+{
+	0x00000000, 0x1c200000, 0x38400000, 0x24600000, 0x70800000, 0x6ca00000, 0x48c00000, 0x54e00000,
+	0xe1000000, 0xfd200000, 0xd9400000, 0xc5600000, 0x91800000, 0x8da00000, 0xa9c00000, 0xb5e00000,
+};
+
+/*uint16_t ghash_shoup4_R_LE[16] __attribute__((aligned(16*2), section(".data.ghash_shoup4_R_LE"))) =
+{
+	0x0000, 0x201c, 0x4038, 0x6024, 0x8070, 0xa06c, 0xc048, 0xe054,
+	0x00e1, 0x20fd, 0x40d9, 0x60c5, 0x8091, 0xa08d, 0xc0a9, 0xe0b5,
+};*/
+
+
+

@@ -27,9 +27,9 @@ uint8_t expected_ciphertext_256[16] = {0x8e, 0xa2, 0xb7, 0xca, 0x51, 0x67, 0x45,
 
 uint8_t tmp[16];
 
-aes::CipherContext<128, aes::target::CM85_d4T> t128;
-aes::CipherContext<192, aes::target::CM85_d4T> t192;
-aes::CipherContext<256, aes::target::CM85_d4T> t256;
+aes::CipherContext<128, aes::target::CM3_1T> t128;
+aes::CipherContext<192, aes::target::CM3_1T> t192;
+aes::CipherContext<256, aes::target::CM3_1T> t256;
 
 #if defined(__ARM_ARCH_7EM__)||defined(__ARM_ARCH_7M__)||defined(__ARM_ARCH_8M_MAIN__)||defined(__ARM_ARCH_8_1M_MAIN__)
 
@@ -603,7 +603,7 @@ uint8_t gcm_tmp2[16];
 aes::mode::GCM<128,
 		aes::target::CM7_1T,
 		aes::mode::target::CTR32_CM7_1T,
-		aes::mode::target::gcm::GHASH_GENERIC_BEAR_CT> tgcm128;
+		aes::mode::target::gcm::GHASH_GENERIC_SHOUP_M4> tgcm128;
 
 
 

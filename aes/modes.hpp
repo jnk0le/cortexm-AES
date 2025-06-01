@@ -399,7 +399,7 @@ namespace mode {
 			*reinterpret_cast<uint64_t*>(&lenAC[0]) = aux::byteswap(len_A);
 			*reinterpret_cast<uint64_t*>(&lenAC[8]) = aux::byteswap(len_C);
 
-			g_ctx.gmulH(lenAC, partial_tag_cache, 1); // need non xoring gmul ??
+			g_ctx.gmulH(lenAC, partial_tag_cache, 1);
 
 			// handle "counter 0" aka J0 aka HF, recycle partial_tag_cache for output
 			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)1));
