@@ -91,7 +91,7 @@ See https://www.bearssl.org/constanttime.html#ghash-for-gcm for details.
 - `GHASH_GENERIC_BEAR_CT`
 - `GHASH_GENERIC_BEAR_CT32`
 - `GHASH_GENERIC_SHOUP_M4`
-- `GHASH_GENERIC_SHOUP_M8` (not yet)
+- `GHASH_GENERIC_SHOUP_M8`
 - `GHASH_GENERIC_FULL_M4` (not yet)
 - target specific implementations ?????
 
