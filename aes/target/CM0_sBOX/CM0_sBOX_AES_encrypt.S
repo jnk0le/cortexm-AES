@@ -52,7 +52,7 @@ CM0_sBOX_AES_encrypt:
 	eors r6, r2
 	eors r7, r3
 
-	// state elements will be represented with big endian representation (transposed canonical state representation)
+	// state elements will be represented with big endian order (transposed canonical state representation)
 	// columns are loaded in little endian so right/left in shifts is in reverse wrt transposed canonical state representation
 
 	// global allocation

@@ -44,6 +44,9 @@ CM3_1T_AES_decrypt:
 	eors r2, r6
 	eors r3, r7
 
+	// state elements will be represented with big endian order (transposed canonical state representation)
+	// columns are loaded in little endian so right/left in shifts is in reverse wrt transposed canonical state representation
+
 	// global allocation
 	// r11 - rk + 16 (final)
 	// r12 - current rk ptr

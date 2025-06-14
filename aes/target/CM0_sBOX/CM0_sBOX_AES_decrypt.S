@@ -57,6 +57,9 @@ CM0_sBOX_AES_decrypt:
 	eors r6, r2
 	eors r7, r3
 
+	// state elements will be represented with big endian order (transposed canonical state representation)
+	// columns are loaded in little endian so right/left in shifts is in reverse wrt transposed canonical state representation
+
 	// r8 - decrement constant
 	// r9 - inv_sbox
 	// r10 - 0x80808080
