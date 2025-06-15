@@ -603,7 +603,7 @@ uint8_t gcm_tmp2[16];
 aes::mode::GCM<128,
 		aes::target::CM7_1T,
 		aes::mode::target::CTR32_CM7_1T,
-		aes::mode::target::gcm::GHASH_GENERIC_SHOUP_M8> tgcm128;
+		aes::mode::target::gcm::GHASH_GENERIC_FULL_M4> tgcm128;
 
 
 

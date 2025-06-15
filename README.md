@@ -92,7 +92,8 @@ See https://www.bearssl.org/constanttime.html#ghash-for-gcm for details.
 - `GHASH_GENERIC_BEAR_CT32`
 - `GHASH_GENERIC_SHOUP_M4`
 - `GHASH_GENERIC_SHOUP_M8`
-- `GHASH_GENERIC_FULL_M4` (not yet)
+- `GHASH_GENERIC_FULL_M4`
+- `GHASH_GENERIC_FULL_M8` (not yet)
 - target specific implementations ?????
 
 #### memory reqirements
@@ -103,6 +104,7 @@ See https://www.bearssl.org/constanttime.html#ghash-for-gcm for details.
 | `SHOUP_M4`       | 304 + AES roundkey | 64 + AES  |
 | `SHOUP_M8`       | 4144 + AES roundkey | 1024 + AES |
 | `FULL_M4`        | 8240 + AES roundkey | 0 + AES    |
+| `FULL_M8`        |  + AES roundkey | 0 + AES    |
 
 
 

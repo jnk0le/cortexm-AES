@@ -106,7 +106,7 @@ namespace gcm {
 			M[(8 * 4) + 3] = t3;
 
 			for(int i = 4; i > 0; i >>= 1) {
-				// M [i] ← M [2i] · P
+				// M[i] ← M[2i] · P
 				uint32_t carry = t3 & 1;
 
 				t3 = (t3 >> 1) | (t2 << 31);
@@ -157,7 +157,7 @@ namespace gcm {
 			M[(128 * 4) + 3] = t3;
 
 			for(int i = 64; i > 0; i >>= 1) {
-				// M [i] ← M [2i] · P
+				// M[i] ← M[2i] · P
 				uint32_t carry = t3 & 1;
 
 				t3 = (t3 >> 1) | (t2 << 31);
@@ -276,9 +276,8 @@ namespace gcm {
 
 	private:
 		// M is generated from byte reversed state
-		uint32_t M[16*4]; // 16 * 16 byte entries
+		uint32_t M[16*4]; // 16 elements * 16 byte entries
 	};
-
 
 	class GHASH_GENERIC_SHOUP_M8
 	{
@@ -342,7 +341,107 @@ namespace gcm {
 
 	private:
 		// M is generated from byte reversed state
-		uint32_t M[256*4]; // 256 * 16 byte entries
+		uint32_t M[256*4]; // 256 elements * 16 byte entries
+	};
+
+
+	class GHASH_GENERIC_FULL_M4
+	{
+	public:
+		void setH(const uint8_t* H) {
+			generic::ghashSetM0_4bit(H, M); // M0
+
+			// M[i] = M[i-1] · P^4
+			// P^4 is P applied 4 times, P is shift + reduction by polynomial, can be also seen
+			// as multiplication (with reduction) by another polynomial where n (from P^n) bit is set
+
+			// P has been applied 3 times already in M0, accessible at M[1]
+			// one more P needs to be applied here
+
+			uint32_t* Mcur = M;
+
+			for(int i = 1; i < 32; i++) {
+				uint32_t next_H[4];
+
+				uint32_t carry = Mcur[(1 * 4) + 3] & 1;
+
+				next_H[3] = (Mcur[(1 * 4) + 3] >> 1) | (Mcur[(1 * 4) + 2] << 31);
+				next_H[2] = (Mcur[(1 * 4) + 2] >> 1) | (Mcur[(1 * 4) + 1] << 31);
+				next_H[1] = (Mcur[(1 * 4) + 1] >> 1) | (Mcur[(1 * 4) + 0] << 31);
+				next_H[0] = (Mcur[(1 * 4) + 0] >> 1) ^ (0xe1000000 * carry); // R;
+
+				// H input is byte reversed in M0 gen, so unreverse it
+				// fix later
+				next_H[0] = aux2::byteswap(next_H[0]);
+				next_H[1] = aux2::byteswap(next_H[1]);
+				next_H[2] = aux2::byteswap(next_H[2]);
+				next_H[3] = aux2::byteswap(next_H[3]);
+
+				Mcur += 256/4; // 256 bytes per M[i]
+				generic::ghashSetM0_4bit((uint8_t*)next_H, Mcur); // repeat algorithm 3
+			}
+
+		}
+
+		void gmulH(uint8_t* partial_tag, const uint8_t* data, uint32_t blocks_cnt) {
+			uint32_t Z[4];
+			uint8_t lo, hi; // low part is extracted from the top 4 bits
+
+			uint32_t* partial_tag32 = reinterpret_cast<uint32_t*>(partial_tag);
+			const uint32_t* data32 = reinterpret_cast<const uint32_t*>(data);
+
+			for(uint32_t n = 0; n < blocks_cnt; n++) {
+				partial_tag32[0] ^= data32[0];
+				partial_tag32[1] ^= data32[1];
+				partial_tag32[2] ^= data32[2];
+				partial_tag32[3] ^= data32[3];
+				data32 += 4; // advance input // don't use 8bit pointer from now
+
+				uint32_t* Mcur = M; // current M, incremented as there are 32 M tables
+
+				lo = partial_tag[0] >> 4;
+
+				Z[0] = Mcur[(lo * 4) + 0];
+				Z[1] = Mcur[(lo * 4) + 1];
+				Z[2] = Mcur[(lo * 4) + 2];
+				Z[3] = Mcur[(lo * 4) + 3];
+
+				Mcur += 256/4; // 256 bytes per M[i]
+				hi = partial_tag[0] & 0x0f;
+
+				Z[0] ^= Mcur[(hi * 4) + 0];
+				Z[1] ^= Mcur[(hi * 4) + 1];
+				Z[2] ^= Mcur[(hi * 4) + 2];
+				Z[3] ^= Mcur[(hi * 4) + 3];
+
+				for(int i = 1; i < 16; i++) {
+					Mcur += 256/4; // 256 bytes per M[i]
+					lo = partial_tag[i] >> 4;
+
+					Z[0] ^= Mcur[(lo * 4) + 0];
+					Z[1] ^= Mcur[(lo * 4) + 1];
+					Z[2] ^= Mcur[(lo * 4) + 2];
+					Z[3] ^= Mcur[(lo * 4) + 3];
+
+					Mcur += 256/4; // 256 bytes per M[i]
+					hi = partial_tag[i] & 0x0f;
+
+					Z[0] ^= Mcur[(hi * 4) + 0];
+					Z[1] ^= Mcur[(hi * 4) + 1];
+					Z[2] ^= Mcur[(hi * 4) + 2];
+					Z[3] ^= Mcur[(hi * 4) + 3];
+				}
+
+				partial_tag32[0] = aux2::byteswap(Z[0]);
+				partial_tag32[1] = aux2::byteswap(Z[1]);
+				partial_tag32[2] = aux2::byteswap(Z[2]);
+				partial_tag32[3] = aux2::byteswap(Z[3]);
+			}
+		}
+
+	private:
+		// M is generated from byte reversed state, M[i] is placed after M[i-1]
+		uint32_t M[32*16*4]; // 32 tables * 16 elements * 16 byte entries (8 KiB total)
 	};
 
 }

@@ -1035,6 +1035,8 @@ uint32_t AES_d4Td4[256*4] __attribute__((aligned(1024*4), section(".data.AES_d4T
 
 // reduction tables for ghash shoup's method
 
+// reduction value in multiplication by P^4/P^8, content is basically `i · R`
+
 uint32_t ghash_shoup4_R[16] __attribute__((aligned(16*4), section(".data.ghash_shoup4_R"))) =
 {
 	0x00000000, 0x1c200000, 0x38400000, 0x24600000, 0x70800000, 0x6ca00000, 0x48c00000, 0x54e00000,
