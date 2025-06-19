@@ -82,6 +82,10 @@ All implementations are currently based on CTR_32 class. (there will be fused ct
 
 Table based implementations are implemented accoding to:
 https://luca-giuzzi.unibs.it/corsi/Support/papers-cryptography/gcm-spec.pdf
+The GCM context needs to be placed in uncached SRAM/TCM memory (required by M tables only).
+
+The FULL-table implementations are not recommended as the 4 bit version doesn't improve speed enough
+and 8 bit one requires unrealistic amount of uncached memory.
 
 The `BEAR_CT{32}` implementations come from bearSSL package and are constant time with
 single cycle multipliers (use CT32 for cortex-m0 and cortex-m3).
