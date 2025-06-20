@@ -475,14 +475,14 @@ namespace gcm {
 				next_H[2] = aux2::byteswap(next_H[2]);
 				next_H[3] = aux2::byteswap(next_H[3]);
 
-				Mcur += 4096/4; // 256 bytes per M[i]
+				Mcur += 4096/4; // 4096 bytes per M[i]
 				generic::ghashSetM0_8bit((uint8_t*)next_H, Mcur); // repeat algorithm 3
 			}
 		}
 
 		void gmulH(uint8_t* partial_tag, const uint8_t* data, uint32_t blocks_cnt) {
 			uint32_t Z[4];
-			uint8_t in; // low part is extracted from the top 4 bits
+			uint8_t in;
 
 			uint32_t* partial_tag32 = reinterpret_cast<uint32_t*>(partial_tag);
 			const uint32_t* data32 = reinterpret_cast<const uint32_t*>(data);
@@ -494,7 +494,7 @@ namespace gcm {
 				partial_tag32[3] ^= data32[3];
 				data32 += 4; // advance input // don't use 8bit pointer from now
 
-				uint32_t* Mcur = M; // current M, incremented as there are 32 M tables
+				uint32_t* Mcur = M; // current M, incremented as there are 16 M tables
 
 				in = partial_tag[0];
 
