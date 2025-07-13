@@ -15,7 +15,7 @@
 .thumb
 .text
 
-.align 2
+.balign 4
 // void CM0_sBOX_AES_encrypt(uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds) {
 .global CM0_sBOX_AES_encrypt
 .type   CM0_sBOX_AES_encrypt,%function
