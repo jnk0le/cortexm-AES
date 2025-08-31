@@ -2,9 +2,9 @@
  * \file cipher_impl_CM7.hpp
  * \brief implementation wrappers of AES implementations for cortex-m7
  *
- * don't use directly
+ * don't use this file directly
  *
- * \author jnk0le <jnk0le@hotmail.com>
+ * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \copyright MIT License
  */
 

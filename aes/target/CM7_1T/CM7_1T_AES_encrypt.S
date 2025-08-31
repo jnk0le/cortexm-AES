@@ -55,7 +55,7 @@ CM7_1T_AES_encrypt:
 	// r6 - s02T ^ s13T ^ s20T ^ s31T
 	// r7 - s03T ^ s10T ^ s21T ^ s32T
 
-1:	// skew addroundkey to begginning of loop
+1:
 	eors r0, r4
 	eors r1, r5
 
