@@ -134,7 +134,7 @@ namespace mode {
 		 * \return size of decrypted (appended) plaintext (stripped from padding), -1 if ciphertext is malformed
 		 */
 
-		uint32_t decryptAppendFinalize(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
+		int32_t decryptAppendFinalize(const uint8_t* data_in, uint8_t* data_out, uint32_t len) {
 			mode_impl<key_length, base_impl>::decrypt(data_in, data_out, iv, (len >> 4));
 
 			uint32_t last_pad = data_out[len - 1];
@@ -151,7 +151,7 @@ namespace mode {
 			if(last_pad*last_pad != padding_sum)
 				return -1;
 
-			return len - last_pad;
+			return (int)(len - last_pad);
 		}
 
 	private:
