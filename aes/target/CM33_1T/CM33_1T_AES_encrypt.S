@@ -5,7 +5,6 @@
  * utilizes Te2 table
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
- * Peter Schwabe & Ko Stoffelen @2016
  * \license SPDX-License-Identifier: MIT
  */
 
