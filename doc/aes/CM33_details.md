@@ -12,7 +12,7 @@
 
 ## perfomance
 
-| Cipher function  |  ??? - CM33_1T |
+| Cipher function  |  RP2350 - CM33_1T |
 |------------------|-------------------|
 | `setEncKey<128>` | |
 | `setEncKey<256>` | |
