@@ -16,7 +16,7 @@
 	extern "C" {
 #endif
 
-	//void CM33_1T_AES128_keyschedule_enc(uint8_t* rk, const uint8_t* key);
+	void CM33_1T_AES128_keyschedule_enc(uint8_t* rk, const uint8_t* key);
 	//void CM33_1T_AES192_keyschedule_enc(uint8_t* rk, const uint8_t* key);
 	//void CM33_1T_AES256_keyschedule_enc(uint8_t* rk, const uint8_t* key);
 

@@ -14,7 +14,7 @@
 
 | Cipher function  |  RP2350 - CM33_1T |
 |------------------|-------------------|
-| `setEncKey<128>` | |
+| `setEncKey<128>` | 271 |
 | `setEncKey<256>` | |
 | `encrypt<128>`    | 574 |
 | `encrypt<256>`    | 790 |
@@ -27,7 +27,7 @@
 
 | Function | code size in bytes | stack usage in bytes | notes |
 |----------|--------------------|----------------------|-------|
-| `CM33_1T_AES128_keyschedule_enc` | | | uses Te2 table |
+| `CM33_1T_AES128_keyschedule_enc` | 94 | 16 | uses Te2 table |
 | `CM33_1T_AES192_keyschedule_enc` | | | uses Te2 table |
 | `CM33_1T_AES256_keyschedule_enc` | | | uses Te2 table |
 | `CM33_1T_AES_keyschedule_dec` | | | uses Te2 and Td2 table |

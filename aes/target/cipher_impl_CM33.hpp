@@ -27,7 +27,7 @@ namespace target {
 			switch(key_length)
 			{
 			case 128:
-				CM3_1T_AES128_keyschedule_enc(rk, key);
+				CM33_1T_AES128_keyschedule_enc(rk, key);
 				break;
 			case 192:
 				CM3_1T_AES192_keyschedule_enc(rk, key);
