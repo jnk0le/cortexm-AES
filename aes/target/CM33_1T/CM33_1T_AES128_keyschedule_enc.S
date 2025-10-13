@@ -47,7 +47,6 @@ CM33_1T_AES128_keyschedule_enc:
 	ldrb r2, [r12, r2, lsl #2] // load sbox from Te2
 
 	uxtb r3, r7, ror #8 // then lsl #0
-
 	eor r4, r4, r2, lsl #16
 	ldrb r3, [r12, r3, lsl #2] // load sbox from Te2
 
