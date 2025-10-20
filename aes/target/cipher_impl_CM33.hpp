@@ -33,7 +33,7 @@ namespace target {
 				CM3_1T_AES192_keyschedule_enc(rk, key);
 				break;
 			case 256:
-				CM3_1T_AES256_keyschedule_enc(rk, key);
+				CM33_1T_AES256_keyschedule_enc(rk, key);
 				break;
 			}
 		}
