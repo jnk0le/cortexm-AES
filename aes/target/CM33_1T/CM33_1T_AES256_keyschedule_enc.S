@@ -31,7 +31,7 @@ CM33_1T_AES256_keyschedule_enc:
 
 	str r3, [r0], #4 // need to split stmia due to rcon
 
-	mov.w r1, #0x01000000 // calculate rcon in highest byte to use a carry flag
+	mov.w r1, #0x01000000 // calculate rcon in highest byte to use a negative flag
 	eor r3, r3, r1, lsr #24 // rcon application is skewed into g transform part
 
 	stmia r0!, {r4-r6} // copy first half of the key
@@ -96,7 +96,6 @@ CM33_1T_AES256_keyschedule_enc:
 	lsls r1, #1 // next rcon
 	itttt ne // rcon is never zero, also avoids dirty workaround required by `it al`
 	eorne r3, r2
-
 	eorne r4, r3
 	eorne r5, r4
 	eorne r6, r5

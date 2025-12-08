@@ -30,7 +30,7 @@ CM3_1T_AES256_keyschedule_enc:
 	movt r1, #:upper16:AES_Te2
 	str r1, [sp, #-8]! // put and reserve Te2 on stack before looping
 
-	mov.w r1, #0x01000000 // calculate rcon in highest byte to use a carry flag
+	mov.w r1, #0x01000000 // calculate rcon in highest byte to use a negative flag
 
 	//sp+0 - Te2
 	//sp+4 - rcon
