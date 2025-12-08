@@ -47,7 +47,7 @@ namespace target {
 		}
 
 		void decrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
-			CM3_1T_AES_decrypt(rk, data_in, data_out, this->key_rounds);
+			CM33_1T_AES_decrypt(rk, data_in, data_out, this->key_rounds);
 		}
 
 	protected:

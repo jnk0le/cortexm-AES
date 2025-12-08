@@ -28,11 +28,10 @@ CM33_1T_AES_encrypt:
 
 	mov r12, r0
 
-	//load input
-	ldmia r1!, {r4-r7}
-	//load key
-	ldmia r12!, {r0-r3}
+	ldmia r1!, {r4-r7} // load input
+	ldmia r12!, {r0-r3} // load key
 
+	// initial addroundkey
 	eors r0, r4
 	eors r1, r5
 	eors r2, r6
@@ -234,12 +233,14 @@ CM33_1T_AES_encrypt:
 	uxtb r4, r0 // skewed
 	bne 1b
 
+	// final round
+
 	//current allocation
 	// r0 -  -  | s10 | s20 | s30
 	// r1 - s01 | s11 | s21 | s31
 	// r2 - s02 | s12 | s22 | s32
 	// r3 - s03 | s13 | s23 | s33
-	// r4 - s00 // c0 ???
+	// r4 - s00 // c0r0
 	// r5 -
 	// r6 -
 	// r7 -
