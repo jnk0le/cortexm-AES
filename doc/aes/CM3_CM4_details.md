@@ -1,5 +1,7 @@
 # cortex-m3/m4
 
+cortex m3 and cortex m4 optimized implementations.
+
 32 bit LDR opcodes are aligned to 4 byte boundaries (instructions not data) to prevent weird 
 undocumented "feature" of cortex-m3/4 that prevents some pipelining of neighbouring loads.
 
@@ -12,7 +14,6 @@ wide access, that is not crossing different memory domains (eg. AHB slaves).
 
 ### CM3_1T
 
-cortex m3 and cortex m4 optimized implementation.
 Uses a single T table per enc/dec cipher and additional inv_sbox for final round in decryption.
 
 Originally based on "Peter Schwabe and Ko Stoffelen" AES implementation available 

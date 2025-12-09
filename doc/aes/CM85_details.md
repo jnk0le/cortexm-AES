@@ -1,5 +1,8 @@
 # cortex-m85
 
+cortex m85 optimized implementations.
+
+optimized to avoid dual issue of data dependent loads which cause stalls when accessing same DTCM bank 
 
 Similarly to CM7, all lookup tables must be placed in DTCM memory.
 

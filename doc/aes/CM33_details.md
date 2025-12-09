@@ -1,14 +1,16 @@
 # cortex-m33
 
-
-
+cortex m33 optimized implementations.
 
 
 ## base impl
 
 ### CM33_1T
 
+Uses a single T table per enc/dec cipher and additional inv_sbox for final round in decryption.
 
+On RP2350 only SRAM8 and SRAM9 can be used for lookups to be free from bank timming.
+(unstriped alias of main blocks is not available)
 
 ## perfomance
 

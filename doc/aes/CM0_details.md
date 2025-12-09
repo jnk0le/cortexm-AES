@@ -1,5 +1,8 @@
 # cortex-m0/m0+
 
+cortex m0/m0+ and cortex m23 optimized implementations.
+
+
 ## base impl
 
 ### CM0_sBOX
@@ -66,7 +69,9 @@ striping) SRAM memories (e.g. SRAM0-3 in rp2040)
 ### CM0_d4T_FAST
 
 Same as d4T but uses basic sbox/inv_sbox in final round.
+
 Forward encryption consumes extra 256 bytes. (sbox)
+Decryption shrinks by 3840 bytes (inv_sbox instead of d4Td4)
 
 Can be used on typical unstriped memories.
 
