@@ -74,8 +74,8 @@ s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3
 | `setEncKey<256>` | 178 | 178 |
 | `encrypt<128>`   | 292 | 400 |
 | `encrypt<256>`   | 400 | 556 |
-| `setDecKey<128>` | 357 | 357 |
-| `setDecKey<256>` | 509 | 509 |
+| `setDecKey<128>` | 357 | (1T) |
+| `setDecKey<256>` | 509 | (1T) |
 | `decrypt<128>`   | 293 | (1T) |
 | `decrypt<256>`   | 401 | (1T) |
 
