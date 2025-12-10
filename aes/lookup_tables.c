@@ -236,7 +236,7 @@ uint32_t AES_Td2[256] __attribute__((aligned(1024), section(".data.AES_Td2"))) =
 };
 
 
-// The diffused 4 Te tables, designed for MVE gathers
+// The diffused 4 Te tables, designed for 2 or 4 banked, striped SRAMs
 // requires left shifts (+ offsets) that are not supported natively by AGUs
 //
 // starting at index i/4 we have:
@@ -502,7 +502,7 @@ uint32_t AES_d4Te[256*4] __attribute__((aligned(1024*4), section(".data.AES_d4Te
 	0x3a16162c, 0x16162c3a, 0x162c3a16, 0x2c3a1616,
 };
 
-// The diffused 4 Td tables, designed for MVE gathers
+// The diffused 4 Td tables, designed for 2 or 4 banked, striped SRAMs
 // requires left shifts (+ offsets) that are not supported natively by AGUs
 //
 // starting at index i/4 we have:
@@ -770,7 +770,7 @@ uint32_t AES_d4Td[256*4] __attribute__((aligned(1024*4), section(".data.AES_d4Td
 
 // Td4 aka inv_sbox spread across 4, 32bit banks.
 // It's a bit painfull waste, but a price to pay for bank timming free decryption.
-// Banked, striped SRAMS usually come with enough capacity for this anyway
+// Banked, striped SRAMs usually come with enough capacity for this anyway
 
 uint32_t AES_d4Td4[256*4] __attribute__((aligned(1024*4), section(".data.AES_d4Td4"))) =
 {
