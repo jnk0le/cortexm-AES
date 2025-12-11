@@ -32,21 +32,21 @@
 	If .data section is already in DTCM and you just want to make sure it is as explicit as possible
 
 	.data : ALIGN(4) {
-		PROVIDE(__data_start__ = .);
+		__data_start__ = .;
 		*(.AES_TABLES .AES_TABLES.*)
 		*(.data .data.* .gnu.linkonce.d.*)
-		PROVIDE(__data_end__ = .);
+		__data_end__ = .;
 	} > DTCM AT > FLASH
 
 	If .data section is not placed in deterministic memory block, then you have to create another output section:
 
 	.AES_TABLES : ALIGN(4) {
-		PROVIDE(__aes_tables_start__ = .);
+		__aes_tables_start__ = .;
 		*(.AES_TABLES .AES_TABLES.*)
-		PROVIDE(__aes_tables_end__ = .);
+		__aes_tables_end__ = .;
 	} > DTCM AT > FLASH
 
-	PROVIDE(__aes_tables_init_start__ = LOADADDR(.AES_TABLES));
+	__aes_tables_init_start__ = LOADADDR(.AES_TABLES);
 
 	and initialize it somewhere at startup:
 
