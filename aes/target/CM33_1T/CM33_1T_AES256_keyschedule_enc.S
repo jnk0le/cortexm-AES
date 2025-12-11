@@ -35,7 +35,7 @@ CM33_1T_AES256_keyschedule_enc:
 	eor r3, r3, r1, lsr #24 // rcon application is skewed into g transform part
 
 	stmia r0!, {r4-r6} // copy first half of the key
-	b 2f // nothing to dual issue (could do stmia without that rcon)
+	b 2f
 
 	// allocation
 	// r0 - rk ptr
