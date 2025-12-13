@@ -13,6 +13,10 @@
 #include <stddef.h>
 #include <string.h>
 
+#if __cplusplus >= 202302L
+	#include <bit>
+#endif
+
 #include "generic_external/bear_ghash.h"
 
 namespace aes {
