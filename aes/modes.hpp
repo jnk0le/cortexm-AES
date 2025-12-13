@@ -258,12 +258,7 @@ namespace mode {
 			g_ctx.setH(partial_tag_cache);
 
 			// prepare for first encryption
-			memset(partial_tag_cache, 0, 16);
-
-			len_A = 0;
-			len_C = 0;
-
-			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)2)); // set to "counter 1"
+			reinitInternalState();
 		}
 
 		/*!
@@ -545,7 +540,6 @@ namespace mode {
 		}
 
 	private:
-		//this is private as it doesn't always reinitialize CTR, which is done by "J0" encryption
 		void reinitInternalState() {
 			len_A = 0;
 			len_C = 0;
