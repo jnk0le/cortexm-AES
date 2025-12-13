@@ -323,7 +323,7 @@ namespace mode {
 		 */
 		void setTlsSeq(uint64_t seq) {
 			uint32_t* nonce = ctr_ctx.getNoncePtr();
-			*reinterpret_cast<uint64_t*>(&nonce[1]) ^= seq;
+			*reinterpret_cast<uint64_t*>(&nonce[1]) = seq;
 		}
 
 		/*!
