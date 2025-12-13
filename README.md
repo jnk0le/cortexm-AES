@@ -39,7 +39,7 @@ https://webthesis.biblio.polito.it/secure/26870/1/tesi.pdf - (CM3_1T on cortex-m
 
 ## base implementations
 
-- [cortex-m0/m0+](doc/aes/CM0_details.md)
+- [cortex-m0/m0+/m23](doc/aes/CM0_details.md)
 - [cortex-m3/m4](doc/aes/CM3_CM4_details.md)
 - [cortex-m7](doc/aes/CM7_details.md)
 - [cortex-m33](doc/aes/CM33_details.md)
@@ -83,9 +83,10 @@ All implementations are currently based on CTR_32 class. (there will be fused ct
 Table based implementations are implemented accoding to:
 https://luca-giuzzi.unibs.it/corsi/Support/papers-cryptography/gcm-spec.pdf
 The GCM context needs to be placed in uncached SRAM/TCM memory (required by M tables only).
+Currently M tables are not align protected from spanning 2 different memory banks.
 
-The FULL-table implementations are not recommended as the 4 bit version doesn't improve speed enough
-and 8 bit one requires unrealistic amount of uncached memory.
+The generic FULL-table implementations are not recommended as the 4 bit version doesn't improve speed enough
+(on M33 it's even slower) and 8 bit one requires unrealistic amount of uncached memory.
 
 The `BEAR_CT{32}` implementations come from bearSSL package and are constant time with
 single cycle multipliers (use CT32 for cortex-m0 and cortex-m3).
