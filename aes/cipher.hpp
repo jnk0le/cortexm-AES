@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "common.hpp"
 #include "target/cipher_impl.hpp"
 
 namespace aes

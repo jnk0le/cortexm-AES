@@ -17,6 +17,7 @@
 	#include <bit>
 #endif
 
+#include "common.hpp"
 #include "cipher.hpp"
 #include "target_modes/modes_impl.hpp"
 #include "target_modes/ghash_impl.hpp"
@@ -24,19 +25,6 @@
 
 namespace aes {
 namespace mode {
-
-	namespace aux {
-	#if __cplusplus >= 202302L
-		using std::byteswap;
-	#else
-		constexpr uint32_t byteswap(uint32_t value) {
-			return __builtin_bswap32(value);
-		}
-		constexpr uint64_t byteswap(uint64_t value) {
-			return __builtin_bswap64(value);
-		}
-	#endif
-	}
 
 	template<size_t key_length,
 			template<size_t> class base_impl = aes::target::CM3_1T,
@@ -334,7 +322,7 @@ namespace mode {
 			uint32_t* nonce = ctr_ctx.getNoncePtr();
 
 			// need to unxor previous seq number
-			*reinterpret_cast<uint64_t*>(&nonce[1]) ^= aux::byteswap(prev_seq_cnt ^ new_seq_cnt);
+			*reinterpret_cast<uint64_t*>(&nonce[1]) ^= aes::common::byteswap(prev_seq_cnt ^ new_seq_cnt);
 		}
 
 		/*!
@@ -391,13 +379,13 @@ namespace mode {
 		void finalizeTagLast(uint8_t* tag) {
 			uint8_t lenAC[16];
 
-			*reinterpret_cast<uint64_t*>(&lenAC[0]) = aux::byteswap(len_A);
-			*reinterpret_cast<uint64_t*>(&lenAC[8]) = aux::byteswap(len_C);
+			*reinterpret_cast<uint64_t*>(&lenAC[0]) = aes::common::byteswap(len_A);
+			*reinterpret_cast<uint64_t*>(&lenAC[8]) = aes::common::byteswap(len_C);
 
 			g_ctx.gmulH(lenAC, partial_tag_cache, 1);
 
 			// handle "counter 0" aka J0 aka HF, recycle partial_tag_cache for output
-			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)1));
+			ctr_ctx.setNonceCtr(aes::common::byteswap((uint32_t)1));
 
 			ctr_ctx.encryptByExposedBase((uint8_t*)ctr_ctx.getNoncePtr(), partial_tag_cache);
 			// "counter 1" is set later
@@ -546,7 +534,7 @@ namespace mode {
 
 			memset(partial_tag_cache, 0, 16);
 
-			ctr_ctx.setNonceCtr(aux::byteswap((uint32_t)2)); // set to "counter 1"
+			ctr_ctx.setNonceCtr(aes::common::byteswap((uint32_t)2)); // set to "counter 1"
 		}
 
 		void ghashData(const uint8_t* data_in, uint32_t len) {

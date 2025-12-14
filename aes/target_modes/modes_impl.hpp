@@ -2,7 +2,7 @@
  * \file modes_impl.hpp
  * \brief wrappers for block mode ciphers
  *
- * GCM mode is in separate file
+ * GCM mode is separated from this file
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT

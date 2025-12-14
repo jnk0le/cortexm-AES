@@ -1,6 +1,6 @@
 /*!
  * \file ghash_impl.hpp
- * \brief block mode implementations
+ * \brief ghash implementations
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
@@ -13,10 +13,8 @@
 #include <stddef.h>
 #include <string.h>
 
-#if __cplusplus >= 202302L
-	#include <bit>
-#endif
-
+#include "../common.hpp"
+#include "ghash_common.hpp"
 #include "generic_external/bear_ghash.h"
 
 namespace aes {
@@ -72,130 +70,11 @@ namespace gcm {
 		uint8_t H[16];
 	};
 
-	//move aux to separate file??
-	namespace aux2 {
-	#if __cplusplus >= 202302L
-		using std::byteswap;
-	#else
-		constexpr uint32_t byteswap(uint32_t value) {
-			return __builtin_bswap32(value);
-		}
-		constexpr uint64_t byteswap(uint64_t value) {
-			return __builtin_bswap64(value);
-		}
-	#endif
-	}
-
-	// separate file?
-	namespace generic {
-		inline void ghashSetM0_4bit(const uint8_t* H, uint32_t* M) {
-			const uint32_t* H32 = reinterpret_cast<const uint32_t*>(H);
-			uint32_t t0, t1, t2, t3; // code gets messy without temporaries
-
-			// algorithm 3 in https://luca-giuzzi.unibs.it/corsi/Support/papers-cryptography/gcm-spec.pdf
-			M[0 + 0] = 0;
-			M[0 + 1] = 0;
-			M[0 + 2] = 0;
-			M[0 + 3] = 0;
-
-			// need endian swap to handle P (page 9)
-			t0 = aux2::byteswap(H32[0]);
-			t1 = aux2::byteswap(H32[1]);
-			t2 = aux2::byteswap(H32[2]);
-			t3 = aux2::byteswap(H32[3]);
-
-			M[(8 * 4) + 0] = t0;
-			M[(8 * 4) + 1] = t1;
-			M[(8 * 4) + 2] = t2;
-			M[(8 * 4) + 3] = t3;
-
-			for(int i = 4; i > 0; i >>= 1) {
-				// M[i] ← M[2i] · P
-				uint32_t carry = t3 & 1;
-
-				t3 = (t3 >> 1) | (t2 << 31);
-				t2 = (t2 >> 1) | (t1 << 31);
-				t1 = (t1 >> 1) | (t0 << 31);
-				t0 = (t0 >> 1) ^ (0xe1000000 * carry); // R
-
-				M[(i * 4) + 0] = t0;
-				M[(i * 4) + 1] = t1;
-				M[(i * 4) + 2] = t2;
-				M[(i * 4) + 3] = t3;
-			}
-
-			for(int i = 2; i < 16; i *= 2) {
-				t0 = M[(i * 4) + 0];
-				t1 = M[(i * 4) + 1];
-				t2 = M[(i * 4) + 2];
-				t3 = M[(i * 4) + 3];
-
-				for(int j = 1; j < i; j++) {
-					M[((j+i) * 4) + 0] = t0 ^ M[(j * 4) + 0];
-					M[((j+i) * 4) + 1] = t1 ^ M[(j * 4) + 1];
-					M[((j+i) * 4) + 2] = t2 ^ M[(j * 4) + 2];
-					M[((j+i) * 4) + 3] = t3 ^ M[(j * 4) + 3];
-				}
-			}
-		}
-
-		inline void ghashSetM0_8bit(const uint8_t* H, uint32_t* M) {
-			const uint32_t* H32 = reinterpret_cast<const uint32_t*>(H);
-			uint32_t t0, t1, t2, t3; // code gets messy without temporaries
-
-			// algorithm 3 in https://luca-giuzzi.unibs.it/corsi/Support/papers-cryptography/gcm-spec.pdf
-			M[0 + 0] = 0;
-			M[0 + 1] = 0;
-			M[0 + 2] = 0;
-			M[0 + 3] = 0;
-
-			// need endian swap to handle P (page 9)
-			t0 = aux2::byteswap(H32[0]);
-			t1 = aux2::byteswap(H32[1]);
-			t2 = aux2::byteswap(H32[2]);
-			t3 = aux2::byteswap(H32[3]);
-
-			M[(128 * 4) + 0] = t0;
-			M[(128 * 4) + 1] = t1;
-			M[(128 * 4) + 2] = t2;
-			M[(128 * 4) + 3] = t3;
-
-			for(int i = 64; i > 0; i >>= 1) {
-				// M[i] ← M[2i] · P
-				uint32_t carry = t3 & 1;
-
-				t3 = (t3 >> 1) | (t2 << 31);
-				t2 = (t2 >> 1) | (t1 << 31);
-				t1 = (t1 >> 1) | (t0 << 31);
-				t0 = (t0 >> 1) ^ (0xe1000000 * carry); // R
-
-				M[(i * 4) + 0] = t0;
-				M[(i * 4) + 1] = t1;
-				M[(i * 4) + 2] = t2;
-				M[(i * 4) + 3] = t3;
-			}
-
-			for(int i = 2; i < 256; i *= 2) {
-				t0 = M[(i * 4) + 0];
-				t1 = M[(i * 4) + 1];
-				t2 = M[(i * 4) + 2];
-				t3 = M[(i * 4) + 3];
-
-				for(int j = 1; j < i; j++) {
-					M[((j+i) * 4) + 0] = t0 ^ M[(j * 4) + 0];
-					M[((j+i) * 4) + 1] = t1 ^ M[(j * 4) + 1];
-					M[((j+i) * 4) + 2] = t2 ^ M[(j * 4) + 2];
-					M[((j+i) * 4) + 3] = t3 ^ M[(j * 4) + 3];
-				}
-			}
-		}
-	}
-
 	class GHASH_GENERIC_SHOUP_M4
 	{
 	public:
 		void setH(const uint8_t* H) {
-			generic::ghashSetM0_4bit(H, M);
+			gcm::common::ghashSetM0_4bit(H, M);
 		}
 
 		/*!
@@ -271,10 +150,10 @@ namespace gcm {
 					Z[3] ^= M[(hi * 4) + 3];
 				}
 
-				partial_tag32[0] = aux2::byteswap(Z[0]);
-				partial_tag32[1] = aux2::byteswap(Z[1]);
-				partial_tag32[2] = aux2::byteswap(Z[2]);
-				partial_tag32[3] = aux2::byteswap(Z[3]);
+				partial_tag32[0] = aes::common::byteswap(Z[0]);
+				partial_tag32[1] = aes::common::byteswap(Z[1]);
+				partial_tag32[2] = aes::common::byteswap(Z[2]);
+				partial_tag32[3] = aes::common::byteswap(Z[3]);
 			}
 		}
 
@@ -287,7 +166,7 @@ namespace gcm {
 	{
 	public:
 		void setH(const uint8_t* H) {
-			generic::ghashSetM0_8bit(H, M);
+			gcm::common::ghashSetM0_8bit(H, M);
 		}
 
 		/*!
@@ -335,10 +214,10 @@ namespace gcm {
 					Z[3] ^= M[(in * 4) + 3];
 				}
 
-				partial_tag32[0] = aux2::byteswap(Z[0]);
-				partial_tag32[1] = aux2::byteswap(Z[1]);
-				partial_tag32[2] = aux2::byteswap(Z[2]);
-				partial_tag32[3] = aux2::byteswap(Z[3]);
+				partial_tag32[0] = aes::common::byteswap(Z[0]);
+				partial_tag32[1] = aes::common::byteswap(Z[1]);
+				partial_tag32[2] = aes::common::byteswap(Z[2]);
+				partial_tag32[3] = aes::common::byteswap(Z[3]);
 			}
 
 		}
@@ -352,7 +231,7 @@ namespace gcm {
 	{
 	public:
 		void setH(const uint8_t* H) {
-			generic::ghashSetM0_4bit(H, M); // M0
+			gcm::common::ghashSetM0_4bit(H, M); // M0
 
 			// M[i] = M[i-1] · P^4
 			// P^4 is P applied 4 times, P is shift + reduction by polynomial, can be also seen
@@ -375,13 +254,13 @@ namespace gcm {
 
 				// H input is byte reversed in M0 gen, so unreverse it
 				// fix later
-				next_H[0] = aux2::byteswap(next_H[0]);
-				next_H[1] = aux2::byteswap(next_H[1]);
-				next_H[2] = aux2::byteswap(next_H[2]);
-				next_H[3] = aux2::byteswap(next_H[3]);
+				next_H[0] = aes::common::byteswap(next_H[0]);
+				next_H[1] = aes::common::byteswap(next_H[1]);
+				next_H[2] = aes::common::byteswap(next_H[2]);
+				next_H[3] = aes::common::byteswap(next_H[3]);
 
 				Mcur += 256/4; // 256 bytes per M[i]
-				generic::ghashSetM0_4bit((uint8_t*)next_H, Mcur); // repeat algorithm 3
+				gcm::common::ghashSetM0_4bit((uint8_t*)next_H, Mcur); // repeat algorithm 3
 			}
 
 		}
@@ -435,10 +314,10 @@ namespace gcm {
 					Z[3] ^= Mcur[(hi * 4) + 3];
 				}
 
-				partial_tag32[0] = aux2::byteswap(Z[0]);
-				partial_tag32[1] = aux2::byteswap(Z[1]);
-				partial_tag32[2] = aux2::byteswap(Z[2]);
-				partial_tag32[3] = aux2::byteswap(Z[3]);
+				partial_tag32[0] = aes::common::byteswap(Z[0]);
+				partial_tag32[1] = aes::common::byteswap(Z[1]);
+				partial_tag32[2] = aes::common::byteswap(Z[2]);
+				partial_tag32[3] = aes::common::byteswap(Z[3]);
 			}
 		}
 
@@ -451,7 +330,7 @@ namespace gcm {
 	{
 	public:
 		void setH(const uint8_t* H) {
-			generic::ghashSetM0_8bit(H, M); // M0
+			gcm::common::ghashSetM0_8bit(H, M); // M0
 
 			// M[i] = M[i-1] · P^8
 			// P^8 is P applied 8 times, P is shift + reduction by polynomial, can be also seen
@@ -474,13 +353,13 @@ namespace gcm {
 
 				// H input is byte reversed in M0 gen, so unreverse it
 				// fix later
-				next_H[0] = aux2::byteswap(next_H[0]);
-				next_H[1] = aux2::byteswap(next_H[1]);
-				next_H[2] = aux2::byteswap(next_H[2]);
-				next_H[3] = aux2::byteswap(next_H[3]);
+				next_H[0] = aes::common::byteswap(next_H[0]);
+				next_H[1] = aes::common::byteswap(next_H[1]);
+				next_H[2] = aes::common::byteswap(next_H[2]);
+				next_H[3] = aes::common::byteswap(next_H[3]);
 
 				Mcur += 4096/4; // 4096 bytes per M[i]
-				generic::ghashSetM0_8bit((uint8_t*)next_H, Mcur); // repeat algorithm 3
+				gcm::common::ghashSetM0_8bit((uint8_t*)next_H, Mcur); // repeat algorithm 3
 			}
 		}
 
@@ -517,10 +396,10 @@ namespace gcm {
 					Z[3] ^= Mcur[(in * 4) + 3];
 				}
 
-				partial_tag32[0] = aux2::byteswap(Z[0]);
-				partial_tag32[1] = aux2::byteswap(Z[1]);
-				partial_tag32[2] = aux2::byteswap(Z[2]);
-				partial_tag32[3] = aux2::byteswap(Z[3]);
+				partial_tag32[0] = aes::common::byteswap(Z[0]);
+				partial_tag32[1] = aes::common::byteswap(Z[1]);
+				partial_tag32[2] = aes::common::byteswap(Z[2]);
+				partial_tag32[3] = aes::common::byteswap(Z[3]);
 			}
 		}
 

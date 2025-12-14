@@ -1,6 +1,6 @@
 /*!
  * \file gcm_impl.hpp
- * \brief block mode implementations
+ * \brief optimized implementations fusing AES ctr mode and the ghash in data phase
  *
  * \author Jan Oleksiewicz <jnk0le@hotmail.com>
  * \license SPDX-License-Identifier: MIT
