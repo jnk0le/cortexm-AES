@@ -2,12 +2,21 @@
 
 cortex m0/m0+ and cortex m23 optimized implementations.
 
+Most of the m0(+) microcontrollers can safely operate with lookup tables placed
+in the internal flash memory, provided that the clock is low enough to allow 
+running flash at 0 waitstates, with explicitly disabled prefetch buffers.
+
+sbox @48MHz,1ws is still faster than d4T @24MHz,0ws however.
+
+There are some uCs rated for maximum clock of <25MHz where it makes more sense.
+
+It is not available by default and you will have to modify lookup_tables.c file.
 
 ## base impl
 
 ### CM0_sBOX
 
-Uses simple sbox with parallel mixcolumns
+Uses simple sbox with parallel mixcolumns. Encryption is faster than the typical compiled 1T or 4T implementations.
 
 Forward mixcolumns is done as (and according to [this](http://www.wseas.us/e-library/conferences/2009/moscow/AIC/AIC44.pdf)
 or [this](https://www.researchgate.net/publication/221002183_Efficient_AES_implementations_for_ARM_based_platforms) 
@@ -61,7 +70,8 @@ out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 ### CM0_d4T
 
 Uses the diffused 4 T tables, which is more efficient than 1T or 4T as it doesn't require
-rotations or increasing register pressure with 4 pointers.
+rotations or increasing register pressure with 4 pointers. Left shifts by 4 are essentially free
+as the AGU doesn't have scaled addressing mode.
 
 Fully resistant to bank timming attacks on 2 or 4 banked (by word
 striping) SRAM memories (e.g. SRAM0-3 in rp2040)
@@ -70,10 +80,10 @@ striping) SRAM memories (e.g. SRAM0-3 in rp2040)
 
 Same as d4T but uses basic sbox/inv_sbox in final round.
 
-Forward encryption consumes extra 256 bytes. (sbox)
-Decryption shrinks by 3840 bytes (inv_sbox instead of d4Td4)
+Forward encryption consumes extra 256 bytes. (sbox in final round)
+Decryption shrinks by 3840 bytes (inv_sbox instead of d4Td4 in final round)
 
-Can be used on typical unstriped memories.
+Can be used on typical unstriped memories. (or with just sbox/inv_sbox in unstriped bank, e.g. SRAM4/5 in RP2040)
 
 Requires single cycle multipler for inverse keyschedule
 

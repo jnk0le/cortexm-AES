@@ -28,8 +28,9 @@ However in some cases it's still possible when running at reduced clock, with fl
 - using implementations on wrong microarchitecture might introduce timming leaks (e.g. CM3_1T run on CM7).
 - Unrolled implementations might perform slower than looped versions due to (usually LRU) cache pressure and flash waitstates. (like STM32F4 with 1K ART cache and up to 8WS)
 - for optimization gimmicks refer to [pipeline cycle test repo](https://github.com/jnk0le/random/tree/master/pipeline%20cycle%20test)
-- included unit tests don't cover timming leaks (performance difference on different runs may not be a data dependent ones,
-there are special tools like [dudect](https://eprint.iacr.org/2016/1123.pdf) for that)
+- included unit tests don't cover timming leaks. Performance difference on different runs may not be a data dependent ones.
+(there are special tools like [dudect](https://eprint.iacr.org/2016/1123.pdf) for that, some attack scenarios require
+a more sophisticated setup than just timming on the randomized data)
 
 ## cryptoanalysis 
 
