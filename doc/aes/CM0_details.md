@@ -6,7 +6,7 @@ Most of the m0(+) microcontrollers can safely operate with lookup tables placed
 in the internal flash memory, provided that the clock is low enough to allow 
 running flash at 0 waitstates, with explicitly disabled prefetch buffers.
 
-sbox @48MHz,1ws is still faster than d4T @24MHz,0ws however.
+sbox @48MHz is still faster than d4T @24MHz however.
 
 There are some uCs rated for maximum clock of <25MHz where it makes more sense.
 
