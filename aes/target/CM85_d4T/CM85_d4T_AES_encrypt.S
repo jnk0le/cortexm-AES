@@ -59,8 +59,7 @@ CM85_d4T_AES_encrypt:
 
 	veor q0, q0, q1
 
-	// state and vector elements will be represented with big endian representation
-	// (as in transposed canonical state representation)
+	// state and vector elements will be represented with big endian order (transposed canonical state representation)
 
 	// global allocation
 	// r0 - rk

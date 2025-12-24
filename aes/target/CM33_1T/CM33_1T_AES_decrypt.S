@@ -40,9 +40,6 @@ CM33_1T_AES_decrypt:
 	eors r2, r6
 	eors r3, r7
 
-	// one uxtb skewed to allow branch dual issue
-	uxtb r4, r0
-
 	// state elements will be represented with big endian order (transposed canonical state representation)
 	// columns are loaded in little endian so right/left in shifts is in reverse wrt transposed canonical state representation
 
@@ -63,6 +60,9 @@ CM33_1T_AES_decrypt:
 	// r5 - s01T ^ s10T ^ s23T ^ s32T
 	// r6 - s02T ^ s11T ^ s20T ^ s33T
 	// r7 - s03T ^ s12T ^ s21T ^ s30T
+
+	// one uxtb skewed to allow branch dual issue
+	uxtb r4, r0
 
 1:
 	//current allocation
