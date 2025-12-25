@@ -8,7 +8,7 @@ running flash at 0 waitstates, with explicitly disabled prefetch buffers.
 
 sbox @48MHz is still faster than d4T @24MHz however.
 
-There are some uCs rated for maximum clock of <25MHz where it makes more sense.
+There are some uCs rated for maximum clock of <25MHz (0ws) where it makes more sense.
 
 It is not available by default and you will have to modify lookup_tables.c file.
 

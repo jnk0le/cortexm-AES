@@ -377,7 +377,7 @@ CM33_d4T_AES_encrypt:
 	// r7 - s03`| s10`| s21`| s32`
 
 	ldmia r12!, {r0-r3} // load rk
-//595
+
 	eors r4, r0 // need caller saved loreg for pointer
 	eors r1, r5
 	ldr r0, [sp], #8 // load out ptr
