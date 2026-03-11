@@ -239,7 +239,7 @@ uint32_t AES_Td2[256] __attribute__((aligned(1024), section(".data.AES_Td2"))) =
 // The diffused 4 Te tables, designed for 2 or 4 banked, striped SRAMs
 // requires left shifts (+ offsets) that are not supported natively by AGUs
 //
-// starting at index i/4 we have:
+// starting at index i*4 we have:
 // Te0[i], Te1[i], Te2[i], Te3[i]
 
 uint32_t AES_d4Te[256*4] __attribute__((aligned(1024*4), section(".data.AES_d4Te"))) =
@@ -505,7 +505,7 @@ uint32_t AES_d4Te[256*4] __attribute__((aligned(1024*4), section(".data.AES_d4Te
 // The diffused 4 Td tables, designed for 2 or 4 banked, striped SRAMs
 // requires left shifts (+ offsets) that are not supported natively by AGUs
 //
-// starting at index i/4 we have:
+// starting at index i*4 we have:
 // Td0[i], Td1[i], Td2[i], Td3[i]
 
 uint32_t AES_d4Td[256*4] __attribute__((aligned(1024*4), section(".data.AES_d4Td"))) =
