@@ -21,7 +21,7 @@
 namespace aes {
 namespace common {
 
-#if __cplusplus < 202302L
+#if __cplusplus >= 202302L
 	using std::byteswap;
 #else
 	constexpr uint32_t byteswap(uint32_t value) {
