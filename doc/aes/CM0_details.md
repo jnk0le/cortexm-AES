@@ -87,7 +87,7 @@ Can be used on typical unstriped memories. (or with just sbox/inv_sbox in unstri
 
 Requires single cycle multipler for inverse keyschedule
 
-## perfomance
+## perfomance (cycles total)
 
 | Cipher function  | STM32F0 (0ws/1ws) - CM0_sBOX | STM32F0 (0ws/1ws) - CM0_FASTMULsBOX | STM32F0 (0ws/1ws) - CM0_d4T | STM32F0 (0ws/1ws) - CM0_d4T_FAST |
 |------------------|------------------------------|-------------------------------------|------------------------------|------------------------------|

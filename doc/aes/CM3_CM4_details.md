@@ -72,7 +72,7 @@ s0{e}^s1{b}^s2{d}^s3{9} | s1{e}^s2{b}^s3{d}^s0{9} | s2{e}^s3{b}^s0{d}^s1{9} | s3
 	sel r4, r8, r6 // if uadd carried then take reduced byte
 ```
 
-## perfomance
+## perfomance (cycles total)
 
 | Cipher function  | STM32F1 (0ws/2ws) - CM3_1T | STM32F1 (0ws/2ws) - CM3_sBOX | STM32F4 (0ws/5ws) - CM3_1T | STM32F4 - CM4_DSPsBOX |
 |------------------|----------------------------|------------------------------|----------------------------|-----------------------|

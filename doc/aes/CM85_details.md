@@ -25,7 +25,7 @@ uses diffused 4 T tables, which is fully resistant to bank timming attacks (with
 
 (only encryption is available at the moment, no keyschedules yet)
 
-## perfomance
+## perfomance (cycles total)
 
 | Cipher function  | RA8D1 - CM85_1T  | RA8D1 - CM85_d4T |
 |------------------|------------------|------------------|

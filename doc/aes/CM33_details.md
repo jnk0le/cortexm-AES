@@ -21,7 +21,7 @@ striping) SRAM memories (e.g. SRAM0-7 in rp2350)
 
 currently only encryption is available
 
-## perfomance
+## perfomance (cycles total)
 
 | Cipher function  | RP2350 - CM33_1T | RP2350 - CM33_d4T |
 |------------------|------------------|-------------------|

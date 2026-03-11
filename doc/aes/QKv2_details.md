@@ -45,7 +45,7 @@ mask = in & 0x80808080;
 out = ((in & 0x7f7f7f7f) << 1) ^ ((mask - (mask >> 7)) & 0x1b1b1b1b);
 ```
 
-## perfomance
+## perfomance (cycles total)
 
 | Cipher function  | ch32v003 (0ws/1ws) - QKv2_sBOX |
 |------------------|------------------|
