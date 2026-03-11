@@ -20,7 +20,7 @@
 // compile for compatible targets only
 #if __ARM_EABI__ && __thumb2__ && __ARM_FEATURE_DSP
 
-#include "aes/target_modes/CM7_1T/CM7_1T_AES_unrolled.inc"
+#include "aes/target_modes/CM7/CM7_1T_AES_unrolled.inc"
 
 .syntax unified
 .thumb
