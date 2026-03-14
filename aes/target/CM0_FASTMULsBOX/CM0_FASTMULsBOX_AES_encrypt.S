@@ -276,7 +276,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 	eors r7, r6 // s0^s1^s2^s3 | s1^s2^s3^s0 | s2^s3^s0^s1 | s3^s0^s1^s2
 	eors r0, r7 // s1^s2^s3 | s0^s2^s3 | s0^s1^s3 | s0^s1^s2
 
-	/*now mult r2 and eors it into r4 // r3 free
+	/* now mult r6 and eors it into r0 // r7 free
 
 	do quad multiplication according to:
 	// out = ((in & 0x7f7f7f7f) << 1) ^ (((in & 0x80808080) >> 7)) * 0x1b);
