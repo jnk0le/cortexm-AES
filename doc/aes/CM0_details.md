@@ -103,10 +103,8 @@ Requires single cycle multipler for inverse keyschedule
 
 ## perfomance (cycles total)
 
-| Cipher function  | STM32F0 (0ws/1ws) - CM0_sBOX | STM32F0 (0ws/1ws) - CM0_FASTMULsBOX | CM0_FASTMULsBOX_OTFKS |
-STM32F0 (0ws/1ws) - CM0_d4T | STM32F0 (0ws/1ws) - CM0_d4T_FAST |
-|------------------|------------------------------|-------------------------------------|-----------------------|
-------------------------------|------------------------------|
+| Cipher function  | STM32F0 (0ws/1ws) - CM0_sBOX | STM32F0 (0ws/1ws) - CM0_FASTMULsBOX | CM0_FASTMULsBOX_OTFKS | STM32F0 (0ws/1ws) - CM0_d4T | STM32F0 (0ws/1ws) - CM0_d4T_FAST |
+|------------------|------------------------------|-------------------------------------|-----------------------|------------------------------|------------------------------|
 | `setEncKey<128>` | 399/414 | (sBOX) | memcpy | 439/? | (sBOX) |
 | `setEncKey<256>` | 568/579 | (sBOX) | memcpy | 620/? | (sBOX) |
 | `encrypt<128>`   | 1646/1659 | 1567/1579 | 2525 | 1152/? | 1138/? |
