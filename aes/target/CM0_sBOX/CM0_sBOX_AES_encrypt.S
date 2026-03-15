@@ -254,7 +254,7 @@ CM0_sBOX_AES_encrypt:
 	// s0` ^= tmp ^ gmul2(s0^s1) // s1^s2^s3^gmul2(s0^s1)
 	// s1` ^= tmp ^ gmul2(s1^s2) // s0^s2^s3^gmul2(s1^s2)
 	// s2` ^= tmp ^ gmul2(s2^s3) // s0^s1^s3^gmul2(s2^s3)
-	// S3` ^= tmp ^ gmul2(s3^s0) // s0^s1^s2^gmul2(s3^s0)
+	// s3` ^= tmp ^ gmul2(s3^s0) // s0^s1^s2^gmul2(s3^s0)
 
 	// use approach with 1 more xor instead of rotation
 

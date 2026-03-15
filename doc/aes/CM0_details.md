@@ -67,6 +67,20 @@ out = ((in & 0x7f7f7f7f) << 1) ^ (((in & 0x80808080) >> 7)) * 0x1b);
 out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 ```
 
+### CM0_FASTMULsBOX_OTFKS
+
+Code density optimized implementation of CM0_FASTMULsBOX with on the fly key schedule.
+Not the smallest possible as that would sacrifice too much performance (+stack) and gains would be overshadowed by sbox itself.
+
+The inner loop is is rolled in, 4 times, over the shiftrows to reduce the duplication.
+Intermediate roundkeys are kept on stack, decryption requires fully pre iterated roundkey.
+
+C++ api holds the whole key in its context, due to compatibility and pre-processing key for decryption.
+(extracted functions can source keys directly from flash)
+
+192 bit keys are not supported in OTFKS, it's not commonly used and problematic to implement.
+256 bit keys and decryption are not available yet.
+
 ### CM0_d4T
 
 Uses the diffused 4 T tables, which is more efficient than 1T or 4T as it doesn't require
@@ -89,16 +103,18 @@ Requires single cycle multipler for inverse keyschedule
 
 ## perfomance (cycles total)
 
-| Cipher function  | STM32F0 (0ws/1ws) - CM0_sBOX | STM32F0 (0ws/1ws) - CM0_FASTMULsBOX | STM32F0 (0ws/1ws) - CM0_d4T | STM32F0 (0ws/1ws) - CM0_d4T_FAST |
-|------------------|------------------------------|-------------------------------------|------------------------------|------------------------------|
-| `setEncKey<128>` | 399/414 | (sBOX) | 439/? | (sBOX) |
-| `setEncKey<256>` | 568/579 | (sBOX) | 620/? | (sBOX) |
-| `encrypt<128>`   | 1646/1659 | 1567/1579 | 1152/? | 1138/? |
-| `encrypt<256>`   | 2306/2323 | 2195/2211 | 1588/? | 1574/? |
-| `setDecKey<128>` | 0 | 0 | 1604/? | 1500/? |
-| `setDecKey<256>` | 0 | 0 | 2308/? | 2156/? |
-| `decrypt<128>`   | 2537/2551 | 2351/2364 | 1155/? | 1132/? |
-| `decrypt<256>`   | 3589/3607 | 3323/3339 | 1591/? | 1568/? |
+| Cipher function  | STM32F0 (0ws/1ws) - CM0_sBOX | STM32F0 (0ws/1ws) - CM0_FASTMULsBOX | CM0_FASTMULsBOX_OTFKS |
+STM32F0 (0ws/1ws) - CM0_d4T | STM32F0 (0ws/1ws) - CM0_d4T_FAST |
+|------------------|------------------------------|-------------------------------------|-----------------------|
+------------------------------|------------------------------|
+| `setEncKey<128>` | 399/414 | (sBOX) | memcpy | 439/? | (sBOX) |
+| `setEncKey<256>` | 568/579 | (sBOX) | memcpy | 620/? | (sBOX) |
+| `encrypt<128>`   | 1646/1659 | 1567/1579 | 2525 | 1152/? | 1138/? |
+| `encrypt<256>`   | 2306/2323 | 2195/2211 | | 1588/? | 1574/? |
+| `setDecKey<128>` | 0 | 0 | | 1604/? | 1500/? |
+| `setDecKey<256>` | 0 | 0 | | 2308/? | 2156/? |
+| `decrypt<128>`   | 2537/2551 | 2351/2364 | | 1155/? | 1132/? |
+| `decrypt<256>`   | 3589/3607 | 3323/3339 | | 1591/? | 1568/? |
 
 STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% performance degradation)
 

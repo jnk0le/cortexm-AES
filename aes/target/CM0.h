@@ -30,6 +30,11 @@
 	void CM0_FASTMULsBOX_AES_encrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
 	void CM0_FASTMULsBOX_AES_decrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
 
+	void CM0_FASTMULsBOX_OTFKS_AES128_encrypt(const uint8_t* key, const uint8_t* in, uint8_t* out);
+	//void CM0_FASTMULsBOX_OTFKS_AES256_encrypt(const uint8_t* key, const uint8_t* in, uint8_t* out);
+	//void CM0_FASTMULsBOX_OTFKS_AES128_decrypt(const uint8_t* last_rk, const uint8_t* in, uint8_t* out);
+	//void CM0_FASTMULsBOX_OTFKS_AES256_decrypt(const uint8_t* last_rk, const uint8_t* in, uint8_t* out);
+
 	void CM0_d4T_AES_encrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
 	void CM0_d4T_AES_decrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
 
@@ -38,6 +43,10 @@
 
 	void CM0_d4T_AES_keyschedule_dec(uint8_t* rk, size_t rounds);
 	void CM0_FASTMUL_AES_keyschedule_dec(uint8_t* rk, size_t rounds);
+
+	//expands key up to the last round for OTFKS decryption
+	//void CM0_sBOX_OTFKS_AES128_keyschedule_dec(uint8_t* last_rk, const uint8_t* key);
+	//void CM0_sBOX_OTFKS_AES256_keyschedule_dec(uint8_t* last_rk, const uint8_t* key);
 
 #ifdef __cplusplus
 	}

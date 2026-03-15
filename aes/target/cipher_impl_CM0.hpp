@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
 
 #include "CM0.h"
 
@@ -87,6 +88,41 @@ namespace target {
 
 	protected:
 		static constexpr size_t key_rounds = (key_length == 128) ? 10 : ((key_length == 192) ? 12 : 14);
+	};
+
+	template<size_t key_length>
+	class CM0_FASTMULsBOX_OTFKS
+	{
+	public:
+		void key_schedule_enc(uint8_t* rk, const uint8_t* key) {
+			if (key_length == 128)
+				memcpy(rk, key, 16);
+			else
+				while(1){ asm volatile(""); } // not available yet
+		}
+
+		void key_schedule_dec(uint8_t* rk) {
+			while(1){ asm volatile(""); } // not available yet
+		}
+
+		void encrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
+			if (key_length == 128)
+				CM0_FASTMULsBOX_OTFKS_AES128_encrypt(rk, data_in, data_out);
+			else
+				while(1){ asm volatile(""); } // not available yet
+				//CM0_FASTMULsBOX_OTFKS_AES256_encrypt(rk, data_in, data_out);
+		}
+
+		void decrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
+			while(1){ asm volatile(""); } // not available yet
+		}
+
+	protected:
+		// OTFKS mode doesn't expand the key, just store 16 or 32 bytes.
+		static constexpr size_t key_rounds = (key_length == 128) ? 0 : 1; // will be (key_rounds+1)*16
+	private:
+		static_assert(key_length != 192, "192 bit keys are not supported in OTFKS");
+		static_assert(key_length != 256, "not available yet");
 	};
 
 	template<size_t key_length>
