@@ -261,7 +261,7 @@ CM0_FASTMULsBOX_AES_encrypt:
 	mov r4, r10 // 0x01010101
 	movs r5, #0x1b
 
-	// 2 registers + 1 in/out are free // column 0 comes in r3 insteadof r4, need to correct it's position before mul
+	// 2 registers + 1 in/out are free
 
 	//col 0
 	lsrs r6, r0, #8 // need to preserve input, so rors makes no diff

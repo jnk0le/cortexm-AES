@@ -133,7 +133,7 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 	mov r2, r8 // get col 0 back
 	eors r2, r1
 
-	mov r11, r1 //str r1, [sp, #16+0] // rk[0] done
+	mov r11, r1 // rk[0] done
 	str r2, [sp, #0] // state[0] done
 
 	// current allocation
@@ -356,7 +356,7 @@ keyschedule_common:
 	// outputs next rk[0] in r1
 	// touches r2
 
-	mov r1, r11 //ldr r1, [sp, #16+0] // load rk[0]
+	mov r1, r11 // load rk[0]
 
 	ldrb r2, [r4, #16+8+1]
 	ldrb r2, [r7, r2]
