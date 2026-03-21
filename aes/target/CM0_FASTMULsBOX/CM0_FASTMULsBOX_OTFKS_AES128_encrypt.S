@@ -36,8 +36,10 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 	eors r2, r6
 	eors r3, r7
 
-	push {r4-r7} // roundkey
+	push {r5-r7} // roundkey // rk[0] is kept in upper reg
 	push {r0-r3} // state
+
+	mov r11, r4 // rk[0]
 
 	mov r4, sp // can't ldrb from sp
 	movs r5, #0x1b
@@ -49,8 +51,8 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 
 	// sp
 	// +0  - state, 16 bytes
-	// +16 - roundkey, 16 bytes
-	// +32 - out ptr
+	// +16 - roundkey, 12 bytes (rk[0] is kept in r11)
+	// +28 - out ptr
 	// stacked registers
 	// stacked registers
 
@@ -66,10 +68,11 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 	// r8 - tmp c0
 	// r9 - tmp c1
 	// r10 - tmp c2
-	// r11 - ???
+	// r11 - rk[0]
 	// r12 - rcon
 	// r14 - (need lr for inner calls)
 
+	ldrb r0, [r4, #0] // skewed shiftrows
 1:
 	//state layout
 	//  +0: s00,  +1: s10,  +2: s20,  +3: s30
@@ -84,7 +87,6 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 	// c3 - s03`| s10`| s21`| s32`
 
 	// col 0
-	ldrb r0, [r4, #0]
 	ldrb r1, [r4, #5]
 	ldrb r2, [r4, #10]
 	ldrb r3, [r4, #15]
@@ -131,7 +133,7 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 	mov r2, r8 // get col 0 back
 	eors r2, r1
 
-	str r1, [sp, #16+0] // rk[0] done
+	mov r11, r1 //str r1, [sp, #16+0] // rk[0] done
 	str r2, [sp, #0] // state[0] done
 
 	// current allocation
@@ -140,13 +142,13 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 	// r2 -
 	// r3 - rcon
 
-	ldr r2, [sp, #16+4] // load rk[1]
+	ldr r2, [sp, #16+0] // load rk[1]
 	eors r2, r1
 
 	mov r1, r9 // get col 1 back
 	eors r1, r2
 
-	str r2, [sp, #16+4] // rk[1] done
+	str r2, [sp, #16+0] // rk[1] done
 	str r1, [sp, #4] // state[1] done
 
 	// current allocation
@@ -155,13 +157,13 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 	// r2 - rk[1]
 	// r3 - rcon
 
-	ldr r1, [sp, #16+8] // load rk[2]
+	ldr r1, [sp, #16+4] // load rk[2]
 	eors r1, r2
 
 	mov r2, r10 // get col 2 back
 	eors r2, r1
 
-	str r1, [sp, #16+8] // rk[2] done
+	str r1, [sp, #16+4] // rk[2] done
 	str r2, [sp, #8] // state[2] done
 
 	// current allocation
@@ -170,13 +172,15 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 	// r2 -
 	// r3 - rcon
 
-	ldr r2, [sp, #16+12] // load rk[3]
+	ldr r2, [sp, #16+8] // load rk[3]
 	eors r2, r1
 
 	eors r0, r2
 
-	str r2, [sp, #16+12] // rk[3] done
+	str r2, [sp, #16+8] // rk[3] done
 	str r0, [sp, #12] // state[3] done
+
+	ldrb r0, [r4, #0] // skewed shiftrows
 
 	lsls r3, #1 // next rcon
 	cmp r3, #0x36 // final condition
@@ -189,19 +193,18 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 	mov r12, r5 // set rcon to 0x1b
 	b 1b
 
-
 2:	// final round
 
+	// r0 extraction is skewed
 	// rcon is in r3
 	// r5, r6 are free
 
-	ldr r5, [sp, #32] // out ptr
+	ldr r5, [sp, #28] // out ptr
 
 	// col 0
 	bl keyschedule_common
 	mov r6, r1
 
-	ldrb r0, [r4, #0]
 	ldrb r1, [r4, #5]
 	ldrb r2, [r4, #10]
 	ldrb r3, [r4, #15]
@@ -211,7 +214,7 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 	str r0, [r5, #0]
 
 	// col 1
-	ldr r0, [sp, #16+4]
+	ldr r0, [sp, #16+0] // rk[1]
 	eors r6, r0
 
 	ldrb r0, [r4, #4]
@@ -224,7 +227,7 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 	str r0, [r5, #4]
 
 	// col 2
-	ldr r0, [sp, #16+8]
+	ldr r0, [sp, #16+4] // rk[2]
 	eors r6, r0
 
 	ldrb r0, [r4, #8]
@@ -237,7 +240,7 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 	str r0, [r5, #8]
 
 	// col 3
-	ldr r0, [sp, #16+12]
+	ldr r0, [sp, #16+8] // rk[3]
 	eors r6, r0
 
 	ldrb r0, [r4, #12]
@@ -250,16 +253,15 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 	str r0, [r5, #12]
 
 	//cleanup
-	add sp, #16+16+4
+	add sp, #16+12+4
 
-	pop {r0-r3} // pop to non data
+	pop {r0-r3}
 	mov r8, r0
 	mov r9, r1
 	mov r10, r2
 	mov r11, r3
 
 	pop {r4-r7, pc}
-
 
 .balign 4
 sbox_mix_inner:
@@ -354,23 +356,23 @@ keyschedule_common:
 	// outputs next rk[0] in r1
 	// touches r2
 
-	ldr r1, [sp, #16+0] // load rk[0]
+	mov r1, r11 //ldr r1, [sp, #16+0] // load rk[0]
 
-	ldrb r2, [r4, #16+12+1]
+	ldrb r2, [r4, #16+8+1]
 	ldrb r2, [r7, r2]
 	eors r1, r2
 
-	ldrb r2, [r4, #16+12+2]
+	ldrb r2, [r4, #16+8+2]
 	ldrb r2, [r7, r2]
 	lsls r2, #8
 	eors r1, r2
 
-	ldrb r2, [r4, #16+12+3]
+	ldrb r2, [r4, #16+8+3]
 	ldrb r2, [r7, r2]
 	lsls r2, #16
 	eors r1, r2
 
-	ldrb r2, [r4, #16+12+0]
+	ldrb r2, [r4, #16+8+0]
 	ldrb r2, [r7, r2]
 	lsls r2, #24
 	eors r1, r2
