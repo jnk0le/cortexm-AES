@@ -210,8 +210,6 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 
 	bl sbox_addkey_final
 
-	str r0, [r5, #0]
-
 	// col 1
 	ldr r0, [sp, #16+0] // rk[1]
 	eors r6, r0
@@ -222,8 +220,6 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 	ldrb r3, [r4, #3]
 
 	bl sbox_addkey_final
-
-	str r0, [r5, #4]
 
 	// col 2
 	ldr r0, [sp, #16+4] // rk[2]
@@ -236,8 +232,6 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 
 	bl sbox_addkey_final
 
-	str r0, [r5, #8]
-
 	// col 3
 	ldr r0, [sp, #16+8] // rk[3]
 	eors r6, r0
@@ -248,8 +242,6 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 	ldrb r3, [r4, #11]
 
 	bl sbox_addkey_final
-
-	str r0, [r5, #12]
 
 	//cleanup
 	add sp, #16+12+4
@@ -328,7 +320,7 @@ sbox_mix_inner:
 sbox_addkey_final:
 	// expect extracted elements in r0-r3 (past the shiftrows)
 	// roundkey in r6
-	// return in r0
+	// out ptr in r5 (will be incremented)
 
 	ldrb r0, [r0, r7]
 	ldrb r1, [r1, r7]
@@ -346,6 +338,8 @@ sbox_addkey_final:
 	orrs r0, r3
 
 	eors r0, r6 // apply rk
+
+	stmia r5!, {r0}
 
 	bx lr
 

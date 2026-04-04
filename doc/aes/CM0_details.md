@@ -107,7 +107,7 @@ Requires single cycle multipler for inverse keyschedule
 |---|---|---|---|---|---|
 | `setEncKey<128>` | 399/414 | (sBOX) | memcpy | 439/? | (sBOX) |
 | `setEncKey<256>` | 568/579 | (sBOX) | memcpy | 620/? | (sBOX) |
-| `encrypt<128>`   | 1646/1659 | 1567/1579 | 2506/2650 | 1152/? | 1138/? |
+| `encrypt<128>`   | 1646/1659 | 1567/1579 | 2506/2648 | 1152/? | 1138/? |
 | `encrypt<256>`   | 2306/2323 | 2195/2211 | 3751/     | 1588/? | 1574/? |
 | `setDecKey<128>` | 0 | 0 |     | 1604/? | 1500/? |
 | `setDecKey<256>` | 0 | 0 |     | 2308/? | 2156/? |
@@ -137,7 +137,7 @@ STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% perfor
 | `CM0_d4T_AES_decrypt` | 408 | 32 | uses d4Td and d4Td4 tables |
 | `CM0_d4T_FAST_AES_encrypt` | 368 | 32 | uses d4Te and sbox table |
 | `CM0_d4T_FAST_AES_decrypt` | 376 | 32 | uses d4Td and inv_sbox tables |
-| `CM0_FASTMULsBOX_OTFKS_AES128_encrypt` | 372 | 68(72) | uses sbox table, requires single cycle multiplier |
+| `CM0_FASTMULsBOX_OTFKS_AES128_encrypt` | 368 | 68(72) | uses sbox table, requires single cycle multiplier |
 | `CM0_FASTMULsBOX_OTFKS_AES256_encrypt` |  |  | uses sbox table, requires single cycle multiplier |
 
 code sizes include pc-rel constants and their padding
