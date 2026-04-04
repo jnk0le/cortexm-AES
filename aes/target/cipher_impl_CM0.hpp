@@ -95,10 +95,7 @@ namespace target {
 	{
 	public:
 		void key_schedule_enc(uint8_t* rk, const uint8_t* key) {
-			if (key_length == 128)
-				memcpy(rk, key, 16);
-			else
-				while(1){ asm volatile(""); } // not available yet
+				memcpy(rk, key, (key_length/8));
 		}
 
 		void key_schedule_dec(uint8_t* rk) {
@@ -109,8 +106,7 @@ namespace target {
 			if (key_length == 128)
 				CM0_FASTMULsBOX_OTFKS_AES128_encrypt(rk, data_in, data_out);
 			else
-				while(1){ asm volatile(""); } // not available yet
-				//CM0_FASTMULsBOX_OTFKS_AES256_encrypt(rk, data_in, data_out);
+				CM0_FASTMULsBOX_OTFKS_AES256_encrypt(rk, data_in, data_out);
 		}
 
 		void decrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
@@ -122,7 +118,6 @@ namespace target {
 		static constexpr size_t key_rounds = (key_length == 128) ? 0 : 1; // will be (key_rounds+1)*16
 	private:
 		static_assert(key_length != 192, "192 bit keys are not supported in OTFKS");
-		static_assert(key_length != 256, "not available yet");
 	};
 
 	template<size_t key_length>

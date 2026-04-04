@@ -31,7 +31,7 @@
 	void CM0_FASTMULsBOX_AES_decrypt(const uint8_t* rk, const uint8_t* in, uint8_t* out, size_t rounds);
 
 	void CM0_FASTMULsBOX_OTFKS_AES128_encrypt(const uint8_t* key, const uint8_t* in, uint8_t* out);
-	//void CM0_FASTMULsBOX_OTFKS_AES256_encrypt(const uint8_t* key, const uint8_t* in, uint8_t* out);
+	void CM0_FASTMULsBOX_OTFKS_AES256_encrypt(const uint8_t* key, const uint8_t* in, uint8_t* out);
 	//void CM0_FASTMULsBOX_OTFKS_AES128_decrypt(const uint8_t* last_rk, const uint8_t* in, uint8_t* out);
 	//void CM0_FASTMULsBOX_OTFKS_AES256_decrypt(const uint8_t* last_rk, const uint8_t* in, uint8_t* out);
 

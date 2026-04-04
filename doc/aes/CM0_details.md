@@ -72,7 +72,7 @@ out = ((in << 1) & 0xfefefefe) ^ (((in >> 7) & 0x01010101) * 0x1b)
 Density optimized implementation of CM0_FASTMULsBOX with on the fly key schedule.
 Not the smallest possible as that would sacrifice too much performance for minimal gains.
 
-The inner loop is is rolled in, 4 times, over the sbox and mixcolumns, to reduce the duplication.
+The inner loop is is rolled in, 4 times, to reduce the duplication.
 Intermediate roundkeys are kept on stack, decryption requires fully pre iterated roundkey.
 
 C++ api holds the whole key in its context, due to compatibility and pre-processing key for decryption.
@@ -108,7 +108,7 @@ Requires single cycle multipler for inverse keyschedule
 | `setEncKey<128>` | 399/414 | (sBOX) | memcpy | 439/? | (sBOX) |
 | `setEncKey<256>` | 568/579 | (sBOX) | memcpy | 620/? | (sBOX) |
 | `encrypt<128>`   | 1646/1659 | 1567/1579 | 2506/2650 | 1152/? | 1138/? |
-| `encrypt<256>`   | 2306/2323 | 2195/2211 |      | 1588/? | 1574/? |
+| `encrypt<256>`   | 2306/2323 | 2195/2211 | 3751/     | 1588/? | 1574/? |
 | `setDecKey<128>` | 0 | 0 |     | 1604/? | 1500/? |
 | `setDecKey<256>` | 0 | 0 |     | 2308/? | 2156/? |
 | `decrypt<128>`   | 2537/2551 | 2351/2364 |      | 1155/? | 1132/? |
@@ -138,6 +138,7 @@ STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% perfor
 | `CM0_d4T_FAST_AES_encrypt` | 368 | 32 | uses d4Te and sbox table |
 | `CM0_d4T_FAST_AES_decrypt` | 376 | 32 | uses d4Td and inv_sbox tables |
 | `CM0_FASTMULsBOX_OTFKS_AES128_encrypt` | 372 | 68(72) | uses sbox table, requires single cycle multiplier |
+| `CM0_FASTMULsBOX_OTFKS_AES256_encrypt` |  |  | uses sbox table, requires single cycle multiplier |
 
 code sizes include pc-rel constants and their padding
 
