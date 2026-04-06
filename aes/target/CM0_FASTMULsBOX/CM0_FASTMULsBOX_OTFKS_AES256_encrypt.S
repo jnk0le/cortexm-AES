@@ -42,15 +42,12 @@ CM0_FASTMULsBOX_OTFKS_AES256_encrypt:
 	eors r3, r7
 
 	push {r0-r3}
-	sub sp, #16
 
 	// initially
-	add r4, sp, #48 // first iteration uses upper half
+	add r4, sp, #32 // first iteration uses upper half
 	mov r11, r4
 
-	add r4, sp, #16 // can't ldrb from sp
-
-
+	mov r4, sp // can't ldrb from sp
 
 	movs r5, #0x1b
 	ldr r6, =0x01010101
@@ -59,36 +56,41 @@ CM0_FASTMULsBOX_OTFKS_AES256_encrypt:
 	movs r0, #1 // rcon
 	mov r12, r0
 
-
-
 	// sp
-	// +0  - state intermediate
-	// +16 - state, extracted
-	// +32 - roundkey 0-3
-	// +48 - roundkey 4-7, applied in even rounds
+	// +0 - state, extracted
+	// +16 - roundkey 0-3
+	// +32 - roundkey 4-7
 
-	// +64 - out ptr
+	// +48 - out ptr
 	// stacked registers
 	// stacked registers
-
-
-	
-
 
 	// global allocation
 	// r4 - pointer to state, for byte extractions
 	// r5 - 0x1b (tmp for keyschedule)
 	// r6 - 0x01010101
 	// r7 - sbox
-	// r8 -
-	// r9 -
-	// r10 -
+	// r8 - tmp c0
+	// r9 - tmp c1
+	// r10 - tmp c2
 	// r11 - current rk half ptr
 	// r12 - rcon
 	// r14 - (need lr for inner calls)
 
 .balign 4
 1:
+	//state layout
+	//  +0: s00,  +1: s10,  +2: s20,  +3: s30
+	//  +4: s01,  +5: s11,  +6: s21,  +7: s31
+	//  +8: s02,  +9: s12, +10: s22, +11: s32
+	// +12: s03, +13: s13, +14: s23, +15: s33
+
+	//final
+	// c0 - s00`| s11`| s22`| s33`
+	// c1 - s01`| s12`| s23`| s30`
+	// c2 - s02`| s13`| s20`| s31`
+	// c3 - s03`| s10`| s21`| s32`
+
 	// col 0
 	ldrb r0, [r4, #0]
 	ldrb r1, [r4, #5]
@@ -97,7 +99,7 @@ CM0_FASTMULsBOX_OTFKS_AES256_encrypt:
 
 	bl sbox_mix_inner
 
-	str r0, [sp, #0]
+	mov r8, r0
 
 	// col 1
 	ldrb r0, [r4, #4]
@@ -107,7 +109,7 @@ CM0_FASTMULsBOX_OTFKS_AES256_encrypt:
 
 	bl sbox_mix_inner
 
-	str r0, [sp, #4]
+	mov r9, r0
 
 	// col 2
 	ldrb r0, [r4, #8]
@@ -117,7 +119,7 @@ CM0_FASTMULsBOX_OTFKS_AES256_encrypt:
 
 	bl sbox_mix_inner
 
-	str r0, [sp, #8]
+	mov r10, r0
 
 	// col 3
 	ldrb r0, [r4, #12]
@@ -127,42 +129,42 @@ CM0_FASTMULsBOX_OTFKS_AES256_encrypt:
 
 	bl sbox_mix_inner
 
-	str r0, [sp, #12]
+	// c3 stays in r0
 
 	// addrounkey
 	mov r3, r11 // get working rk
 
 	// col0
 	ldr r1, [r3, #0]
-	ldr r2, [sp, #0]
+	mov r2, r8
 	eors r1, r2
 	str r1, [r4, #0]
 
 	// col1
 	ldr r1, [r3, #4]
-	ldr r2, [sp, #4]
+	mov r2, r9
 	eors r1, r2
 	str r1, [r4, #4]
 
 	// col2
 	ldr r1, [r3, #8]
-	ldr r2, [sp, #8]
+	mov r2, r10
 	eors r1, r2
 	str r1, [r4, #8]
 
 	// col3
 	ldr r1, [r3, #12]
-	ldr r2, [sp, #12]
-	eors r1, r2
+	eors r1, r0
 	str r1, [r4, #12]
 
-	add r0, sp, #32
-	cmp r11, r0 // check if even/odd round was applied
+	// keyschedule
+	add r0, sp, #16
+	cmp r11, r0 // check if even/odd roundkey was applied
 
 	bne 2f // not secret
 
 	// rk0-4 has been applied, g transform
-	add r3, sp, #48
+	add r3, sp, #32
 	mov r11, r3 // swap working rk for next addroundkey
 
 	// extract
@@ -200,10 +202,10 @@ CM0_FASTMULsBOX_OTFKS_AES256_encrypt:
 	// final round
 	// r5, r6 are free
 
-	ldr r5, [sp, #64] // out ptr
+	ldr r5, [sp, #48] // out ptr
 
 	// col 0
-	ldr r6, [sp, #32+0] // rk[0]
+	ldr r6, [sp, #16+0] // rk[0]
 
 	ldrb r0, [r4, #0]
 	ldrb r1, [r4, #5]
@@ -213,7 +215,7 @@ CM0_FASTMULsBOX_OTFKS_AES256_encrypt:
 	bl sbox_addkey_final
 
 	// col 1
-	ldr r6, [sp, #32+4] // rk[1]
+	ldr r6, [sp, #16+4] // rk[1]
 
 	ldrb r0, [r4, #4]
 	ldrb r1, [r4, #9]
@@ -223,7 +225,7 @@ CM0_FASTMULsBOX_OTFKS_AES256_encrypt:
 	bl sbox_addkey_final
 
 	// col 2
-	ldr r6, [sp, #32+8] // rk[2]
+	ldr r6, [sp, #16+8] // rk[2]
 
 	ldrb r0, [r4, #8]
 	ldrb r1, [r4, #13]
@@ -233,7 +235,7 @@ CM0_FASTMULsBOX_OTFKS_AES256_encrypt:
 	bl sbox_addkey_final
 
 	// col 3
-	ldr r6, [sp, #32+12] // rk[3]
+	ldr r6, [sp, #16+12] // rk[3]
 
 	ldrb r0, [r4, #12]
 	ldrb r1, [r4, #1]
@@ -243,7 +245,7 @@ CM0_FASTMULsBOX_OTFKS_AES256_encrypt:
 	bl sbox_addkey_final
 
 	//cleanup
-	add sp, #64+4
+	add sp, #16+32+4
 
 	pop {r0-r3}
 	mov r8, r0
@@ -258,7 +260,7 @@ CM0_FASTMULsBOX_OTFKS_AES256_encrypt:
 .balign 4
 keyschedule_inner:
 	// expect extracted elements in r0-r3 (past the shiftrows), rcon in r5
-	// r5 is restored
+	// r5 is restored to 0x1b
 
 	ldrb r0, [r0, r7]
 	ldrb r1, [r1, r7]
