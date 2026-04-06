@@ -174,12 +174,7 @@ CM0_FASTMULsBOX_OTFKS_AES256_encrypt:
 	ldrb r0, [r0, #12+0] // lsl0
 
 	movs r5, #0 // fake rcon
-	//inc rcon here???
-
-	bl keyschedule_inner
-
-	b 1b
-
+	b 3f
 2:
 	// rk4-7 has been applied, rotword, rcon, finish
 	mov r11, r0 // swap working rk for next addroundkey
@@ -193,8 +188,38 @@ CM0_FASTMULsBOX_OTFKS_AES256_encrypt:
 	mov r5, r12 // get rcon
 	add r12, r12 // left shift rcon by 1
 
-	bl keyschedule_inner
+	// common keyschedule
+3:
+	ldrb r0, [r0, r7]
+	ldrb r1, [r1, r7]
+	ldrb r2, [r2, r7]
+	ldrb r3, [r3, r7]
 
+	//pack it
+	lsls r1, #8
+	lsls r2, #16
+	lsls r3, #24
+
+	orrs r3, r0
+	orrs r3, r1
+	orrs r3, r2
+
+	eors r5, r3 // apply rcon, keep in r5
+
+	mov r3, r11 // get next rk
+	ldm r3, {r0-r3}
+
+	eors r0, r5
+	eors r1, r0
+	eors r2, r1
+	eors r3, r2
+
+	mov r5, r11 // get rk again
+	stmia r5!, {r0-r3}
+
+	movs r5, #0x1b // restore r5
+
+	// faster to run comparison every loop than separating common into function
 	movs r0, #0x80
 	cmp r0, r12
 	bne 1b
@@ -254,43 +279,6 @@ CM0_FASTMULsBOX_OTFKS_AES256_encrypt:
 	mov r11, r3
 
 	pop {r4-r7, pc}
-
-
-// inline after some branching ??
-.balign 4
-keyschedule_inner:
-	// expect extracted elements in r0-r3 (past the shiftrows), rcon in r5
-	// r5 is restored to 0x1b
-
-	ldrb r0, [r0, r7]
-	ldrb r1, [r1, r7]
-	ldrb r2, [r2, r7]
-	ldrb r3, [r3, r7]
-
-	lsls r1, #8
-	lsls r2, #16
-	lsls r3, #24
-
-	orrs r3, r0
-	orrs r3, r1
-	orrs r3, r2
-
-	eors r5, r3 // apply rcon, keep in r5
-
-	mov r3, r11 // get next rk
-	ldm r3, {r0-r3}
-
-	eors r0, r5
-	eors r1, r0
-	eors r2, r1
-	eors r3, r2
-
-	mov r5, r11 // get rk again
-	stmia r5!, {r0-r3}
-
-	movs r5, #0x1b // restore r5
-
-	bx lr
 
 .balign 4
 sbox_mix_inner:
@@ -380,6 +368,5 @@ sbox_addkey_final:
 	stmia r5!, {r0}
 
 	bx lr
-
 
 #endif
