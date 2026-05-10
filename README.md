@@ -31,6 +31,7 @@ However in some cases it's still possible when running at reduced clock, with fl
 - included unit tests don't cover timming leaks. Performance difference on different runs may not be a data dependent ones.
 (there are special tools like [dudect](https://eprint.iacr.org/2016/1123.pdf) for that, some attack scenarios require
 a more sophisticated setup than just timming on the randomized data)
+- "on the fly key schedule" (OTFKS) implementations are available only for selected targets
 
 ## cryptoanalysis 
 
@@ -85,6 +86,8 @@ Table based implementations are implemented accoding to:
 https://luca-giuzzi.unibs.it/corsi/Support/papers-cryptography/gcm-spec.pdf
 The GCM context needs to be placed in uncached SRAM/TCM memory (required by M tables only).
 Currently M tables are not align protected from spanning 2 different memory banks.
+
+Generic shoup implementations are not protected form bank timming attacks.
 
 The generic FULL-table implementations are not recommended as the 4 bit version doesn't improve speed enough
 (on M33 it's even slower) and 8 bit one requires unrealistic amount of uncached memory.
