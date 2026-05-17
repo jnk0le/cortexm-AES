@@ -79,7 +79,7 @@ C++ api holds the whole key in its context, due to compatibility and pre-process
 (extracted functions can source keys directly from flash)
 
 192 bit keys are not supported in OTFKS, it's not commonly used and problematic to implement.
-Decryption is not available yet.
+256 bit decryption is not available yet.
 
 ### CM0_d4T
 
@@ -109,9 +109,9 @@ Requires single cycle multipler for inverse keyschedule
 | `setEncKey<256>` | 568/579 | (sBOX) | memcpy | 620/? | (sBOX) |
 | `encrypt<128>`   | 1646/1659 | 1567/1579 | 2506/2648 | 1152/? | 1138/? |
 | `encrypt<256>`   | 2306/2323 | 2195/2211 | 3558/3735 | 1588/? | 1574/? |
-| `setDecKey<128>` | 0 | 0 |     | 1604/? | 1500/? |
-| `setDecKey<256>` | 0 | 0 |     | 2308/? | 2156/? |
-| `decrypt<128>`   | 2537/2551 | 2351/2364 |      | 1155/? | 1132/? |
+| `setDecKey<128>` | 0 | 0 | 349/362 | 1604/? | 1500/? |
+| `setDecKey<256>` | 0 | 0 |         | 2308/? | 2156/? |
+| `decrypt<128>`   | 2537/2551 | 2351/2364 | 3156/3273 | 1155/? | 1132/? |
 | `decrypt<256>`   | 3589/3607 | 3323/3339 |      | 1591/? | 1568/? |
 
 STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% performance degradation)
@@ -137,8 +137,13 @@ STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% perfor
 | `CM0_d4T_AES_decrypt` | 408 | 32 | uses d4Td and d4Td4 tables |
 | `CM0_d4T_FAST_AES_encrypt` | 368 | 32 | uses d4Te and sbox table |
 | `CM0_d4T_FAST_AES_decrypt` | 376 | 32 | uses d4Td and inv_sbox tables |
-| `CM0_FASTMULsBOX_OTFKS_AES128_encrypt` | 368 | 68(72) | uses sbox table, requires single cycle multiplier |
-| `CM0_FASTMULsBOX_OTFKS_AES256_encrypt` | 376 | 88 | uses sbox table, requires single cycle multiplier |
+| `CM0_FASTMULsBOX_OTFKS_AES128_encrypt` | 368 | 68(72) | uses sbox table, requires single cycle multiplier, sensitive data (partially processed) visits stack |
+| `CM0_FASTMULsBOX_OTFKS_AES256_encrypt` | 376 | 88 | uses sbox table, requires single cycle multiplier, sensitive data (partially processed) visits stack |
+| `CM0_sBOX_OTFKS_AES128_keyschedule_dec` | 76 | 16 | uses sbox table |
+| `CM0_sBOX_OTFKS_AES256_keyschedule_dec` | | | uses sbox table |
+| `CM0_FASTMULsBOX_OTFKS_AES128_decrypt` | 394 | 72 | uses sbox and inv_sbox tables, requires single cycle multiplier, sensitive data (partially processed) visits stack |
+| `CM0_FASTMULsBOX_OTFKS_AES256_decrypt` |  |  | uses sbox and inv_sbox tables, requires single cycle multiplier, sensitive data (partially processed) visits stack |
+
 
 code sizes include pc-rel constants and their padding
 

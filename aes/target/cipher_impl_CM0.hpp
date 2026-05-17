@@ -99,7 +99,10 @@ namespace target {
 		}
 
 		void key_schedule_dec(uint8_t* rk) {
-			while(1){ asm volatile(""); } // not available yet
+			if (key_length == 128)
+				CM0_sBOX_OTFKS_AES128_keyschedule_dec(rk, rk); // rk has been populated with key
+			else
+				while(1){ asm volatile(""); } // not available yet
 		}
 
 		void encrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
@@ -110,7 +113,10 @@ namespace target {
 		}
 
 		void decrypt(const uint8_t* rk, const uint8_t* data_in, uint8_t* data_out) {
-			while(1){ asm volatile(""); } // not available yet
+			if (key_length == 128)
+				CM0_FASTMULsBOX_OTFKS_AES128_decrypt(rk, data_in, data_out);
+			else
+				while(1){ asm volatile(""); } // not available yet
 		}
 
 	protected:
