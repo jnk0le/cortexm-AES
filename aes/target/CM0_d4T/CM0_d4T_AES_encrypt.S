@@ -72,7 +72,6 @@ CM0_d4T_AES_encrypt:
 	// r2 - s02T ^ s13T ^ s20T ^ s31T
 	// r3 - s03T ^ s10T ^ s21T ^ s32T
 
-.balign 4
 1:
 	mov r3, r9 // skip 3 additions on row0
 

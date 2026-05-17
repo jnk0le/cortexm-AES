@@ -33,7 +33,7 @@ However in some cases it's still possible when running at reduced clock, with fl
 a more sophisticated setup than just timming on the randomized data)
 - "on the fly key schedule" (OTFKS) implementations are available only for selected targets
 
-## cryptoanalysis 
+## cryptoanalysis
 
 some of the cryptoanalysis works/papers, that tested one or more of the provided implementations.
 

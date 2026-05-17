@@ -31,6 +31,7 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 	ldmia r0!, {r4-r7} // load key
 	ldm r1, {r0-r3} // load input
 
+	// initial addroundkey
 	eors r0, r4
 	eors r1, r5
 	eors r2, r6
@@ -243,7 +244,7 @@ CM0_FASTMULsBOX_OTFKS_AES128_encrypt:
 
 	bl sbox_addkey_final
 
-	//cleanup
+	// cleanup
 	add sp, #16+12+4
 
 	pop {r0-r3}

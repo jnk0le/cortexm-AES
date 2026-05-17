@@ -36,6 +36,7 @@ CM0_FASTMULsBOX_OTFKS_AES256_encrypt:
 	mov r7, r8
 	ldm r7, {r4-r7} // load data
 
+	// initial addroundkey
 	eors r0, r4
 	eors r1, r5
 	eors r2, r6
@@ -77,7 +78,6 @@ CM0_FASTMULsBOX_OTFKS_AES256_encrypt:
 	// r12 - rcon
 	// r14 - (need lr for inner calls)
 
-.balign 4
 1:
 	//state layout
 	//  +0: s00,  +1: s10,  +2: s20,  +3: s30
