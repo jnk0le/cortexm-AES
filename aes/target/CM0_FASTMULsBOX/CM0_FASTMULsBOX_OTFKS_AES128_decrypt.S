@@ -68,7 +68,7 @@ CM0_FASTMULsBOX_OTFKS_AES128_decrypt:
 
 	// global allocation
 	// r4 - pointer to sp, for byte extractions (sp+16 for keyschedules)
-	// r5 - tmp
+	// r5 - tmp (0x1b)
 	// r6 - 0x01010101
 	// r7 - inv_sbox
 	// r8 - tmp c1

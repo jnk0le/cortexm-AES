@@ -285,10 +285,10 @@ sbox_mix_inner:
 	// expect extracted elements in r0-r3 (past the shiftrows)
 	// return in r0
 
-	ldrb r0, [r0, r7]
-	ldrb r1, [r1, r7]
-	ldrb r2, [r2, r7]
-	ldrb r3, [r3, r7]
+	ldrb r0, [r7, r0]
+	ldrb r1, [r7, r1]
+	ldrb r2, [r7, r2]
+	ldrb r3, [r7, r3]
 
 	// pack it
 	lsls r1, #8
@@ -348,10 +348,10 @@ sbox_addkey_final:
 	// roundkey in r6
 	// out ptr in r5 (will be incremented)
 
-	ldrb r0, [r0, r7]
-	ldrb r1, [r1, r7]
-	ldrb r2, [r2, r7]
-	ldrb r3, [r3, r7]
+	ldrb r0, [r7, r0]
+	ldrb r1, [r7, r1]
+	ldrb r2, [r7, r2]
+	ldrb r3, [r7, r3]
 
 	// pack it
 	lsls r1, #8
