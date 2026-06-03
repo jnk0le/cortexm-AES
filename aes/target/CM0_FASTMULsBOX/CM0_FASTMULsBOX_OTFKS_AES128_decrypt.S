@@ -19,7 +19,6 @@
 .text
 
 .balign 4
-	nop // align loop entry
 // void CM0_FASTMULsBOX_OTFKS_AES128_decrypt(const uint8_t* last_rk, const uint8_t* in, uint8_t* out) {
 .global CM0_FASTMULsBOX_OTFKS_AES128_decrypt
 .type   CM0_FASTMULsBOX_OTFKS_AES128_decrypt,%function
@@ -45,16 +44,16 @@ CM0_FASTMULsBOX_OTFKS_AES128_decrypt:
 
 	add r4, sp, #16 // keyschedule restores it to sp
 
-	ldr r6, =0x01010101
+	adr r7, aes_dec_constants
+	ldm r7, {r5,r6,r7}
+
+	mov r11, r5 // AES_sbox
+
 	movs r5, #0x36 // initial rcon
+	mov r12, r5 // store rcon as expected by keyschedule
 
-	ldr r7, =AES_inv_sbox
-	mov r12, r5 // store rcon
-
-	ldr r5, =AES_sbox
-	mov r11, r5
-
-	bl inv_keyschedule // leaves rcon in r5
+	b skipto_keyschedule
+	// unaligned by 2 bytes here
 
 	// sp
 	// +0  - state, 16 bytes
@@ -77,6 +76,9 @@ CM0_FASTMULsBOX_OTFKS_AES128_decrypt:
 	// r11 - sbox (for keyschedule)
 	// r12 - rcon
 	// r14 - (need lr for inner calls)
+
+rcon_reduce: // unaligned position, preserve alignment of main loop
+	movs r5, #0x80 // actually a reduction by 0x8D
 
 1:
 	mov r12, r5 // restore rcon
@@ -144,13 +146,63 @@ CM0_FASTMULsBOX_OTFKS_AES128_decrypt:
 	mov r3, r10
 
 	stmia r4!, {r0-r3} // store state
-	// r4 now points to roundkey, will be restored in keyschedule
+	// r4 now points to roundkey
 
-	//keyschedule for next round
-	bl inv_keyschedule
-	// rcon is in r5, already shifted
+	// keyschedule for next round
+skipto_keyschedule:
 
-	// condition flags come from shift inside keyschedule, reduce when carried with 0x0d left
+	// load roundkey, r4 is now free
+	ldmia r4!, {r0-r3}
+
+	// undo keyschedule step
+	eors r3, r2
+	eors r2, r1
+	eors r1, r0
+
+	mov r4, r11 // get sbox
+
+	// current allocation
+	// r0 - rk[0]
+	// r1 - rk[1]`
+	// r2 - rk[2]`
+	// r3 - rk[3]`
+	// r4 - sbox
+	// r5 -
+
+	lsrs r5, r3, #8
+	uxtb r5, r5
+	ldrb r5, [r4, r5]
+	eors r0, r5
+
+	lsrs r5, r3, #16
+	uxtb r5, r5
+	ldrb r5, [r4, r5]
+	lsls r5, #8
+	eors r0, r5
+
+	lsrs r5, r3, #24
+	ldrb r5, [r4, r5]
+	lsls r5, #16
+	eors r0, r5
+
+	uxtb r5, r3
+	ldrb r5, [r4, r5]
+	lsls r5, #24
+	eors r0, r5
+
+	mov r5, r12 // get rcon
+
+	eors r0, r5 // apply rcon
+
+	// preserve next roundkey
+	add r4, sp, #16
+	stmia r4!, {r0-r3}
+
+	mov r4, sp // restore r4 for shiftrows
+
+	lsrs r5, #1 // next rcon
+
+	// reduce rcon when carried with 0x0d left
 	// branch away as this is done only once
 	// `hi` condition checks for carry set and zero cleared (have to finish loop when reached zero)
 	bhi rcon_reduce // rcon is not secret
@@ -213,11 +265,6 @@ CM0_FASTMULsBOX_OTFKS_AES128_decrypt:
 	mov r11, r3
 
 	pop {r4-r7, pc}
-
-.balign 4
-rcon_reduce:
-	movs r5, #0x80 // actually a reduction by 0x8D
-	b 1b // continue loop
 
 .balign 4
 inv_sbox_addkey_mix_inner:
@@ -284,7 +331,7 @@ inv_sbox_addkey_mix_inner:
 	eors r3, r5 // S{8}
 
 	// r0 - S{1}
-	// r1 -	S{2}
+	// r1 - S{2}
 	// r2 - S{4}
 	// r3 - S{8}
 	// r5 -
@@ -346,62 +393,9 @@ inv_sbox_addkey_inner_final:
 	bx lr
 
 .balign 4
-inv_keyschedule:
-	// expect pointer to roundkey in r4
-	// return rcon in r5
-	// rcon is shifted and reduced here, status flags can be used upon return
-
-	// load roundkey, r4 is now free
-	ldmia r4!, {r0-r3}
-
-	// undo keyschedule step
-	eors r3, r2
-	eors r2, r1
-	eors r1, r0
-
-	mov r4, r11 // get sbox
-
-	// current allocation
-	// r0 - rk[0]
-	// r1 - rk[1]`
-	// r2 - rk[2]`
-	// r3 - rk[3]`
-	// r4 - sbox
-	// r5 -
-
-	lsrs r5, r3, #8
-	uxtb r5, r5
-	ldrb r5, [r4, r5]
-	eors r0, r5
-
-	lsrs r5, r3, #16
-	uxtb r5, r5
-	ldrb r5, [r4, r5]
-	lsls r5, #8
-	eors r0, r5
-
-	lsrs r5, r3, #24
-	ldrb r5, [r4, r5]
-	lsls r5, #16
-	eors r0, r5
-
-	uxtb r5, r3
-	ldrb r5, [r4, r5]
-	lsls r5, #24
-	eors r0, r5
-
-	mov r5, r12 // get rcon
-
-	eors r0, r5 // apply rcon
-
-	// preserve next roundkey
-	add r4, sp, #16
-	stmia r4!, {r0-r3}
-
-	mov r4, sp // restore r4 for shiftrows
-
-	lsrs r5, #1 // next rcon
-
-	bx lr
+aes_dec_constants:
+	.long AES_sbox
+	.long 0x01010101
+	.long AES_inv_sbox
 
 #endif

@@ -111,7 +111,7 @@ Requires single cycle multipler for inverse keyschedule
 | `encrypt<256>`   | 2306/2323 | 2195/2211 | 3558/3735 | 1588/? | 1574/? |
 | `setDecKey<128>` | 0 | 0 | 349/362 | 1604/? | 1500/? |
 | `setDecKey<256>` | 0 | 0 |         | 2308/? | 2156/? |
-| `decrypt<128>`   | 2537/2551 | 2351/2364 | 3156/3273 | 1155/? | 1132/? |
+| `decrypt<128>`   | 2537/2551 | 2351/2364 | 3089/3187 | 1155/? | 1132/? |
 | `decrypt<256>`   | 3589/3607 | 3323/3339 |      | 1591/? | 1568/? |
 
 STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% performance degradation)
@@ -141,8 +141,8 @@ STM32F0 is cortex-m0 (prefetch enabled for 1ws, no prefetch leads to ~45% perfor
 | `CM0_FASTMULsBOX_OTFKS_AES256_encrypt` | 376 | 88 | uses sbox table, requires single cycle multiplier, sensitive data (partially processed and roundkey) visits stack |
 | `CM0_sBOX_OTFKS_AES128_keyschedule_dec` | 76 | 16 | uses sbox table |
 | `CM0_sBOX_OTFKS_AES256_keyschedule_dec` | | | uses sbox table |
-| `CM0_FASTMULsBOX_OTFKS_AES128_decrypt` | 394 | 72 | uses sbox and inv_sbox tables, requires single cycle multiplier, sensitive data (partially processed and key) visits stack |
-| `CM0_FASTMULsBOX_OTFKS_AES256_decrypt` |  |  | uses sbox and inv_sbox tables, requires single cycle multiplier, sensitive data (partially processed and key) visits stack |
+| `CM0_FASTMULsBOX_OTFKS_AES128_decrypt` | 380 | 72 | uses sbox and inv_sbox tables, requires single cycle multiplier, sensitive data (partially processed and roundkey) visits stack |
+| `CM0_FASTMULsBOX_OTFKS_AES256_decrypt` |  |  | uses sbox and inv_sbox tables, requires single cycle multiplier, sensitive data (partially processed and roundkey) visits stack |
 
 
 code sizes include pc-rel constants and their padding
