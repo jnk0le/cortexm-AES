@@ -84,10 +84,11 @@ All implementations are currently based on CTR_32 class. (there will be fused ct
 
 Table based implementations are implemented accoding to:
 https://luca-giuzzi.unibs.it/corsi/Support/papers-cryptography/gcm-spec.pdf
+
 The GCM context needs to be placed in uncached SRAM/TCM memory (required by M tables only).
 Currently M tables are not align protected from spanning 2 different memory banks.
 
-Generic shoup implementations are not protected form bank timming attacks.
+Generic shoup implementations are not protected from bank timming attacks.
 
 The generic FULL-table implementations are not recommended as the 4 bit version doesn't improve speed enough
 (on M33 it's even slower) and 8 bit one requires unrealistic amount of uncached memory.
