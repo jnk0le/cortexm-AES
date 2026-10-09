@@ -18,19 +18,19 @@ No cmake yet.
 - asm functions (and CM*.h headers) can be extracted and used as C only code, but that may require extra boilerplate code (structures etc.)
 - C++ API doesn't use exceptions nor dynamic memory allocation
 - Do not use base implementations (ECB mode) for any serious encryption. It's provided for building proper modes.
-- Do not blindly trust in timming constantness of LUT based ciphers since it depends on many factors that are 
+- Do not blindly trust in timing constantness of LUT based ciphers since it depends on many factors that are 
 unknown or just implementation defined like section placement or pipeline suprises (you need to verify it, especially where is `.data` 
 section).
 - LUT tables have to be placed in deterministic memory section, usally TCMs and non-waitstated SRAMs (by default it lands in `.data` section)
 - FLASH memory is unsafe even on simplest cortex m0(+) as there might be a prefetcher with a few entry cache (like stm32f0/l0).
 However in some cases it's still possible when running at reduced clock, with flash configured to 0ws and explicitly disabled prefetch.
 - None of the currently available implementations protects against power/EMI analysis or glitch attacks.
-- using implementations on wrong microarchitecture might introduce timming leaks (e.g. CM3_1T run on CM7).
+- using implementations on wrong microarchitecture might introduce timing leaks (e.g. CM3_1T run on CM7).
 - Unrolled implementations might perform slower than looped versions due to (usually LRU) cache pressure and flash waitstates. (like STM32F4 with 1K ART cache and up to 8WS)
 - for optimization gimmicks refer to [pipeline cycle test repo](https://github.com/jnk0le/random/tree/master/pipeline%20cycle%20test)
-- included unit tests don't cover timming leaks. Performance difference on different runs may not be a data dependent ones.
+- included unit tests don't cover timing leaks. Performance difference on different runs may not be a data dependent ones.
 (there are special tools like [dudect](https://eprint.iacr.org/2016/1123.pdf) for that, some attack scenarios require
-a more sophisticated setup than just timming on the randomized data)
+a more sophisticated setup than just timing on the randomized data)
 - "on the fly key schedule" (OTFKS) implementations are available only for selected targets
 
 ## cryptoanalysis
@@ -88,7 +88,7 @@ https://luca-giuzzi.unibs.it/corsi/Support/papers-cryptography/gcm-spec.pdf
 The GCM context needs to be placed in uncached SRAM/TCM memory (required by M tables only).
 Currently M tables are not align protected from spanning 2 different memory banks.
 
-Generic shoup implementations are not protected from bank timming attacks.
+Generic shoup implementations are not protected from bank timing attacks.
 
 The generic FULL-table implementations are not recommended as the 4 bit version doesn't improve speed enough
 (on M33 it's even slower) and 8 bit one requires unrealistic amount of uncached memory.

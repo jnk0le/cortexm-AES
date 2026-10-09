@@ -87,7 +87,7 @@ Uses the diffused 4 T tables, which is more efficient than 1T or 4T as it doesn'
 rotations or increasing register pressure with 4 pointers. Left shifts by 4 are essentially free
 as the AGU doesn't have scaled addressing mode.
 
-Fully resistant to bank timming attacks on 2 or 4 banked (by word
+Fully resistant to bank timing attacks on 2 or 4 banked (by word
 striping) SRAM memories (e.g. SRAM0-3 in rp2040)
 
 ### CM0_d4T_FAST

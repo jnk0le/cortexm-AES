@@ -14,7 +14,7 @@
 
 #### CTR32_CM3_1T
 
-Implements counter mode caching. Do not use if IV/counter is secret as it will lead to a timming leak of a single byte, every 256 aligned counter steps.
+Implements counter mode caching. Do not use if IV/counter is secret as it will lead to a timing leak of a single byte, every 256 aligned counter steps.
 
 #### CTR32_CM3_1T_unrolled
 
@@ -48,7 +48,7 @@ extra 4 bytes on stack comes from aligning stack to 8 bytes on ISR entry.
 
 #### CTR32_CM7_1T
 
-Implements counter mode caching. Do not use if IV/counter is secret as it will lead to a timming leak of a single byte, every 256 aligned counter steps.
+Implements counter mode caching. Do not use if IV/counter is secret as it will lead to a timing leak of a single byte, every 256 aligned counter steps.
 
 Preloads input data in case it's in SDRAM or QSPI memory.
 
